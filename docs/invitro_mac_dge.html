@@ -17,7 +17,7 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -382,7 +382,7 @@ div.tocify {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">tcga_macs</a>
+      <a class="navbar-brand" href="index.html">Macrophage signatures in TCGA</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -526,10 +526,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree13ee5e07deb1c432977fc7f2d21d334232961afdtargetblank13ee5e0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/13ee5e07deb1c432977fc7f2d21d334232961afd" target="_blank">13ee5e0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9910c1dc1011a4b29711916c5e257236b0e15659targetblank9910c1da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9910c1dc1011a4b29711916c5e257236b0e15659" target="_blank">9910c1d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree13ee5e07deb1c432977fc7f2d21d334232961afdtargetblank13ee5e0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9910c1dc1011a4b29711916c5e257236b0e15659targetblank9910c1da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -576,6 +576,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/17f3020720fb6faa9b18e0fae66c7741d157c6d3/analysis/invitro_mac_dge.Rmd" target="_blank">17f3020</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+beginning the text on the homepage
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/6dc88381bf3cf9dd2d2ccb88e8e9467bbd9bd590/docs/invitro_mac_dge.html" target="_blank">6dc8838</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -642,50 +676,9 @@ citations added and packages loaded
 <pre><code>Xue J, Schmidt SV, Sander J, Draffehn A et al. Transcriptome-based network analysis reveals a spectrum model of human macrophage activation. Immunity 2014 Feb 20;40(2):274-88. PMID: 24530056</code></pre>
 <p>Clear workspace prior to analysis and load necessary packages</p>
 <pre class="r"><code>rm(list=ls())</code></pre>
-<pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
-<pre><code>── Attaching packages ──────────────────────────────── tidyverse 1.2.1 ──</code></pre>
-<pre><code>✔ ggplot2 3.1.1       ✔ purrr   0.3.2  
-✔ tibble  2.1.1       ✔ dplyr   0.8.0.1
-✔ tidyr   0.8.3       ✔ stringr 1.4.0  
-✔ readr   1.3.1       ✔ forcats 0.4.0  </code></pre>
-<pre><code>── Conflicts ─────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(&quot;GEOquery&quot;)</code></pre>
-<pre><code>Loading required package: Biobase</code></pre>
-<pre><code>Loading required package: BiocGenerics</code></pre>
-<pre><code>Loading required package: parallel</code></pre>
-<pre><code>
-Attaching package: &#39;BiocGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:parallel&#39;:
-
-    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-    clusterExport, clusterMap, parApply, parCapply, parLapply,
-    parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
-<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
-
-    combine, intersect, setdiff, union</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    anyDuplicated, append, as.data.frame, basename, cbind,
-    colMeans, colnames, colSums, dirname, do.call, duplicated,
-    eval, evalq, Filter, Find, get, grep, grepl, intersect,
-    is.unsorted, lapply, lengths, Map, mapply, match, mget, order,
-    paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind,
-    Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
-    table, tapply, union, unique, unsplit, which, which.max,
-    which.min</code></pre>
-<pre><code>Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    &#39;browseVignettes()&#39;. To cite Bioconductor, see
-    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre><code>Setting options(&#39;download.file.method.GEOquery&#39;=&#39;auto&#39;)</code></pre>
-<pre><code>Setting options(&#39;GEOquery.inmemory.gpl&#39;=FALSE)</code></pre>
-<pre class="r"><code>library(&quot;affy&quot;)</code></pre>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;GEOquery&quot;)
+library(&quot;affy&quot;)</code></pre>
 </div>
 <div id="data-import" class="section level2">
 <h2>Data import</h2>
@@ -701,7 +694,7 @@ cols(
 )</code></pre>
 <pre><code>See spec(...) for full column specifications.</code></pre>
 <pre><code>File stored at: </code></pre>
-<pre><code>/var/folders/dc/481f588d6ksdf0wn34p80stw0000gn/T//Rtmp41u9Pz/GPL6947.soft</code></pre>
+<pre><code>/var/folders/dc/481f588d6ksdf0wn34p80stw0000gn/T//Rtmp5k0BJi/GPL6947.soft</code></pre>
 <pre class="r"><code># review metadata
 show(gse46903)</code></pre>
 <pre><code>$GSE46903_series_matrix.txt.gz
