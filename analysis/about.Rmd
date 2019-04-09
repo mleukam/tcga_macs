@@ -5,4 +5,4 @@ output:
     toc: false
 ---
 
-Describe your project.
+This project seeks to understand the relationship between various macrophage activation gene signatures and tumor type in the TCGA.
