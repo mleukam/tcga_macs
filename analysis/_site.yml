@@ -1,7 +1,7 @@
 name: tcga_macs
 output_dir: ../docs
 navbar:
-  title: tcga_macs
+  title: Macrophage signatures in TCGA
   left:
   - text: Home
     href: index.html
@@ -17,5 +17,5 @@ output:
   workflowr::wflow_html:
     toc: yes
     toc_float: yes
-    theme: cosmo
+    theme: flatly
     highlight: textmate

@@ -6,11 +6,11 @@ output:
     toc: false
 ---
 
-Welcome to the lab notebook for our research project describing the distribution of macrophage gene signatures across various tumor types in TCGA data.
+Welcome to the lab notebook for our research project describing the distribution of macrophage gene signatures across various tumor types in The Cancer Genome Atlas (TCGA) data.
 
 ## Introduction
 
-A T cell inflamed signature has been defined and described across tumor types in the TCGA that corresponds to response to T cell directed immunotherapy. Is there a similar signature for macrophages that might predict the tumors most likely to respond to macrophage-directed immunotherapy? One challenge has been the diversity and plasticity of activated macrophage states compared to cytotoxic T cells. This project will use experimentally derived activation gene signatures for a range of macrophage subtypes and use high dimensional clustering to computationally define macrophage subsets. The distribution of these subsets will then be examined in multiple tumor types in TCGA data.
+A T cell inflamed signature has been defined and described across tumor types in TCGA that corresponds to response to T cell directed immunotherapy. Is there a similar signature for macrophages that might predict the tumors most likely to respond to macrophage-directed immunotherapy? One challenge has been the diversity and plasticity of activated macrophage states compared to cytotoxic T cells. This project will use experimentally derived activation gene signatures for a range of macrophage subtypes and use high dimensional clustering to computationally define macrophage subsets. The distribution of these subsets will then be examined in multiple tumor types in TCGA data.
 
 ## Defining macrophage gene sets
 
