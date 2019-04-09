@@ -1,8 +1,13 @@
 # tcga_macs
 
+A collaboration with Riyue Bao and Jason Luke to identify macrophage signatures across the TCGA.
+
 Best viewed in website form: https://mleukam.github.io/tcga_macs/index.html
 
-Collaboration with Dr. Luke and Dr. Bao to determine pan-cancer macrophage activity distributions
+
+
+
+======================================================
 
 A [workflowr][] project.
 
