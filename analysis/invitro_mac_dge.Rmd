@@ -1,0 +1,46 @@
+---
+title: "Differential gene expression in _in vitro_ macrophage model"
+author: "mleukam"
+date: "2019-04-09"
+output: workflowr::wflow_html
+---
+
+## Introduction
+
+The purpose of this analysis is to find ranked differential gene expression for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for downstream analysis. The source for this method is:
+
+```
+Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19. 
+```
+
+The original source of the macrophage differentiation schema is found here:
+
+```
+Xue J, Schmidt SV, Sander J, Draffehn A et al. Transcriptome-based network analysis reveals a spectrum model of human macrophage activation. Immunity 2014 Feb 20;40(2):274-88. PMID: 24530056
+```
+
+The affymetrix gene expression analysis was first published with this paper:
+
+```
+Shaykhiev R, Krause A, Salit J, Strulovici-Barel Y et al. Smoking-dependent reprogramming of alveolar macrophage polarization: implication for pathogenesis of chronic obstructive pulmonary disease. J Immunol 2009 Aug 15;183(4):2867-83. PMID: 19635926
+```
+
+Clear workspace prior to analysis and load necessary packages
+```{r}
+rm(list=ls())
+```
+
+```{r packages, message=FALSE, warning=FALSE, include=FALSE}
+library("tidyverse")
+library("GEOquery")
+
+```
+
+## Data import
+
+Expression data was retrieved from GEO with GSE46903 ID
+
+```{r}
+
+```
+
