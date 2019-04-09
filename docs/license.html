@@ -22,6 +22,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -69,9 +71,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -190,8 +190,6 @@ $(document).ready(function () {
 });
 </script>
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
 
 <style type="text/css">
@@ -265,6 +263,15 @@ $(document).ready(function () {
 
 
 
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
@@ -289,7 +296,13 @@ $(document).ready(function () {
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mleukam/tcga_macs">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -362,10 +375,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong3428b49"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 3428b49 </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree7b056c761bf9be1520f6460a4eb4e73cffde0dcctargetblank7b056c7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/7b056c761bf9be1520f6460a4eb4e73cffde0dcc" target="_blank">7b056c7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrong3428b49" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree7b056c761bf9be1520f6460a4eb4e73cffde0dcctargetblank7b056c7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -374,6 +387,10 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
+    Modified:   analysis/invitro_mac_dge.Rmd
 
 </code></pre>
 <p>
@@ -417,7 +434,41 @@ Message
 Rmd
 </td>
 <td>
-3428b49
+<a href="https://github.com/mleukam/tcga_macs/blob/7b056c761bf9be1520f6460a4eb4e73cffde0dcc/analysis/license.Rmd" target="_blank">7b056c7</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+updates to basic documentation for website, license
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/bae7e193ef27a69f574dd3a3083b5ea031133c09/docs/license.html" target="_blank">bae7e19</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/3428b498b8d13d86d44fd5dc8b335ccd87c39b38/analysis/license.Rmd" target="_blank">3428b49</a>
 </td>
 <td>
 mleukam
@@ -436,9 +487,9 @@ Start workflowr project.
 </div>
 </div>
 </div>
-<p>What license are you using for your code? See <a href="http://choosealicense.com/">choosealicense.com</a> for help deciding. It’s a convention to save a file <code>LICENSE</code> in the root of your Git repo that contains the license text.</p>
-<p>What license are you using for the written content on your site? It is traditional to choose a <a href="https://creativecommons.org/choose/">Creative Commons</a> license for this type of content.</p>
-<p>How should others cite your work? It’s a convention to save a file <code>CITATION</code> in the root of your Git repo that contains the citation information.</p>
+<p>Licenses Software published under MIT license. Link: <a href="https://opensource.org/licenses/MIT" class="uri">https://opensource.org/licenses/MIT</a></p>
+<p>Other written content published under Creative Commons Attribution-ShareAlike 4.0 International license. Link: <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode" class="uri">https://creativecommons.org/licenses/by-sa/4.0/legalcode</a></p>
+<p>Citation Pending</p>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
