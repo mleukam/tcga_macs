@@ -24,7 +24,7 @@ Clear workspace prior to analysis and load necessary packages
 rm(list=ls())
 ```
 
-```{r packages}
+```{r packages, message=FALSE, warning=FALSE}
 library("tidyverse")
 library("GEOquery")
 library("affy")
