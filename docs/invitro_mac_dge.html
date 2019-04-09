@@ -526,10 +526,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9910c1dc1011a4b29711916c5e257236b0e15659targetblank9910c1da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9910c1dc1011a4b29711916c5e257236b0e15659" target="_blank">9910c1d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree8c06425b5aba4ece8ed25814b330d833d3e487ddtargetblank8c06425a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/8c06425b5aba4ece8ed25814b330d833d3e487dd" target="_blank">8c06425</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9910c1dc1011a4b29711916c5e257236b0e15659targetblank9910c1da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree8c06425b5aba4ece8ed25814b330d833d3e487ddtargetblank8c06425a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -576,6 +576,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/8c06425b5aba4ece8ed25814b330d833d3e487dd/analysis/invitro_mac_dge.Rmd" target="_blank">8c06425</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+added protocols
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/363b5df5770f40d8b98527c9ced243c7aa7a06d9/docs/invitro_mac_dge.html" target="_blank">363b5df</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -672,6 +706,11 @@ citations added and packages loaded
 <h2>Introduction</h2>
 <p>The purpose of this analysis is to find ranked differential gene expression for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for downstream analysis. The source for this method is:</p>
 <pre><code>Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19. </code></pre>
+<p>This is a summary of the method:</p>
+<pre><code>Expression data was retrieved from GEO with GSE46903 ID. For analysis, we selected only monocyte and macrophage samples. According to the dataset description, peripheral blood monocytes were stimulated with GM-CSF or M-CSF, and subsequently stimulated with different compounds. We excluded all M-CSF-derived macrophages and non-72 hour time points. M0-GM-CSF 72 hour samples were used as baseline. We used limma package to perform differential expression in order to understand gene changes upon treatments compared to baseline. For each comparison, gene lists were obtained and ranked by t-statistics. To compare human macrophages under different stimuli with mouse monocytes/macrophages from our scRNAseq data, we compared genes, upregulated or downregulated inside each scRNAseq cluster with genes, upregulated or downregulated in each human monocyte/macrophage treatment condition. The goal was to get a list of signed scores that will represent the level of concordance between treatments and each cluster.
+
+For each cluster, we created two gene sets: 100 upregulated and downregulated genes. GSEA (with fgsea package) was performed using this gene set against ranked gene lists from treatment comparisons. To obtain a score, we subtracted the normalized enrichment score (NES) of downregulated genes from NES of upregulated genes. To further investigate the correlation (or lack thereof) between clusters and treatments, we visualized genes associated with each cluster in human macrophages. We reduced the dimensions of macrophage datasets with Rtsne package and plotted each sample in two dimensions using the ggplot2 package. Samples were then highlighted using Z-scored expression profiles of cluster-associated genes.
+</code></pre>
 <p>The gene chip data used to derive differential expression for various macrophage subtypes was first published here:</p>
 <pre><code>Xue J, Schmidt SV, Sander J, Draffehn A et al. Transcriptome-based network analysis reveals a spectrum model of human macrophage activation. Immunity 2014 Feb 20;40(2):274-88. PMID: 24530056</code></pre>
 <p>Clear workspace prior to analysis and load necessary packages</p>
@@ -682,7 +721,9 @@ library(&quot;affy&quot;)</code></pre>
 </div>
 <div id="data-import" class="section level2">
 <h2>Data import</h2>
-<p>Expression data was retrieved from GEO with GSE46903 ID</p>
+<p>Expression data was retrieved from GEO with GSE46903 ID.</p>
+<p>Source: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903</a></p>
+<p>Reference/help documents: GEOquery vignette and this site: <a href="http://genomicsclass.github.io/book/pages/GEOquery.html" class="uri">http://genomicsclass.github.io/book/pages/GEOquery.html</a></p>
 <pre class="r"><code># download data from GEO as a list of ExpressionSets
 gse46903 &lt;- getGEO(&quot;GSE46903&quot;, GSEMatrix = TRUE)</code></pre>
 <pre><code>Found 1 file(s)</code></pre>
@@ -694,7 +735,7 @@ cols(
 )</code></pre>
 <pre><code>See spec(...) for full column specifications.</code></pre>
 <pre><code>File stored at: </code></pre>
-<pre><code>/var/folders/dc/481f588d6ksdf0wn34p80stw0000gn/T//Rtmp5k0BJi/GPL6947.soft</code></pre>
+<pre><code>/var/folders/dc/481f588d6ksdf0wn34p80stw0000gn/T//RtmphnSVyl/GPL6947.soft</code></pre>
 <pre class="r"><code># review metadata
 show(gse46903)</code></pre>
 <pre><code>$GSE46903_series_matrix.txt.gz
