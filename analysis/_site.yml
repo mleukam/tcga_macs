@@ -1,7 +1,7 @@
-name: "tcga_macs"
+name: tcga_macs
 output_dir: ../docs
 navbar:
-  title: "tcga_macs"
+  title: tcga_macs
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/mleukam/tcga_macs
 output:
   workflowr::wflow_html:
     toc: yes
