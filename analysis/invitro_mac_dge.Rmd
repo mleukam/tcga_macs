@@ -7,27 +7,33 @@ output: workflowr::wflow_html
 
 ## Introduction
 
-The purpose of this analysis is to find ranked differential gene expression for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for downstream analysis. The source for this method is:
+The purpose of this analysis is to find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. The source for this method is:
 
-```
-Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19. 
-```
 
-This is a summary of the method:
+> Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19. 
 
-```
-Expression data was retrieved from GEO with GSE46903 ID. For analysis, we selected only monocyte and macrophage samples. According to the dataset description, peripheral blood monocytes were stimulated with GM-CSF or M-CSF, and subsequently stimulated with different compounds. We excluded all M-CSF-derived macrophages and non-72 hour time points. M0-GM-CSF 72 hour samples were used as baseline. We used limma package to perform differential expression in order to understand gene changes upon treatments compared to baseline. For each comparison, gene lists were obtained and ranked by t-statistics. To compare human macrophages under different stimuli with mouse monocytes/macrophages from our scRNAseq data, we compared genes, upregulated or downregulated inside each scRNAseq cluster with genes, upregulated or downregulated in each human monocyte/macrophage treatment condition. The goal was to get a list of signed scores that will represent the level of concordance between treatments and each cluster.
+This is a summary of the method from Gubin et al.:
 
-For each cluster, we created two gene sets: 100 upregulated and downregulated genes. GSEA (with fgsea package) was performed using this gene set against ranked gene lists from treatment comparisons. To obtain a score, we subtracted the normalized enrichment score (NES) of downregulated genes from NES of upregulated genes. To further investigate the correlation (or lack thereof) between clusters and treatments, we visualized genes associated with each cluster in human macrophages. We reduced the dimensions of macrophage datasets with Rtsne package and plotted each sample in two dimensions using the ggplot2 package. Samples were then highlighted using Z-scored expression profiles of cluster-associated genes.
+> Expression data was retrieved from GEO with GSE46903 ID. For analysis, we selected only monocyte and macrophage samples. According to the dataset description, peripheral blood monocytes were stimulated with GM-CSF or M-CSF, and subsequently stimulated with different compounds. We excluded all M-CSF-derived macrophages and non-72 hour time points. M0-GM-CSF 72 hour samples were used as baseline. We used limma package to perform differential expression in order to understand gene changes upon treatments compared to baseline. For each comparison, gene lists were obtained and ranked by t-statistics. To compare human macrophages under different stimuli with mouse monocytes/macrophages from our scRNAseq data, we compared genes, upregulated or downregulated inside each scRNAseq cluster with genes, upregulated or downregulated in each human monocyte/macrophage treatment condition. The goal was to get a list of signed scores that will represent the level of concordance between treatments and each cluster.
 
-```
+> For each cluster, we created two gene sets: 100 upregulated and downregulated genes. GSEA (with fgsea package) was performed using this gene set against ranked gene lists from treatment comparisons. To obtain a score, we subtracted the normalized enrichment score (NES) of downregulated genes from NES of upregulated genes. To further investigate the correlation (or lack thereof) between clusters and treatments, we visualized genes associated with each cluster in human macrophages. We reduced the dimensions of macrophage datasets with Rtsne package and plotted each sample in two dimensions using the ggplot2 package. Samples were then highlighted using Z-scored expression profiles of cluster-associated genes.
 
 The gene chip data used to derive differential expression for various macrophage subtypes was first published here:
 
-```
-Xue J, Schmidt SV, Sander J, Draffehn A et al. Transcriptome-based network analysis reveals a spectrum model of human macrophage activation. Immunity 2014 Feb 20;40(2):274-88. PMID: 24530056
-```
+> Xue J, Schmidt SV, Sander J, Draffehn A et al. Transcriptome-based network analysis reveals a spectrum model of human macrophage activation. Immunity 2014 Feb 20;40(2):274-88. PMID: 24530056
 
+The original experiment had two conditions. One (corresponding to the data we want) was done in cell culture with monocytes exposed to growth factor and a number of different cytokines to induce different activation states. They used those gene sets to investigate gene expression signatures from patients with COPD and asthma. The cell culture part was done on an Illumina HumanHT-12 v3.0 expression beadchip
+The human part was done on Affymetrix chips
+
+* The experiment overview is [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903).
+
+* The record for the control group (ie M0-GM-CSF treated monocytes at 72hours) is [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1140443), and has more details about the experimental method.
+
+* The research group posted expression matrices in which “The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite” An example expression matrix from the control group is [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?view=data&acc=GSM1140443&id=38019&db=GeoDb_blob97).
+
+_We will obtain the raw data from the Illumina expression beadchips and normalize ourselves._
+
+### Set up workspace
 Clear workspace prior to analysis and load necessary packages
 ```{r}
 rm(list=ls())
@@ -41,13 +47,9 @@ library("affy")
 
 ## Data import
 
-Expression data was retrieved from GEO with GSE46903 ID.
+GSE46903
 
-Source: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903
-
-Reference/help documents: GEOquery vignette and this site: http://genomicsclass.github.io/book/pages/GEOquery.html
-
-```{r}
+```{r eval=FALSE, include=FALSE}
 # download data from GEO as a list of ExpressionSets
 gse46903 <- getGEO("GSE46903", GSEMatrix = TRUE)
 
@@ -56,6 +58,3 @@ show(gse46903)
 show(pData(phenoData(gse46903[[1]]))[1:5,c(1,6,8)])
 ```
 
-```{r}
-
-```
