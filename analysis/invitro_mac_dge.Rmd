@@ -13,6 +13,15 @@ The purpose of this analysis is to find ranked differential gene expression for 
 Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19. 
 ```
 
+This is a summary of the method:
+
+```
+Expression data was retrieved from GEO with GSE46903 ID. For analysis, we selected only monocyte and macrophage samples. According to the dataset description, peripheral blood monocytes were stimulated with GM-CSF or M-CSF, and subsequently stimulated with different compounds. We excluded all M-CSF-derived macrophages and non-72 hour time points. M0-GM-CSF 72 hour samples were used as baseline. We used limma package to perform differential expression in order to understand gene changes upon treatments compared to baseline. For each comparison, gene lists were obtained and ranked by t-statistics. To compare human macrophages under different stimuli with mouse monocytes/macrophages from our scRNAseq data, we compared genes, upregulated or downregulated inside each scRNAseq cluster with genes, upregulated or downregulated in each human monocyte/macrophage treatment condition. The goal was to get a list of signed scores that will represent the level of concordance between treatments and each cluster.
+
+For each cluster, we created two gene sets: 100 upregulated and downregulated genes. GSEA (with fgsea package) was performed using this gene set against ranked gene lists from treatment comparisons. To obtain a score, we subtracted the normalized enrichment score (NES) of downregulated genes from NES of upregulated genes. To further investigate the correlation (or lack thereof) between clusters and treatments, we visualized genes associated with each cluster in human macrophages. We reduced the dimensions of macrophage datasets with Rtsne package and plotted each sample in two dimensions using the ggplot2 package. Samples were then highlighted using Z-scored expression profiles of cluster-associated genes.
+
+```
+
 The gene chip data used to derive differential expression for various macrophage subtypes was first published here:
 
 ```
@@ -32,7 +41,11 @@ library("affy")
 
 ## Data import
 
-Expression data was retrieved from GEO with GSE46903 ID
+Expression data was retrieved from GEO with GSE46903 ID.
+
+Source: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903
+
+Reference/help documents: GEOquery vignette and this site: http://genomicsclass.github.io/book/pages/GEOquery.html
 
 ```{r}
 # download data from GEO as a list of ExpressionSets
@@ -43,3 +56,6 @@ show(gse46903)
 show(pData(phenoData(gse46903[[1]]))[1:5,c(1,6,8)])
 ```
 
+```{r}
+
+```
