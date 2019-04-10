@@ -64,10 +64,9 @@ library("lumi")
 ## Data import
 GEO ID is: [GSE46903](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903)
 
-```{r eval=FALSE, include=FALSE}
-# download data from GEO as a list of ExpressionSets
-# eset <- getGEO("GSE46903")
-# THIS DOWNLOADS ALREADY NORMALIZED DATA
+```{r}
+# download normalized data with full metadata from GEO as a list of ExpressionSets
+gse46903 <- getGEO("GSE46903")
 ```
 
 Accessing raw data from the GEO: http://genomicsclass.github.io/book/pages/GEOquery.html
@@ -75,14 +74,14 @@ Accessing raw data from the GEO: http://genomicsclass.github.io/book/pages/GEOqu
 Note about raw vs normalized files from GEO: https://www.biostars.org/p/259637/
 
 
-```{r raw_download, eval=FALSE}
+```{r raw_download}
 # download raw data
 filePaths = getGEOSuppFiles("GSE46903", 
                             makeDirectory = TRUE)
 
 ```
 
-```{bash, eval=FALSE}
+```{bash}
 # in terminal
 pwd
 cd GSE46903
@@ -91,7 +90,7 @@ cd ..
 rmdir GSE46903
 ```
 
-```{r, eval=FALSE}
+```{r}
 lumi_input <- lumiR("~/tcga_macs/data/GSE46903_non-normalized.txt.gz") 
 lumi_46903 <- lumiExpresso(lumi_input, 
                          normalize.param = list(method = 'rsn'))
@@ -100,9 +99,43 @@ write.exprs(lumi_46903, file = "~/tcga_macs/output/processed_lumi_46903.txt")
 
 ```
 
-```{r, eval=FALSE}
+```{r}
 # review metadata
 show(lumi_46903)
 show(pData(phenoData(lumi_46903)))
+```
+
+The raw data is labeled with alternate sample names (a 10-digit number followed by underscore and a letter) compared to the GEO records and the sample name in the processed data GSE ExpressionSet object. 
+
+* Check phenotype records in GSE object to see if I can merge with raw data using 10-digit letter name as a key
+
+* Documentation for manipulating ExpressionSet objects in general [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf)
+
+* Documentation for maniupulating ExpressionSets created by GEOquery [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/GEOquery/inst/doc/GEOquery.html#getting-gse-series-matrix-files-as-an-expressionset)
+
+```{r}
+show(pData(phenoData(gse46903[[1]]))[1:20,c(1,6,8)])
+```
+
+The 10-digit sample names correspond to experimental conditions and are appended to the phenodata sample names! I will have to get each component ready and then assemble a new expressionset with complete metadata and raw data but this is do-able.
+
+* Get data and annotations out of AnnotatedDataFrame object, documentation [here](https://www.rdocumentation.org/packages/Biobase/versions/2.32.0/topics/AnnotatedDataFrame)
+
+```{r}
+# pull phenoData from expression set as an AnnotatedDataFrame
+meta46903 <- phenoData(gse46903[[1]])
+
+# get data and annotations as separate objects
+meta_data46903 <- pData(meta46903)
+anno_data46903 <- varMetadata(meta46903)
+
+# doublecheck structure
+str(meta_data46903)
+head(meta_data46903)
+
+str(anno_data46903)
+head(anno_data46903)
+
+# anno_data is pretty useless - just empty variables with matching rownames from pData
 ```
 
