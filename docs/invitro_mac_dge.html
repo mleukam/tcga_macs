@@ -526,10 +526,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreefcefd997d3b694d52c85f702a49784d945619e96targetblankfcefd99a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/fcefd997d3b694d52c85f702a49784d945619e96" target="_blank">fcefd99</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree1ecaa5cf559a8344497d369dc8687431dcb72dc0targetblank1ecaa5ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/1ecaa5cf559a8344497d369dc8687431dcb72dc0" target="_blank">1ecaa5c</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreefcefd997d3b694d52c85f702a49784d945619e96targetblankfcefd99a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree1ecaa5cf559a8344497d369dc8687431dcb72dc0targetblank1ecaa5ca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -540,13 +540,11 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
-
-Untracked files:
-    Untracked:  data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
-    Untracked:  data/GSE46903_Affymetrix_metadata.txt.gz
-    Untracked:  data/GSE46903_RAW.tar
-    Untracked:  data/GSE46903_non-normalized.txt.gz
-    Untracked:  output/processed_lumi_46903.txt
+    Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+    Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
+    Ignored:    data/GSE46903_RAW.tar
+    Ignored:    data/GSE46903_non-normalized.txt.gz
+    Ignored:    output/processed_lumi_46903.txt
 
 </code></pre>
 <p>
@@ -585,6 +583,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/1ecaa5cf559a8344497d369dc8687431dcb72dc0/analysis/invitro_mac_dge.Rmd" target="_blank">1ecaa5c</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-10
+</td>
+<td>
+wflow_publish(“analysis/invitro_mac_dge.Rmd”)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/c43686198fa5b5f0718f028386ecd48036e5e4ce/docs/invitro_mac_dge.html" target="_blank">c436861</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -834,6 +866,18 @@ library(&quot;lumi&quot;)</code></pre>
 <div id="data-import" class="section level2">
 <h2>Data import</h2>
 <p>GEO ID is: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">GSE46903</a></p>
+<pre class="r"><code># download normalized data with full metadata from GEO as a list of ExpressionSets
+gse46903 &lt;- getGEO(&quot;GSE46903&quot;)</code></pre>
+<pre><code>Found 1 file(s)</code></pre>
+<pre><code>GSE46903_series_matrix.txt.gz</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  .default = col_double(),
+  ID_REF = col_character()
+)</code></pre>
+<pre><code>See spec(...) for full column specifications.</code></pre>
+<pre><code>File stored at: </code></pre>
+<pre><code>/var/folders/dc/481f588d6ksdf0wn34p80stw0000gn/T//Rtmp7jGS4V/GPL6947.soft</code></pre>
 <p>Accessing raw data from the GEO: <a href="http://genomicsclass.github.io/book/pages/GEOquery.html" class="uri">http://genomicsclass.github.io/book/pages/GEOquery.html</a></p>
 <p>Note about raw vs normalized files from GEO: <a href="https://www.biostars.org/p/259637/" class="uri">https://www.biostars.org/p/259637/</a></p>
 <pre class="r"><code># download raw data
@@ -845,14 +889,1046 @@ cd GSE46903
 mv GSE* ~/tcga_macs/data
 cd ..
 rmdir GSE46903</code></pre>
-<pre class="r"><code>lumi_input &lt;- lumiR(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt.gz&quot;) 
-lumi_46903 &lt;- lumiExpresso(lumi_input, 
-                         normalize.param = list(method = &#39;rsn&#39;))
+<pre><code>/Users/mleukam/tcga_macs</code></pre>
+<pre class="r"><code>lumi_input &lt;- lumiR(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt.gz&quot;) </code></pre>
+<pre><code>Please provide Illumina ID Mapping library!</code></pre>
+<pre class="r"><code>lumi_46903 &lt;- lumiExpresso(lumi_input, 
+                         normalize.param = list(method = &#39;rsn&#39;))</code></pre>
+<pre><code>Due to the input is not a LumiBatch object, no background adjustment will be performed.
+Background Correction: none 
+Due to the lack of &#39;se.exprs&#39; information, &#39;log2&#39; transformation will be used.
+Variance Stabilizing Transform method: log2 
+Normalization method: rsn 
 
-write.exprs(lumi_46903, file = &quot;~/tcga_macs/output/processed_lumi_46903.txt&quot;)</code></pre>
+
+Background correction ...
+done.
+
+Variance stabilizing ...
+Perform log2 transformation ...
+done.
+
+Normalizing ...
+Perform rsn normalization ...
+2019-04-10 10:16:03 , processing array  1 
+2019-04-10 10:16:03 , processing array  2 
+2019-04-10 10:16:03 , processing array  3 
+2019-04-10 10:16:03 , processing array  4 
+2019-04-10 10:16:03 , processing array  5 
+2019-04-10 10:16:04 , processing array  6 
+2019-04-10 10:16:04 , processing array  7 
+2019-04-10 10:16:04 , processing array  8 
+2019-04-10 10:16:04 , processing array  9 
+2019-04-10 10:16:04 , processing array  10 
+2019-04-10 10:16:04 , processing array  11 
+2019-04-10 10:16:04 , processing array  12 
+2019-04-10 10:16:04 , processing array  13 
+2019-04-10 10:16:04 , processing array  14 
+2019-04-10 10:16:04 , processing array  15 
+2019-04-10 10:16:04 , processing array  16 
+2019-04-10 10:16:04 , processing array  17 
+2019-04-10 10:16:04 , processing array  18 
+2019-04-10 10:16:04 , processing array  19 
+2019-04-10 10:16:05 , processing array  20 
+2019-04-10 10:16:05 , processing array  21 
+2019-04-10 10:16:05 , processing array  22 
+2019-04-10 10:16:05 , processing array  23 
+2019-04-10 10:16:05 , processing array  24 
+2019-04-10 10:16:05 , processing array  25 
+2019-04-10 10:16:05 , processing array  26 
+2019-04-10 10:16:05 , processing array  27 
+2019-04-10 10:16:05 , processing array  28 
+2019-04-10 10:16:05 , processing array  29 
+2019-04-10 10:16:05 , processing array  30 
+2019-04-10 10:16:05 , processing array  31 
+2019-04-10 10:16:05 , processing array  32 
+2019-04-10 10:16:05 , processing array  33 
+2019-04-10 10:16:06 , processing array  34 
+2019-04-10 10:16:06 , processing array  35 
+2019-04-10 10:16:06 , processing array  36 
+2019-04-10 10:16:06 , processing array  37 
+2019-04-10 10:16:06 , processing array  38 
+2019-04-10 10:16:06 , processing array  39 
+2019-04-10 10:16:06 , processing array  40 
+2019-04-10 10:16:06 , processing array  41 
+2019-04-10 10:16:06 , processing array  42 
+2019-04-10 10:16:06 , processing array  43 
+2019-04-10 10:16:06 , processing array  44 
+2019-04-10 10:16:06 , processing array  45 
+2019-04-10 10:16:06 , processing array  46 
+2019-04-10 10:16:07 , processing array  47 
+2019-04-10 10:16:07 , processing array  48 
+2019-04-10 10:16:07 , processing array  49 
+2019-04-10 10:16:07 , processing array  50 
+2019-04-10 10:16:07 , processing array  51 
+2019-04-10 10:16:07 , processing array  52 
+2019-04-10 10:16:07 , processing array  53 
+2019-04-10 10:16:07 , processing array  54 
+2019-04-10 10:16:07 , processing array  55 
+2019-04-10 10:16:07 , processing array  56 
+2019-04-10 10:16:07 , processing array  57 
+2019-04-10 10:16:07 , processing array  58 
+2019-04-10 10:16:07 , processing array  59 
+2019-04-10 10:16:08 , processing array  60 
+2019-04-10 10:16:08 , processing array  61 
+2019-04-10 10:16:08 , processing array  62 
+2019-04-10 10:16:08 , processing array  63 
+2019-04-10 10:16:08 , processing array  64 
+2019-04-10 10:16:08 , processing array  65 
+2019-04-10 10:16:08 , processing array  66 
+2019-04-10 10:16:08 , processing array  67 
+2019-04-10 10:16:08 , processing array  68 
+2019-04-10 10:16:08 , processing array  69 
+2019-04-10 10:16:08 , processing array  70 
+2019-04-10 10:16:08 , processing array  71 
+2019-04-10 10:16:08 , processing array  72 
+2019-04-10 10:16:08 , processing array  73 
+2019-04-10 10:16:09 , processing array  74 
+2019-04-10 10:16:09 , processing array  75 
+2019-04-10 10:16:09 , processing array  76 
+2019-04-10 10:16:09 , processing array  77 
+2019-04-10 10:16:09 , processing array  78 
+2019-04-10 10:16:09 , processing array  79 
+2019-04-10 10:16:09 , processing array  80 
+2019-04-10 10:16:09 , processing array  81 
+2019-04-10 10:16:09 , processing array  82 
+2019-04-10 10:16:09 , processing array  83 
+2019-04-10 10:16:09 , processing array  84 
+2019-04-10 10:16:09 , processing array  85 
+2019-04-10 10:16:09 , processing array  86 
+2019-04-10 10:16:10 , processing array  87 
+2019-04-10 10:16:10 , processing array  88 
+2019-04-10 10:16:10 , processing array  89 
+2019-04-10 10:16:10 , processing array  90 
+2019-04-10 10:16:10 , processing array  91 
+2019-04-10 10:16:10 , processing array  92 
+2019-04-10 10:16:10 , processing array  93 
+2019-04-10 10:16:10 , processing array  94 
+2019-04-10 10:16:10 , processing array  95 
+2019-04-10 10:16:10 , processing array  96 
+2019-04-10 10:16:10 , processing array  97 
+2019-04-10 10:16:10 , processing array  98 
+2019-04-10 10:16:10 , processing array  99 
+2019-04-10 10:16:11 , processing array  100 
+2019-04-10 10:16:11 , processing array  101 
+2019-04-10 10:16:11 , processing array  102 
+2019-04-10 10:16:11 , processing array  103 
+2019-04-10 10:16:11 , processing array  104 
+2019-04-10 10:16:11 , processing array  105 
+2019-04-10 10:16:11 , processing array  106 
+2019-04-10 10:16:11 , processing array  107 
+2019-04-10 10:16:11 , processing array  108 
+2019-04-10 10:16:11 , processing array  109 
+2019-04-10 10:16:11 , processing array  110 
+2019-04-10 10:16:11 , processing array  111 
+2019-04-10 10:16:11 , processing array  112 
+2019-04-10 10:16:11 , processing array  113 
+2019-04-10 10:16:11 , processing array  114 
+2019-04-10 10:16:12 , processing array  115 
+2019-04-10 10:16:12 , processing array  116 
+2019-04-10 10:16:12 , processing array  117 
+2019-04-10 10:16:12 , processing array  118 
+2019-04-10 10:16:12 , processing array  119 
+2019-04-10 10:16:12 , processing array  120 
+2019-04-10 10:16:12 , processing array  121 
+2019-04-10 10:16:12 , processing array  122 
+2019-04-10 10:16:12 , processing array  123 
+2019-04-10 10:16:12 , processing array  124 
+2019-04-10 10:16:12 , processing array  125 
+2019-04-10 10:16:12 , processing array  126 
+2019-04-10 10:16:12 , processing array  127 
+2019-04-10 10:16:13 , processing array  128 
+2019-04-10 10:16:13 , processing array  129 
+2019-04-10 10:16:13 , processing array  130 
+2019-04-10 10:16:13 , processing array  131 
+2019-04-10 10:16:13 , processing array  132 
+2019-04-10 10:16:13 , processing array  133 
+2019-04-10 10:16:13 , processing array  134 
+2019-04-10 10:16:13 , processing array  135 
+2019-04-10 10:16:13 , processing array  136 
+2019-04-10 10:16:13 , processing array  137 
+2019-04-10 10:16:13 , processing array  138 
+2019-04-10 10:16:13 , processing array  139 
+2019-04-10 10:16:14 , processing array  140 
+2019-04-10 10:16:14 , processing array  141 
+2019-04-10 10:16:14 , processing array  142 
+2019-04-10 10:16:14 , processing array  143 
+2019-04-10 10:16:14 , processing array  144 
+2019-04-10 10:16:14 , processing array  145 
+2019-04-10 10:16:14 , processing array  146 
+2019-04-10 10:16:14 , processing array  147 
+2019-04-10 10:16:14 , processing array  148 
+2019-04-10 10:16:14 , processing array  149 
+2019-04-10 10:16:14 , processing array  150 
+2019-04-10 10:16:14 , processing array  151 
+2019-04-10 10:16:14 , processing array  152 
+2019-04-10 10:16:15 , processing array  153 
+2019-04-10 10:16:15 , processing array  154 
+2019-04-10 10:16:15 , processing array  155 
+2019-04-10 10:16:15 , processing array  156 
+2019-04-10 10:16:15 , processing array  157 
+2019-04-10 10:16:15 , processing array  158 
+2019-04-10 10:16:15 , processing array  159 
+2019-04-10 10:16:15 , processing array  160 
+2019-04-10 10:16:15 , processing array  161 
+2019-04-10 10:16:15 , processing array  162 
+2019-04-10 10:16:15 , processing array  163 
+2019-04-10 10:16:15 , processing array  164 
+2019-04-10 10:16:15 , processing array  165 
+2019-04-10 10:16:15 , processing array  166 
+2019-04-10 10:16:16 , processing array  167 
+2019-04-10 10:16:16 , processing array  168 
+2019-04-10 10:16:16 , processing array  169 
+2019-04-10 10:16:16 , processing array  170 
+2019-04-10 10:16:16 , processing array  171 
+2019-04-10 10:16:16 , processing array  172 
+2019-04-10 10:16:16 , processing array  173 
+2019-04-10 10:16:16 , processing array  174 
+2019-04-10 10:16:16 , processing array  175 
+2019-04-10 10:16:16 , processing array  176 
+2019-04-10 10:16:16 , processing array  177 
+2019-04-10 10:16:16 , processing array  178 
+2019-04-10 10:16:16 , processing array  179 
+2019-04-10 10:16:16 , processing array  180 
+2019-04-10 10:16:17 , processing array  181 
+2019-04-10 10:16:17 , processing array  182 
+2019-04-10 10:16:17 , processing array  183 
+2019-04-10 10:16:17 , processing array  184 
+2019-04-10 10:16:17 , processing array  185 
+2019-04-10 10:16:17 , processing array  186 
+2019-04-10 10:16:17 , processing array  187 
+2019-04-10 10:16:17 , processing array  188 
+2019-04-10 10:16:17 , processing array  189 
+2019-04-10 10:16:17 , processing array  190 
+2019-04-10 10:16:17 , processing array  191 
+2019-04-10 10:16:17 , processing array  192 
+2019-04-10 10:16:17 , processing array  193 
+2019-04-10 10:16:17 , processing array  194 
+2019-04-10 10:16:18 , processing array  195 
+2019-04-10 10:16:18 , processing array  196 
+2019-04-10 10:16:18 , processing array  197 
+2019-04-10 10:16:18 , processing array  198 
+2019-04-10 10:16:18 , processing array  199 
+2019-04-10 10:16:18 , processing array  200 
+2019-04-10 10:16:18 , processing array  201 
+2019-04-10 10:16:18 , processing array  202 
+2019-04-10 10:16:18 , processing array  203 
+2019-04-10 10:16:18 , processing array  204 
+2019-04-10 10:16:18 , processing array  205 
+2019-04-10 10:16:18 , processing array  206 
+2019-04-10 10:16:18 , processing array  207 
+2019-04-10 10:16:19 , processing array  208 
+2019-04-10 10:16:19 , processing array  209 
+2019-04-10 10:16:19 , processing array  210 
+2019-04-10 10:16:19 , processing array  211 
+2019-04-10 10:16:19 , processing array  212 
+2019-04-10 10:16:19 , processing array  213 
+2019-04-10 10:16:19 , processing array  214 
+2019-04-10 10:16:19 , processing array  215 
+2019-04-10 10:16:19 , processing array  216 
+2019-04-10 10:16:19 , processing array  217 
+2019-04-10 10:16:19 , processing array  218 
+2019-04-10 10:16:19 , processing array  219 
+2019-04-10 10:16:19 , processing array  220 
+2019-04-10 10:16:19 , processing array  221 
+2019-04-10 10:16:20 , processing array  222 
+2019-04-10 10:16:20 , processing array  223 
+2019-04-10 10:16:20 , processing array  224 
+2019-04-10 10:16:20 , processing array  225 
+2019-04-10 10:16:20 , processing array  226 
+2019-04-10 10:16:20 , processing array  227 
+2019-04-10 10:16:20 , processing array  228 
+2019-04-10 10:16:20 , processing array  229 
+2019-04-10 10:16:20 , processing array  230 
+2019-04-10 10:16:20 , processing array  231 
+2019-04-10 10:16:20 , processing array  232 
+2019-04-10 10:16:20 , processing array  233 
+2019-04-10 10:16:20 , processing array  234 
+2019-04-10 10:16:21 , processing array  235 
+2019-04-10 10:16:21 , processing array  236 
+2019-04-10 10:16:21 , processing array  237 
+2019-04-10 10:16:21 , processing array  238 
+2019-04-10 10:16:21 , processing array  239 
+2019-04-10 10:16:21 , processing array  240 
+2019-04-10 10:16:21 , processing array  241 
+2019-04-10 10:16:21 , processing array  242 
+2019-04-10 10:16:21 , processing array  243 
+2019-04-10 10:16:21 , processing array  244 
+2019-04-10 10:16:21 , processing array  245 
+2019-04-10 10:16:21 , processing array  246 
+2019-04-10 10:16:21 , processing array  247 
+2019-04-10 10:16:21 , processing array  248 
+2019-04-10 10:16:22 , processing array  249 
+2019-04-10 10:16:22 , processing array  250 
+2019-04-10 10:16:22 , processing array  251 
+2019-04-10 10:16:22 , processing array  252 
+2019-04-10 10:16:22 , processing array  253 
+2019-04-10 10:16:22 , processing array  254 
+2019-04-10 10:16:22 , processing array  255 
+2019-04-10 10:16:22 , processing array  256 
+2019-04-10 10:16:22 , processing array  257 
+2019-04-10 10:16:22 , processing array  258 
+2019-04-10 10:16:22 , processing array  259 
+2019-04-10 10:16:22 , processing array  260 
+2019-04-10 10:16:22 , processing array  261 
+2019-04-10 10:16:23 , processing array  262 
+2019-04-10 10:16:23 , processing array  263 
+2019-04-10 10:16:23 , processing array  264 
+2019-04-10 10:16:23 , processing array  265 
+2019-04-10 10:16:23 , processing array  266 
+2019-04-10 10:16:23 , processing array  267 
+2019-04-10 10:16:23 , processing array  268 
+2019-04-10 10:16:23 , processing array  269 
+2019-04-10 10:16:23 , processing array  270 
+2019-04-10 10:16:23 , processing array  271 
+2019-04-10 10:16:23 , processing array  272 
+2019-04-10 10:16:24 , processing array  273 
+2019-04-10 10:16:24 , processing array  274 
+2019-04-10 10:16:24 , processing array  275 
+2019-04-10 10:16:24 , processing array  276 
+2019-04-10 10:16:24 , processing array  277 
+2019-04-10 10:16:24 , processing array  278 
+2019-04-10 10:16:24 , processing array  279 
+2019-04-10 10:16:24 , processing array  280 
+2019-04-10 10:16:24 , processing array  281 
+2019-04-10 10:16:24 , processing array  282 
+2019-04-10 10:16:24 , processing array  283 
+2019-04-10 10:16:24 , processing array  284 
+2019-04-10 10:16:24 , processing array  285 
+2019-04-10 10:16:25 , processing array  286 
+2019-04-10 10:16:25 , processing array  287 
+2019-04-10 10:16:25 , processing array  288 
+2019-04-10 10:16:25 , processing array  289 
+2019-04-10 10:16:25 , processing array  290 
+2019-04-10 10:16:25 , processing array  291 
+2019-04-10 10:16:25 , processing array  292 
+2019-04-10 10:16:25 , processing array  293 
+2019-04-10 10:16:25 , processing array  294 
+2019-04-10 10:16:25 , processing array  295 
+2019-04-10 10:16:25 , processing array  296 
+2019-04-10 10:16:25 , processing array  297 
+2019-04-10 10:16:25 , processing array  298 
+2019-04-10 10:16:25 , processing array  299 
+2019-04-10 10:16:26 , processing array  300 
+2019-04-10 10:16:26 , processing array  301 
+2019-04-10 10:16:26 , processing array  302 
+2019-04-10 10:16:26 , processing array  303 
+2019-04-10 10:16:26 , processing array  304 
+2019-04-10 10:16:26 , processing array  305 
+2019-04-10 10:16:26 , processing array  306 
+2019-04-10 10:16:26 , processing array  307 
+2019-04-10 10:16:26 , processing array  308 
+2019-04-10 10:16:26 , processing array  309 
+2019-04-10 10:16:26 , processing array  310 
+2019-04-10 10:16:26 , processing array  311 
+2019-04-10 10:16:26 , processing array  312 
+2019-04-10 10:16:27 , processing array  313 
+2019-04-10 10:16:27 , processing array  314 
+2019-04-10 10:16:27 , processing array  315 
+2019-04-10 10:16:27 , processing array  316 
+2019-04-10 10:16:27 , processing array  317 
+2019-04-10 10:16:27 , processing array  318 
+2019-04-10 10:16:27 , processing array  319 
+2019-04-10 10:16:27 , processing array  320 
+2019-04-10 10:16:27 , processing array  321 
+2019-04-10 10:16:27 , processing array  322 
+2019-04-10 10:16:27 , processing array  323 
+2019-04-10 10:16:27 , processing array  324 
+2019-04-10 10:16:27 , processing array  325 
+2019-04-10 10:16:28 , processing array  326 
+2019-04-10 10:16:28 , processing array  327 
+2019-04-10 10:16:28 , processing array  328 
+2019-04-10 10:16:28 , processing array  329 
+2019-04-10 10:16:28 , processing array  330 
+2019-04-10 10:16:28 , processing array  331 
+2019-04-10 10:16:28 , processing array  332 
+2019-04-10 10:16:28 , processing array  333 
+2019-04-10 10:16:28 , processing array  334 
+2019-04-10 10:16:28 , processing array  335 
+2019-04-10 10:16:28 , processing array  336 
+2019-04-10 10:16:28 , processing array  337 
+2019-04-10 10:16:28 , processing array  338 
+2019-04-10 10:16:29 , processing array  339 
+2019-04-10 10:16:29 , processing array  340 
+2019-04-10 10:16:29 , processing array  341 
+2019-04-10 10:16:29 , processing array  342 
+2019-04-10 10:16:29 , processing array  343 
+2019-04-10 10:16:29 , processing array  344 
+2019-04-10 10:16:29 , processing array  345 
+2019-04-10 10:16:29 , processing array  346 
+2019-04-10 10:16:29 , processing array  347 
+2019-04-10 10:16:29 , processing array  348 
+2019-04-10 10:16:29 , processing array  349 
+2019-04-10 10:16:29 , processing array  350 
+2019-04-10 10:16:29 , processing array  351 
+2019-04-10 10:16:29 , processing array  352 
+2019-04-10 10:16:30 , processing array  353 
+2019-04-10 10:16:30 , processing array  354 
+2019-04-10 10:16:30 , processing array  355 
+2019-04-10 10:16:30 , processing array  356 
+2019-04-10 10:16:30 , processing array  357 
+2019-04-10 10:16:30 , processing array  358 
+2019-04-10 10:16:30 , processing array  359 
+2019-04-10 10:16:30 , processing array  360 
+2019-04-10 10:16:30 , processing array  361 
+2019-04-10 10:16:30 , processing array  362 
+2019-04-10 10:16:30 , processing array  363 
+2019-04-10 10:16:30 , processing array  364 
+2019-04-10 10:16:30 , processing array  365 
+2019-04-10 10:16:31 , processing array  366 
+2019-04-10 10:16:31 , processing array  367 
+2019-04-10 10:16:31 , processing array  368 
+2019-04-10 10:16:31 , processing array  369 
+2019-04-10 10:16:31 , processing array  370 
+2019-04-10 10:16:31 , processing array  371 
+2019-04-10 10:16:31 , processing array  372 
+2019-04-10 10:16:31 , processing array  373 
+2019-04-10 10:16:31 , processing array  374 
+2019-04-10 10:16:31 , processing array  375 
+2019-04-10 10:16:31 , processing array  376 
+2019-04-10 10:16:31 , processing array  377 
+2019-04-10 10:16:31 , processing array  378 
+2019-04-10 10:16:32 , processing array  379 
+2019-04-10 10:16:32 , processing array  380 
+2019-04-10 10:16:32 , processing array  381 
+2019-04-10 10:16:32 , processing array  382 
+2019-04-10 10:16:32 , processing array  383 
+2019-04-10 10:16:32 , processing array  384 
+done.
+
+Quality control after preprocessing ...
+No Quality Control assessment of the object because it is not a &quot;LumiBatch&quot; object.
+done.</code></pre>
+<pre class="r"><code>write.exprs(lumi_46903, file = &quot;~/tcga_macs/output/processed_lumi_46903.txt&quot;)</code></pre>
 <pre class="r"><code># review metadata
-show(lumi_46903)
-show(pData(phenoData(lumi_46903)))</code></pre>
+show(lumi_46903)</code></pre>
+<pre><code>ExpressionSet (storageMode: lockedEnvironment)
+assayData: 47463 features, 384 samples 
+  element names: detection, exprs 
+protocolData: none
+phenoData
+  sampleNames: 4233291007_A 4233291007_B ... 5376074056_L (384
+    total)
+  varLabels: sampleID
+  varMetadata: labelDescription
+featureData
+  featureNames: 6450255 2570615 ... 4120753 (47463 total)
+  fvarLabels: ProbeID
+  fvarMetadata: labelDescription
+experimentData: use &#39;experimentData(object)&#39;
+Annotation:  </code></pre>
+<pre class="r"><code>show(pData(phenoData(lumi_46903)))</code></pre>
+<pre><code>                 sampleID
+4233291007_A 4233291007_A
+4233291007_B 4233291007_B
+4233291007_C 4233291007_C
+4233291007_D 4233291007_D
+4233291007_E 4233291007_E
+4233291007_F 4233291007_F
+4233291043_A 4233291043_A
+4233291043_B 4233291043_B
+4233291043_C 4233291043_C
+4233291043_D 4233291043_D
+4233291043_E 4233291043_E
+4233291043_F 4233291043_F
+4233291046_A 4233291046_A
+4233291046_B 4233291046_B
+4233291046_C 4233291046_C
+4233291046_D 4233291046_D
+4233291046_E 4233291046_E
+4233291046_F 4233291046_F
+4233291048_A 4233291048_A
+4233291048_B 4233291048_B
+4487653414_E 4487653414_E
+4487653415_E 4487653415_E
+4487653415_G 4487653415_G
+4487653415_H 4487653415_H
+4648883056_A 4648883056_A
+4648883056_B 4648883056_B
+4648883056_C 4648883056_C
+4648883056_D 4648883056_D
+4648883056_E 4648883056_E
+4648883056_F 4648883056_F
+4648883056_G 4648883056_G
+4648883056_H 4648883056_H
+4648883056_I 4648883056_I
+4648883056_J 4648883056_J
+4648883056_K 4648883056_K
+4648883056_L 4648883056_L
+4648883069_A 4648883069_A
+4648883069_B 4648883069_B
+4648883069_C 4648883069_C
+4648883069_D 4648883069_D
+4648883069_E 4648883069_E
+4648883069_F 4648883069_F
+4648883069_G 4648883069_G
+4648883069_H 4648883069_H
+4648883069_I 4648883069_I
+4648883069_J 4648883069_J
+4648883069_K 4648883069_K
+4648883069_L 4648883069_L
+4648883071_A 4648883071_A
+4648883071_B 4648883071_B
+4648883071_C 4648883071_C
+4648883071_D 4648883071_D
+4648883071_E 4648883071_E
+4648883071_F 4648883071_F
+4648883071_G 4648883071_G
+4648883071_H 4648883071_H
+4648883071_I 4648883071_I
+4648883071_J 4648883071_J
+4648883071_K 4648883071_K
+4648883071_L 4648883071_L
+4676163025_A 4676163025_A
+4676163025_B 4676163025_B
+4676163025_C 4676163025_C
+4676163025_D 4676163025_D
+4676163025_E 4676163025_E
+4676163025_F 4676163025_F
+4676163025_G 4676163025_G
+4676163025_H 4676163025_H
+4676163025_I 4676163025_I
+4676163025_J 4676163025_J
+4676163025_K 4676163025_K
+4676163025_L 4676163025_L
+4676163030_A 4676163030_A
+4676163030_B 4676163030_B
+4676163030_C 4676163030_C
+4676163030_D 4676163030_D
+4676163030_E 4676163030_E
+4676163030_F 4676163030_F
+4676163030_G 4676163030_G
+4676163030_H 4676163030_H
+4676163030_I 4676163030_I
+4676163030_J 4676163030_J
+4676163030_K 4676163030_K
+4676163030_L 4676163030_L
+4676163034_A 4676163034_A
+4676163034_B 4676163034_B
+4676163034_C 4676163034_C
+4676163034_D 4676163034_D
+4676163034_E 4676163034_E
+4676163034_F 4676163034_F
+4676163034_G 4676163034_G
+4676163034_H 4676163034_H
+4676163034_I 4676163034_I
+4676163034_J 4676163034_J
+4676163034_K 4676163034_K
+4676163034_L 4676163034_L
+4676163038_B 4676163038_B
+4676163038_C 4676163038_C
+4676163038_D 4676163038_D
+4676163038_F 4676163038_F
+4676163038_G 4676163038_G
+4676163038_H 4676163038_H
+4676163038_J 4676163038_J
+4676163038_K 4676163038_K
+4676163038_L 4676163038_L
+4950679013_A 4950679013_A
+4950679013_B 4950679013_B
+4950679013_C 4950679013_C
+4950679013_D 4950679013_D
+4950679013_E 4950679013_E
+4950679013_F 4950679013_F
+4950679013_G 4950679013_G
+4950679013_I 4950679013_I
+4950679013_J 4950679013_J
+4950679013_K 4950679013_K
+4950679013_L 4950679013_L
+4950679045_A 4950679045_A
+4950679045_B 4950679045_B
+4950679045_C 4950679045_C
+4950679045_D 4950679045_D
+4950679045_E 4950679045_E
+4950679045_F 4950679045_F
+4950679045_G 4950679045_G
+4950679045_H 4950679045_H
+4950679045_I 4950679045_I
+4950679045_J 4950679045_J
+4950679045_K 4950679045_K
+4950679045_L 4950679045_L
+4958478013_A 4958478013_A
+4958478013_B 4958478013_B
+4958478013_C 4958478013_C
+4958478013_D 4958478013_D
+4958478013_E 4958478013_E
+4958478013_F 4958478013_F
+4958478013_G 4958478013_G
+4958478013_H 4958478013_H
+4958478013_I 4958478013_I
+4958478013_J 4958478013_J
+4958478013_K 4958478013_K
+4958478013_L 4958478013_L
+4958478015_A 4958478015_A
+4958478015_B 4958478015_B
+4958478015_C 4958478015_C
+4958478015_D 4958478015_D
+4958478015_E 4958478015_E
+4958478015_F 4958478015_F
+4958478015_G 4958478015_G
+4958478015_H 4958478015_H
+4958478015_I 4958478015_I
+4958478015_J 4958478015_J
+4958478015_K 4958478015_K
+4958478015_L 4958478015_L
+4958478033_A 4958478033_A
+4958478033_B 4958478033_B
+4958478033_C 4958478033_C
+4958478033_D 4958478033_D
+4958478033_E 4958478033_E
+4958478033_F 4958478033_F
+4958478033_G 4958478033_G
+4958478033_H 4958478033_H
+4958478033_I 4958478033_I
+4958478033_J 4958478033_J
+4958478033_K 4958478033_K
+4958478033_L 4958478033_L
+4958478044_A 4958478044_A
+4958478044_B 4958478044_B
+4958478044_C 4958478044_C
+4958478044_D 4958478044_D
+4958478044_E 4958478044_E
+4958478044_F 4958478044_F
+4958478044_G 4958478044_G
+4958478044_H 4958478044_H
+4958478044_I 4958478044_I
+4958478044_J 4958478044_J
+4958478044_K 4958478044_K
+4958478044_L 4958478044_L
+4958478053_A 4958478053_A
+4958478053_B 4958478053_B
+4958478053_C 4958478053_C
+4958478053_D 4958478053_D
+4958478053_E 4958478053_E
+4958478053_F 4958478053_F
+4958478053_G 4958478053_G
+4958478053_H 4958478053_H
+4958478053_I 4958478053_I
+4958478053_J 4958478053_J
+4958478053_K 4958478053_K
+4958478053_L 4958478053_L
+5342595001_A 5342595001_A
+5342595001_B 5342595001_B
+5342595001_C 5342595001_C
+5342595001_D 5342595001_D
+5342595001_E 5342595001_E
+5342595001_F 5342595001_F
+5342595001_G 5342595001_G
+5342595001_H 5342595001_H
+5342595001_I 5342595001_I
+5342595001_J 5342595001_J
+5342595001_K 5342595001_K
+5342595001_L 5342595001_L
+5342595013_A 5342595013_A
+5342595013_B 5342595013_B
+5342595013_C 5342595013_C
+5342595013_D 5342595013_D
+5342595013_E 5342595013_E
+5342595013_F 5342595013_F
+5342595013_G 5342595013_G
+5342595013_H 5342595013_H
+5342595013_I 5342595013_I
+5342595013_L 5342595013_L
+5342595020_A 5342595020_A
+5342595020_B 5342595020_B
+5342595020_C 5342595020_C
+5342595020_D 5342595020_D
+5342595020_E 5342595020_E
+5342595020_F 5342595020_F
+5342595020_G 5342595020_G
+5342595020_H 5342595020_H
+5342595020_I 5342595020_I
+5342595020_J 5342595020_J
+5342595020_K 5342595020_K
+5342595020_L 5342595020_L
+5342595026_A 5342595026_A
+5342595026_B 5342595026_B
+5342595026_C 5342595026_C
+5342595026_D 5342595026_D
+5342595026_E 5342595026_E
+5342595026_F 5342595026_F
+5342595026_G 5342595026_G
+5342595026_H 5342595026_H
+5342595026_I 5342595026_I
+5342595026_J 5342595026_J
+5342595026_K 5342595026_K
+5342595026_L 5342595026_L
+5342595027_A 5342595027_A
+5342595027_B 5342595027_B
+5342595027_C 5342595027_C
+5342595027_D 5342595027_D
+5342595027_E 5342595027_E
+5342595027_F 5342595027_F
+5342595027_H 5342595027_H
+5342595027_I 5342595027_I
+5342595027_J 5342595027_J
+5342595027_K 5342595027_K
+5376074023_A 5376074023_A
+5376074023_B 5376074023_B
+5376074023_C 5376074023_C
+5376074023_D 5376074023_D
+5376074023_E 5376074023_E
+5376074023_F 5376074023_F
+5376074023_G 5376074023_G
+5376074023_H 5376074023_H
+5376074023_I 5376074023_I
+5376074023_J 5376074023_J
+5376074023_K 5376074023_K
+5376074023_L 5376074023_L
+5376074031_B 5376074031_B
+5376074031_D 5376074031_D
+5376074031_F 5376074031_F
+5376074031_H 5376074031_H
+5376074031_I 5376074031_I
+5376074031_J 5376074031_J
+5376074031_L 5376074031_L
+5376074032_A 5376074032_A
+5376074032_B 5376074032_B
+5376074032_C 5376074032_C
+5376074032_D 5376074032_D
+5376074032_E 5376074032_E
+5376074032_F 5376074032_F
+5376074032_G 5376074032_G
+5376074032_H 5376074032_H
+5376074032_I 5376074032_I
+5376074032_J 5376074032_J
+5376074032_K 5376074032_K
+5376074032_L 5376074032_L
+5376074033_A 5376074033_A
+5376074033_B 5376074033_B
+5376074033_C 5376074033_C
+5376074033_D 5376074033_D
+5376074033_E 5376074033_E
+5376074033_F 5376074033_F
+5376074033_G 5376074033_G
+5376074033_H 5376074033_H
+5376074033_I 5376074033_I
+5376074033_J 5376074033_J
+5376074033_K 5376074033_K
+5376074033_L 5376074033_L
+5376074035_A 5376074035_A
+5376074035_B 5376074035_B
+5376074035_E 5376074035_E
+5376074035_G 5376074035_G
+5376074035_I 5376074035_I
+5376074035_J 5376074035_J
+5376074035_K 5376074035_K
+5376074035_L 5376074035_L
+5376074038_A 5376074038_A
+5376074038_B 5376074038_B
+5376074038_C 5376074038_C
+5376074038_D 5376074038_D
+5376074038_E 5376074038_E
+5376074038_F 5376074038_F
+5376074038_G 5376074038_G
+5376074038_H 5376074038_H
+5376074038_I 5376074038_I
+5376074038_J 5376074038_J
+5376074038_K 5376074038_K
+5376074038_L 5376074038_L
+5376074039_F 5376074039_F
+5376074039_J 5376074039_J
+5376074039_L 5376074039_L
+5376074040_A 5376074040_A
+5376074040_B 5376074040_B
+5376074040_C 5376074040_C
+5376074040_D 5376074040_D
+5376074040_E 5376074040_E
+5376074040_F 5376074040_F
+5376074040_G 5376074040_G
+5376074040_H 5376074040_H
+5376074040_I 5376074040_I
+5376074040_J 5376074040_J
+5376074040_K 5376074040_K
+5376074040_L 5376074040_L
+5376074044_B 5376074044_B
+5376074044_C 5376074044_C
+5376074044_D 5376074044_D
+5376074044_E 5376074044_E
+5376074044_F 5376074044_F
+5376074044_G 5376074044_G
+5376074044_H 5376074044_H
+5376074044_I 5376074044_I
+5376074044_K 5376074044_K
+5376074045_A 5376074045_A
+5376074045_B 5376074045_B
+5376074045_C 5376074045_C
+5376074045_D 5376074045_D
+5376074045_E 5376074045_E
+5376074045_F 5376074045_F
+5376074045_G 5376074045_G
+5376074045_H 5376074045_H
+5376074045_J 5376074045_J
+5376074045_K 5376074045_K
+5376074045_L 5376074045_L
+5376074046_A 5376074046_A
+5376074046_B 5376074046_B
+5376074046_C 5376074046_C
+5376074046_D 5376074046_D
+5376074046_E 5376074046_E
+5376074046_F 5376074046_F
+5376074046_G 5376074046_G
+5376074046_H 5376074046_H
+5376074046_I 5376074046_I
+5376074046_J 5376074046_J
+5376074046_K 5376074046_K
+5376074046_L 5376074046_L
+5376074048_A 5376074048_A
+5376074048_B 5376074048_B
+5376074048_C 5376074048_C
+5376074048_D 5376074048_D
+5376074048_E 5376074048_E
+5376074048_F 5376074048_F
+5376074048_G 5376074048_G
+5376074048_H 5376074048_H
+5376074048_I 5376074048_I
+5376074048_J 5376074048_J
+5376074048_K 5376074048_K
+5376074048_L 5376074048_L
+5376074054_A 5376074054_A
+5376074054_C 5376074054_C
+5376074054_F 5376074054_F
+5376074054_H 5376074054_H
+5376074054_I 5376074054_I
+5376074054_L 5376074054_L
+5376074056_A 5376074056_A
+5376074056_B 5376074056_B
+5376074056_C 5376074056_C
+5376074056_D 5376074056_D
+5376074056_E 5376074056_E
+5376074056_F 5376074056_F
+5376074056_G 5376074056_G
+5376074056_H 5376074056_H
+5376074056_I 5376074056_I
+5376074056_J 5376074056_J
+5376074056_K 5376074056_K
+5376074056_L 5376074056_L</code></pre>
+<p>The raw data is labeled with alternate sample names (a 10-digit number followed by underscore and a letter) compared to the GEO records and the sample name in the processed data GSE ExpressionSet object.</p>
+<ul>
+<li><p>Check phenotype records in GSE object to see if I can merge with raw data using 10-digit letter name as a key</p></li>
+<li><p>Documentation for manipulating ExpressionSet objects in general <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf">here</a></p></li>
+<li><p>Documentation for maniupulating ExpressionSets created by GEOquery <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/GEOquery/inst/doc/GEOquery.html#getting-gse-series-matrix-files-as-an-expressionset">here</a></p></li>
+</ul>
+<pre class="r"><code>show(pData(phenoData(gse46903[[1]]))[1:20,c(1,6,8)])</code></pre>
+<pre><code>                                    title type  source_name_ch1
+GSM1140407          B cell [5342595013_G]  RNA peripheral blood
+GSM1140408          B cell [5342595013_I]  RNA peripheral blood
+GSM1140409          B cell [5342595027_I]  RNA peripheral blood
+GSM1140410          DC_reg [5342595013_D]  RNA peripheral blood
+GSM1140411          DC_imm [5342595013_E]  RNA peripheral blood
+GSM1140412          DC_mat [5342595013_H]  RNA peripheral blood
+GSM1140413          DC_mat [5342595013_L]  RNA peripheral blood
+GSM1140414          DC_imm [5342595027_A]  RNA peripheral blood
+GSM1140415          DC_mat [5342595027_D]  RNA peripheral blood
+GSM1140416          DC_reg [5342595027_E]  RNA peripheral blood
+GSM1140417          DC_imm [5342595027_H]  RNA peripheral blood
+GSM1140418          DC_reg [5342595027_J]  RNA peripheral blood
+GSM1140419          DC_imm [5376074046_A]  RNA peripheral blood
+GSM1140420 DC_upLPS_10_24h [5376074046_B]  RNA peripheral blood
+GSM1140421 DC_upLPS_10_24h [5376074046_C]  RNA peripheral blood
+GSM1140422 DC_upLPS_10_24h [5376074046_D]  RNA peripheral blood
+GSM1140423 DC_upLPS_10_24h [5376074046_E]  RNA peripheral blood
+GSM1140424          DC_imm [5376074046_F]  RNA peripheral blood
+GSM1140425          DC_imm [5376074046_G]  RNA peripheral blood
+GSM1140426 DC_upLPS_10_24h [5376074046_H]  RNA peripheral blood</code></pre>
+<p>The 10-digit sample names correspond to experimental conditions and are appended to the phenodata sample names! I will have to get each component ready and then assemble a new expressionset with complete metadata and raw data but this is do-able.</p>
+<ul>
+<li>Get data and annotations out of AnnotatedDataFrame object, documentation <a href="https://www.rdocumentation.org/packages/Biobase/versions/2.32.0/topics/AnnotatedDataFrame">here</a></li>
+</ul>
+<pre class="r"><code># pull phenoData from expression set as an AnnotatedDataFrame
+meta46903 &lt;- phenoData(gse46903[[1]])
+
+# get data and annotations as separate objects
+meta_data46903 &lt;- pData(meta46903)
+anno_data46903 &lt;- varMetadata(meta46903)
+
+# doublecheck structure
+str(meta_data46903)</code></pre>
+<pre><code>&#39;data.frame&#39;:   384 obs. of  38 variables:
+ $ title                      : Factor w/ 384 levels &quot;B cell [5342595013_G]&quot;,..: 1 2 3 22 4 19 20 5 21 23 ...
+ $ geo_accession              : chr  &quot;GSM1140407&quot; &quot;GSM1140408&quot; &quot;GSM1140409&quot; &quot;GSM1140410&quot; ...
+ $ status                     : Factor w/ 1 level &quot;Public on Feb 13 2014&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ submission_date            : Factor w/ 1 level &quot;May 14 2013&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ last_update_date           : Factor w/ 3 levels &quot;Feb 13 2014&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ type                       : Factor w/ 1 level &quot;RNA&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ channel_count              : Factor w/ 1 level &quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ source_name_ch1            : Factor w/ 1 level &quot;peripheral blood&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ organism_ch1               : Factor w/ 1 level &quot;Homo sapiens&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ characteristics_ch1        : Factor w/ 13 levels &quot;initial differentiation: -&quot;,..: 1 1 1 9 9 9 9 9 9 9 ...
+ $ characteristics_ch1.1      : Factor w/ 41 levels &quot;activation stimuli: CD3/28&quot;,..: 39 39 39 34 21 33 33 21 33 34 ...
+ $ characteristics_ch1.2      : Factor w/ 12 levels &quot;time: 0h&quot;,&quot;time: 12h&quot;,..: 1 1 1 11 1 11 11 1 11 11 ...
+ $ characteristics_ch1.3      : Factor w/ 73 levels &quot;donor: BC 65&quot;,..: 56 68 67 71 70 69 70 71 71 70 ...
+ $ molecule_ch1               : Factor w/ 1 level &quot;total RNA&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ extract_protocol_ch1       : Factor w/ 1 level &quot;RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit i&quot;| __truncated__: 1 1 1 1 1 1 1 1 1 1 ...
+ $ label_ch1                  : Factor w/ 1 level &quot;biotin&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ label_protocol_ch1         : Factor w/ 1 level &quot;Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ taxid_ch1                  : Factor w/ 1 level &quot;9606&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ hyb_protocol               : Factor w/ 1 level &quot;Standard Illumina hybridization protocol&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ scan_protocol              : Factor w/ 1 level &quot;Standard Illumina scanning protocol&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ description                : Factor w/ 6 levels &quot;B cell&quot;,&quot;Dendritic cell&quot;,..: 1 1 1 2 2 2 2 2 2 2 ...
+ $ data_processing            : Factor w/ 1 level &quot;The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ platform_id                : Factor w/ 1 level &quot;GPL6947&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_name               : Factor w/ 1 level &quot;Joachim,,Schultze&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_email              : Factor w/ 1 level &quot;j.schultze@uni-bonn.de&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_department         : Factor w/ 1 level &quot;Genomics and Immunoregulation&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_institute          : Factor w/ 1 level &quot;LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_address            : Factor w/ 1 level &quot;Carl-Troll-Strasse 31&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_city               : Factor w/ 1 level &quot;Bonn&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_state              : Factor w/ 1 level &quot;NRW&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_zip/postal_code    : Factor w/ 1 level &quot;53115&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_country            : Factor w/ 1 level &quot;Germany&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ supplementary_file         : Factor w/ 1 level &quot;NONE&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ data_row_count             : Factor w/ 1 level &quot;47463&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ activation stimuli:ch1     : chr  &quot;unstimulated&quot; &quot;unstimulated&quot; &quot;unstimulated&quot; &quot;TNFa 800 u/ml+ PGE2 1µg/ml+ P3C 1µg/ml&quot; ...
+ $ donor:ch1                  : chr  &quot;D1&quot; &quot;D4&quot; &quot;D3&quot; &quot;D7&quot; ...
+ $ initial differentiation:ch1: chr  &quot;-&quot; &quot;-&quot; &quot;-&quot; &quot;GM-CSF + IL4&quot; ...
+ $ time:ch1                   : chr  &quot;0h&quot; &quot;0h&quot; &quot;0h&quot; &quot;72h&quot; ...</code></pre>
+<pre class="r"><code>head(meta_data46903)</code></pre>
+<pre><code>                           title geo_accession                status
+GSM1140407 B cell [5342595013_G]    GSM1140407 Public on Feb 13 2014
+GSM1140408 B cell [5342595013_I]    GSM1140408 Public on Feb 13 2014
+GSM1140409 B cell [5342595027_I]    GSM1140409 Public on Feb 13 2014
+GSM1140410 DC_reg [5342595013_D]    GSM1140410 Public on Feb 13 2014
+GSM1140411 DC_imm [5342595013_E]    GSM1140411 Public on Feb 13 2014
+GSM1140412 DC_mat [5342595013_H]    GSM1140412 Public on Feb 13 2014
+           submission_date last_update_date type channel_count
+GSM1140407     May 14 2013      Feb 13 2014  RNA             1
+GSM1140408     May 14 2013      Feb 13 2014  RNA             1
+GSM1140409     May 14 2013      Feb 13 2014  RNA             1
+GSM1140410     May 14 2013      Feb 13 2014  RNA             1
+GSM1140411     May 14 2013      Feb 13 2014  RNA             1
+GSM1140412     May 14 2013      Feb 13 2014  RNA             1
+            source_name_ch1 organism_ch1
+GSM1140407 peripheral blood Homo sapiens
+GSM1140408 peripheral blood Homo sapiens
+GSM1140409 peripheral blood Homo sapiens
+GSM1140410 peripheral blood Homo sapiens
+GSM1140411 peripheral blood Homo sapiens
+GSM1140412 peripheral blood Homo sapiens
+                             characteristics_ch1
+GSM1140407            initial differentiation: -
+GSM1140408            initial differentiation: -
+GSM1140409            initial differentiation: -
+GSM1140410 initial differentiation: GM-CSF + IL4
+GSM1140411 initial differentiation: GM-CSF + IL4
+GSM1140412 initial differentiation: GM-CSF + IL4
+                                                characteristics_ch1.1
+GSM1140407                           activation stimuli: unstimulated
+GSM1140408                           activation stimuli: unstimulated
+GSM1140409                           activation stimuli: unstimulated
+GSM1140410 activation stimuli: TNFa 800 u/ml+ PGE2 1µg/ml+ P3C 1µg/ml
+GSM1140411                                   activation stimuli: none
+GSM1140412                          activation stimuli: TNFa 800 u/ml
+           characteristics_ch1.2 characteristics_ch1.3 molecule_ch1
+GSM1140407              time: 0h             donor: D1    total RNA
+GSM1140408              time: 0h             donor: D4    total RNA
+GSM1140409              time: 0h             donor: D3    total RNA
+GSM1140410             time: 72h             donor: D7    total RNA
+GSM1140411              time: 0h             donor: D6    total RNA
+GSM1140412             time: 72h             donor: D5    total RNA
+                                                                                                                                                                                                                              extract_protocol_ch1
+GSM1140407 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140408 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140409 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140410 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140411 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140412 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+           label_ch1
+GSM1140407    biotin
+GSM1140408    biotin
+GSM1140409    biotin
+GSM1140410    biotin
+GSM1140411    biotin
+GSM1140412    biotin
+                                                                           label_protocol_ch1
+GSM1140407 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140408 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140409 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140410 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140411 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140412 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+           taxid_ch1                             hyb_protocol
+GSM1140407      9606 Standard Illumina hybridization protocol
+GSM1140408      9606 Standard Illumina hybridization protocol
+GSM1140409      9606 Standard Illumina hybridization protocol
+GSM1140410      9606 Standard Illumina hybridization protocol
+GSM1140411      9606 Standard Illumina hybridization protocol
+GSM1140412      9606 Standard Illumina hybridization protocol
+                                 scan_protocol    description
+GSM1140407 Standard Illumina scanning protocol         B cell
+GSM1140408 Standard Illumina scanning protocol         B cell
+GSM1140409 Standard Illumina scanning protocol         B cell
+GSM1140410 Standard Illumina scanning protocol Dendritic cell
+GSM1140411 Standard Illumina scanning protocol Dendritic cell
+GSM1140412 Standard Illumina scanning protocol Dendritic cell
+                                                                                                 data_processing
+GSM1140407 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140408 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140409 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140410 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140411 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140412 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+           platform_id      contact_name          contact_email
+GSM1140407     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140408     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140409     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140410     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140411     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140412     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+                      contact_department
+GSM1140407 Genomics and Immunoregulation
+GSM1140408 Genomics and Immunoregulation
+GSM1140409 Genomics and Immunoregulation
+GSM1140410 Genomics and Immunoregulation
+GSM1140411 Genomics and Immunoregulation
+GSM1140412 Genomics and Immunoregulation
+                                                                contact_institute
+GSM1140407 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140408 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140409 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140410 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140411 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140412 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+                 contact_address contact_city contact_state
+GSM1140407 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140408 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140409 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140410 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140411 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140412 Carl-Troll-Strasse 31         Bonn           NRW
+           contact_zip/postal_code contact_country supplementary_file
+GSM1140407                   53115         Germany               NONE
+GSM1140408                   53115         Germany               NONE
+GSM1140409                   53115         Germany               NONE
+GSM1140410                   53115         Germany               NONE
+GSM1140411                   53115         Germany               NONE
+GSM1140412                   53115         Germany               NONE
+           data_row_count                 activation stimuli:ch1 donor:ch1
+GSM1140407          47463                           unstimulated        D1
+GSM1140408          47463                           unstimulated        D4
+GSM1140409          47463                           unstimulated        D3
+GSM1140410          47463 TNFa 800 u/ml+ PGE2 1µg/ml+ P3C 1µg/ml        D7
+GSM1140411          47463                                   none        D6
+GSM1140412          47463                          TNFa 800 u/ml        D5
+           initial differentiation:ch1 time:ch1
+GSM1140407                           -       0h
+GSM1140408                           -       0h
+GSM1140409                           -       0h
+GSM1140410                GM-CSF + IL4      72h
+GSM1140411                GM-CSF + IL4       0h
+GSM1140412                GM-CSF + IL4      72h</code></pre>
+<pre class="r"><code>str(anno_data46903)</code></pre>
+<pre><code>&#39;data.frame&#39;:   38 obs. of  1 variable:
+ $ labelDescription: chr  NA NA NA NA ...</code></pre>
+<pre class="r"><code>head(anno_data46903)</code></pre>
+<pre><code>                 labelDescription
+title                        &lt;NA&gt;
+geo_accession                &lt;NA&gt;
+status                       &lt;NA&gt;
+submission_date              &lt;NA&gt;
+last_update_date             &lt;NA&gt;
+type                         &lt;NA&gt;</code></pre>
+<pre class="r"><code># anno_data is pretty useless - just empty variables with matching rownames from pData</code></pre>
 <br> <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -925,27 +2001,28 @@ loaded via a namespace (and not attached):
  [77] doRNG_1.7.1                 whisker_0.3-2              
  [79] nor1mix_1.2-3               xml2_1.2.0                 
  [81] biomaRt_2.38.0              compiler_3.5.3             
- [83] rstudioapi_0.10             affyio_1.52.0              
- [85] stringi_1.4.3               GenomicFeatures_1.34.7     
- [87] minfi_1.28.4                lattice_0.20-38            
- [89] Matrix_1.2-17               multtest_2.38.0            
- [91] pillar_1.3.1                BiocManager_1.30.4         
- [93] data.table_1.12.2           bitops_1.0-6               
- [95] rtracklayer_1.42.2          GenomicRanges_1.34.0       
- [97] R6_2.4.0                    affy_1.60.0                
- [99] KernSmooth_2.23-15          IRanges_2.16.0             
-[101] nleqslv_3.3.2               codetools_0.2-16           
-[103] MASS_7.3-51.4               assertthat_0.2.1           
-[105] rhdf5_2.26.2                SummarizedExperiment_1.12.0
-[107] openssl_1.3                 pkgmaker_0.27              
-[109] rprojroot_1.3-2             withr_2.1.2                
-[111] GenomicAlignments_1.18.1    Rsamtools_1.34.1           
-[113] S4Vectors_0.20.1            GenomeInfoDbData_1.2.0     
-[115] mgcv_1.8-28                 hms_0.4.2                  
-[117] quadprog_1.5-5              grid_3.5.3                 
-[119] base64_2.0                  rmarkdown_1.12             
-[121] DelayedMatrixStats_1.4.0    illuminaio_0.24.0          
-[123] git2r_0.25.2                lubridate_1.7.4            </code></pre>
+ [83] rstudioapi_0.10             curl_3.3                   
+ [85] affyio_1.52.0               stringi_1.4.3              
+ [87] GenomicFeatures_1.34.7      minfi_1.28.4               
+ [89] lattice_0.20-38             Matrix_1.2-17              
+ [91] multtest_2.38.0             pillar_1.3.1               
+ [93] BiocManager_1.30.4          data.table_1.12.2          
+ [95] bitops_1.0-6                rtracklayer_1.42.2         
+ [97] GenomicRanges_1.34.0        R6_2.4.0                   
+ [99] affy_1.60.0                 KernSmooth_2.23-15         
+[101] IRanges_2.16.0              nleqslv_3.3.2              
+[103] codetools_0.2-16            MASS_7.3-51.4              
+[105] assertthat_0.2.1            rhdf5_2.26.2               
+[107] SummarizedExperiment_1.12.0 openssl_1.3                
+[109] pkgmaker_0.27               rprojroot_1.3-2            
+[111] withr_2.1.2                 GenomicAlignments_1.18.1   
+[113] Rsamtools_1.34.1            S4Vectors_0.20.1           
+[115] GenomeInfoDbData_1.2.0      mgcv_1.8-28                
+[117] hms_0.4.2                   quadprog_1.5-5             
+[119] grid_3.5.3                  base64_2.0                 
+[121] rmarkdown_1.12              DelayedMatrixStats_1.4.0   
+[123] illuminaio_0.24.0           git2r_0.25.2               
+[125] lubridate_1.7.4            </code></pre>
 </div>
 </div>
 
