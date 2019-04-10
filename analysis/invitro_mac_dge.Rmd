@@ -84,10 +84,13 @@ filePaths = getGEOSuppFiles("GSE46903",
 ```{bash}
 # in terminal
 pwd
+ls
 cd GSE46903
+ls
 mv GSE* ~/tcga_macs/data
 cd ..
 rmdir GSE46903
+ls
 ```
 
 ```{r}
