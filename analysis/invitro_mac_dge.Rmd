@@ -99,10 +99,11 @@ write.exprs(lumi_46903, file = "~/tcga_macs/output/processed_lumi_46903.txt")
 
 ```
 
-```{r}
+```{r paged.print=TRUE}
 # review metadata
 show(lumi_46903)
-show(pData(phenoData(lumi_46903)))
+raw_metadata <- pData(phenoData(lumi_46903))
+head(raw_metadata)
 ```
 
 The raw data is labeled with alternate sample names (a 10-digit number followed by underscore and a letter) compared to the GEO records and the sample name in the processed data GSE ExpressionSet object. 
@@ -113,7 +114,7 @@ The raw data is labeled with alternate sample names (a 10-digit number followed 
 
 * Documentation for maniupulating ExpressionSets created by GEOquery [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/GEOquery/inst/doc/GEOquery.html#getting-gse-series-matrix-files-as-an-expressionset)
 
-```{r}
+```{r paged.print=TRUE}
 show(pData(phenoData(gse46903[[1]]))[1:20,c(1,6,8)])
 ```
 
