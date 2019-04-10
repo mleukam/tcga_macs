@@ -13,7 +13,7 @@
 
 <meta name="date" content="2019-04-09" />
 
-<title>Differential gene expression in _in vitro_ macrophage model</title>
+<title>Differential gene expression: _in vitro_ macrophage model</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -420,7 +420,7 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Differential gene expression in <em>in vitro</em> macrophage model</h1>
+<h1 class="title toc-ignore">Differential gene expression: <em>in vitro</em> macrophage model</h1>
 <h4 class="author">mleukam</h4>
 <h4 class="date">2019-04-09</h4>
 
@@ -447,7 +447,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-04-09
+<strong>Last updated:</strong> 2019-04-10
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -526,10 +526,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree2555a2a7e7eea7fccfeabb6e392926723e7cff25targetblank2555a2aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/2555a2a7e7eea7fccfeabb6e392926723e7cff25" target="_blank">2555a2a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreefcefd997d3b694d52c85f702a49784d945619e96targetblankfcefd99a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/fcefd997d3b694d52c85f702a49784d945619e96" target="_blank">fcefd99</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree2555a2a7e7eea7fccfeabb6e392926723e7cff25targetblank2555a2aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreefcefd997d3b694d52c85f702a49784d945619e96targetblankfcefd99a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -538,6 +538,15 @@ Great! You are using Git for version control. Tracking code development and conn
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/.DS_Store
+
+Untracked files:
+    Untracked:  data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+    Untracked:  data/GSE46903_Affymetrix_metadata.txt.gz
+    Untracked:  data/GSE46903_RAW.tar
+    Untracked:  data/GSE46903_non-normalized.txt.gz
+    Untracked:  output/processed_lumi_46903.txt
 
 </code></pre>
 <p>
@@ -576,6 +585,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/fcefd997d3b694d52c85f702a49784d945619e96/analysis/invitro_mac_dge.Rmd" target="_blank">fcefd99</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-10
+</td>
+<td>
+successful raw data import and normalization
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/1c4ad0246f938ca2348e7ab0df1a0b4e8a5631f0/docs/invitro_mac_dge.html" target="_blank">1c4ad02</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -738,7 +781,10 @@ citations added and packages loaded
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>The purpose of this analysis is to find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. The source for this method is:</p>
+<div id="purpose-of-this-analysis" class="section level3">
+<h3>Purpose of this analysis</h3>
+<p>Find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses.</p>
+<p>The source for this method is:</p>
 <blockquote>
 <p>Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19.</p>
 </blockquote>
@@ -749,29 +795,64 @@ citations added and packages loaded
 <blockquote>
 <p>For each cluster, we created two gene sets: 100 upregulated and downregulated genes. GSEA (with fgsea package) was performed using this gene set against ranked gene lists from treatment comparisons. To obtain a score, we subtracted the normalized enrichment score (NES) of downregulated genes from NES of upregulated genes. To further investigate the correlation (or lack thereof) between clusters and treatments, we visualized genes associated with each cluster in human macrophages. We reduced the dimensions of macrophage datasets with Rtsne package and plotted each sample in two dimensions using the ggplot2 package. Samples were then highlighted using Z-scored expression profiles of cluster-associated genes.</p>
 </blockquote>
+</div>
+<div id="data-source" class="section level3">
+<h3>Data Source</h3>
 <p>The gene chip data used to derive differential expression for various macrophage subtypes was first published here:</p>
 <blockquote>
 <p>Xue J, Schmidt SV, Sander J, Draffehn A et al. Transcriptome-based network analysis reveals a spectrum model of human macrophage activation. Immunity 2014 Feb 20;40(2):274-88. PMID: 24530056</p>
 </blockquote>
-<p>The original experiment had two conditions. One (corresponding to the data we want) was done in cell culture with monocytes exposed to growth factor and a number of different cytokines to induce different activation states. They used those gene sets to investigate gene expression signatures from patients with COPD and asthma. The cell culture part was done on an Illumina HumanHT-12 v3.0 expression beadchip The human part was done on Affymetrix chips</p>
+<p>The original experiment had two conditions.</p>
+<ol style="list-style-type: decimal">
+<li><p>Cell culture with monocytes exposed to growth factor and a number of different cytokines to induce different activation states. Microarray expression data from cell culture were generated with Illumina HumanHT-12 v3.0 beadchips.</p></li>
+<li><p>Gene sets derived in cell culture were used to categorize expression profiles derived from alveolar macrophages from patients with COPD and asthma. Affymetrix chips were used to measure expression in human samples.</p></li>
+</ol>
+<p>We are interested in the first condition (macrophages in culture). Associated metadata is posted at the GEO:</p>
 <ul>
-<li><p>The experiment overview is <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">here</a>.</p></li>
-<li><p>The record for the control group (ie M0-GM-CSF treated monocytes at 72hours) is <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1140443">here</a>, and has more details about the experimental method.</p></li>
-<li><p>The research group posted expression matrices in which “The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite” An example expression matrix from the control group is <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?view=data&amp;acc=GSM1140443&amp;id=38019&amp;db=GeoDb_blob97">here</a>.</p></li>
+<li><p><a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">The experiment overview</a></p></li>
+<li><p><a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1140443">The record for the control group</a></p>
+<ul>
+<li><p>M0-GM-CSF treated monocytes at 72hours</p></li>
+<li><p>Additional details about how the data were generated</p></li>
+</ul></li>
+<li><p>Expression matrices in which “The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite”</p>
+<ul>
+<li><a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?view=data&amp;acc=GSM1140443&amp;id=38019&amp;db=GeoDb_blob97">Example expression matrix</a> from the control group</li>
+</ul></li>
 </ul>
 <p><em>We will obtain the raw data from the Illumina expression beadchips and normalize ourselves.</em></p>
+</div>
 <div id="set-up-workspace" class="section level3">
 <h3>Set up workspace</h3>
 <p>Clear workspace prior to analysis and load necessary packages</p>
 <pre class="r"><code>rm(list=ls())</code></pre>
 <pre class="r"><code>library(&quot;tidyverse&quot;)
 library(&quot;GEOquery&quot;)
-library(&quot;affy&quot;)</code></pre>
+library(&quot;lumi&quot;)</code></pre>
 </div>
 </div>
 <div id="data-import" class="section level2">
 <h2>Data import</h2>
-<p>GSE46903</p>
+<p>GEO ID is: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">GSE46903</a></p>
+<p>Accessing raw data from the GEO: <a href="http://genomicsclass.github.io/book/pages/GEOquery.html" class="uri">http://genomicsclass.github.io/book/pages/GEOquery.html</a></p>
+<p>Note about raw vs normalized files from GEO: <a href="https://www.biostars.org/p/259637/" class="uri">https://www.biostars.org/p/259637/</a></p>
+<pre class="r"><code># download raw data
+filePaths = getGEOSuppFiles(&quot;GSE46903&quot;, 
+                            makeDirectory = TRUE)</code></pre>
+<pre class="bash"><code># in terminal
+pwd
+cd GSE46903
+mv GSE* ~/tcga_macs/data
+cd ..
+rmdir GSE46903</code></pre>
+<pre class="r"><code>lumi_input &lt;- lumiR(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt.gz&quot;) 
+lumi_46903 &lt;- lumiExpresso(lumi_input, 
+                         normalize.param = list(method = &#39;rsn&#39;))
+
+write.exprs(lumi_46903, file = &quot;~/tcga_macs/output/processed_lumi_46903.txt&quot;)</code></pre>
+<pre class="r"><code># review metadata
+show(lumi_46903)
+show(pData(phenoData(lumi_46903)))</code></pre>
 <br> <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -796,32 +877,75 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] affy_1.60.0         GEOquery_2.50.5     Biobase_2.42.0     
+ [1] lumi_2.34.0         GEOquery_2.50.5     Biobase_2.42.0     
  [4] BiocGenerics_0.28.0 forcats_0.4.0       stringr_1.4.0      
  [7] dplyr_0.8.0.1       purrr_0.3.2         readr_1.3.1        
 [10] tidyr_0.8.3         tibble_2.1.1        ggplot2_3.1.1      
 [13] tidyverse_1.2.1    
 
 loaded via a namespace (and not attached):
- [1] tidyselect_0.2.5      xfun_0.6              haven_2.1.0          
- [4] lattice_0.20-38       colorspace_1.4-1      generics_0.0.2       
- [7] htmltools_0.3.6       yaml_2.2.0            rlang_0.3.4          
-[10] pillar_1.3.1          glue_1.3.1            withr_2.1.2          
-[13] modelr_0.1.4          readxl_1.3.1          affyio_1.52.0        
-[16] plyr_1.8.4            zlibbioc_1.28.0       munsell_0.5.0        
-[19] gtable_0.3.0          workflowr_1.2.0       cellranger_1.1.0     
-[22] rvest_0.3.2           evaluate_0.13         knitr_1.22           
-[25] preprocessCore_1.44.0 broom_0.5.2           Rcpp_1.0.1           
-[28] BiocManager_1.30.4    scales_1.0.0          backports_1.1.3      
-[31] limma_3.38.3          jsonlite_1.6          fs_1.2.7             
-[34] hms_0.4.2             digest_0.6.18         stringi_1.4.3        
-[37] grid_3.5.3            rprojroot_1.3-2       cli_1.1.0            
-[40] tools_3.5.3           magrittr_1.5          lazyeval_0.2.2       
-[43] crayon_1.3.4          whisker_0.3-2         pkgconfig_2.0.2      
-[46] xml2_1.2.0            lubridate_1.7.4       assertthat_0.2.1     
-[49] rmarkdown_1.12        httr_1.4.0            rstudioapi_0.10      
-[52] R6_2.4.0              nlme_3.1-137          git2r_0.25.2         
-[55] compiler_3.5.3       </code></pre>
+  [1] readxl_1.3.1                backports_1.1.3            
+  [3] workflowr_1.2.0             plyr_1.8.4                 
+  [5] lazyeval_0.2.2              splines_3.5.3              
+  [7] BiocParallel_1.16.6         GenomeInfoDb_1.18.2        
+  [9] digest_0.6.18               foreach_1.4.4              
+ [11] htmltools_0.3.6             magrittr_1.5               
+ [13] memoise_1.1.0               limma_3.38.3               
+ [15] Biostrings_2.50.2           annotate_1.60.1            
+ [17] modelr_0.1.4                matrixStats_0.54.0         
+ [19] askpass_1.1                 siggenes_1.56.0            
+ [21] prettyunits_1.0.2           colorspace_1.4-1           
+ [23] blob_1.1.1                  rvest_0.3.2                
+ [25] haven_2.1.0                 xfun_0.6                   
+ [27] crayon_1.3.4                RCurl_1.95-4.12            
+ [29] jsonlite_1.6                genefilter_1.64.0          
+ [31] survival_2.44-1.1           iterators_1.0.10           
+ [33] glue_1.3.1                  registry_0.5-1             
+ [35] gtable_0.3.0                zlibbioc_1.28.0            
+ [37] XVector_0.22.0              DelayedArray_0.8.0         
+ [39] Rhdf5lib_1.4.3              HDF5Array_1.10.1           
+ [41] scales_1.0.0                DBI_1.0.0                  
+ [43] rngtools_1.3.1              bibtex_0.4.2               
+ [45] Rcpp_1.0.1                  xtable_1.8-3               
+ [47] progress_1.2.0              bumphunter_1.24.5          
+ [49] bit_1.1-14                  mclust_5.4.3               
+ [51] preprocessCore_1.44.0       stats4_3.5.3               
+ [53] httr_1.4.0                  RColorBrewer_1.1-2         
+ [55] pkgconfig_2.0.2             reshape_0.8.8              
+ [57] XML_3.98-1.19               locfit_1.5-9.1             
+ [59] tidyselect_0.2.5            rlang_0.3.4                
+ [61] AnnotationDbi_1.44.0        munsell_0.5.0              
+ [63] cellranger_1.1.0            tools_3.5.3                
+ [65] cli_1.1.0                   generics_0.0.2             
+ [67] RSQLite_2.1.1               broom_0.5.2                
+ [69] evaluate_0.13               yaml_2.2.0                 
+ [71] knitr_1.22                  bit64_0.9-7                
+ [73] fs_1.2.7                    beanplot_1.2               
+ [75] methylumi_2.28.0            nlme_3.1-138               
+ [77] doRNG_1.7.1                 whisker_0.3-2              
+ [79] nor1mix_1.2-3               xml2_1.2.0                 
+ [81] biomaRt_2.38.0              compiler_3.5.3             
+ [83] rstudioapi_0.10             affyio_1.52.0              
+ [85] stringi_1.4.3               GenomicFeatures_1.34.7     
+ [87] minfi_1.28.4                lattice_0.20-38            
+ [89] Matrix_1.2-17               multtest_2.38.0            
+ [91] pillar_1.3.1                BiocManager_1.30.4         
+ [93] data.table_1.12.2           bitops_1.0-6               
+ [95] rtracklayer_1.42.2          GenomicRanges_1.34.0       
+ [97] R6_2.4.0                    affy_1.60.0                
+ [99] KernSmooth_2.23-15          IRanges_2.16.0             
+[101] nleqslv_3.3.2               codetools_0.2-16           
+[103] MASS_7.3-51.4               assertthat_0.2.1           
+[105] rhdf5_2.26.2                SummarizedExperiment_1.12.0
+[107] openssl_1.3                 pkgmaker_0.27              
+[109] rprojroot_1.3-2             withr_2.1.2                
+[111] GenomicAlignments_1.18.1    Rsamtools_1.34.1           
+[113] S4Vectors_0.20.1            GenomeInfoDbData_1.2.0     
+[115] mgcv_1.8-28                 hms_0.4.2                  
+[117] quadprog_1.5-5              grid_3.5.3                 
+[119] base64_2.0                  rmarkdown_1.12             
+[121] DelayedMatrixStats_1.4.0    illuminaio_0.24.0          
+[123] git2r_0.25.2                lubridate_1.7.4            </code></pre>
 </div>
 </div>
 
