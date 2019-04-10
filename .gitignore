@@ -9,3 +9,8 @@ analysis/*png
 analysis/*html
 analysis/*_cache
 analysis/site_libs
+data/GSE46903_Affymetrix_metadata.txt.gz
+data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+data/GSE46903_non-normalized.txt.gz
+data/GSE46903_RAW.tar
+output/processed_lumi_46903.txt
