@@ -344,7 +344,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-04-09
+<strong>Last updated:</strong> 2019-04-11
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -375,18 +375,33 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9910c1dc1011a4b29711916c5e257236b0e15659targetblank9910c1da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9910c1dc1011a4b29711916c5e257236b0e15659" target="_blank">9910c1d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreed8458b9403f9ab5c62e498efb87bcbd28c3caef0targetblankd8458b9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/d8458b9403f9ab5c62e498efb87bcbd28c3caef0" target="_blank">d8458b9</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9910c1dc1011a4b29711916c5e257236b0e15659targetblank9910c1da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreed8458b9403f9ab5c62e498efb87bcbd28c3caef0targetblankd8458b9a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .DS_Store
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/.DS_Store
+    Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+    Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
+    Ignored:    data/GSE46903_RAW.tar
+    Ignored:    data/GSE46903_non-normalized.txt
+    Ignored:    data/GSE46903_nonnormalized copy.tsv
+    Ignored:    data/gse_46903.rds
+    Ignored:    output/processed_lumi_46903.Rds
+    Ignored:    output/processed_lumi_46903.tsv
+    Ignored:    output/processed_lumi_exprs.txt
+
+Unstaged changes:
+    Modified:   .gitignore
 
 </code></pre>
 <p>
@@ -425,6 +440,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/363b5df5770f40d8b98527c9ced243c7aa7a06d9/docs/index.html" target="_blank">363b5df</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -524,7 +556,11 @@ Start workflowr project.
 </div>
 <div id="defining-macrophage-gene-sets" class="section level2">
 <h2>Defining macrophage gene sets</h2>
-<p>See R notebook <a href="https://mleukam.github.io/tcga_macs/invitro_mac_dge.html">here</a>.</p>
+<p>Find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. The original data is obtained from GEO, ID=<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">GSE46903</a>.</p>
+<ul>
+<li><a href="data_download.html">Download data from GEO</a></li>
+<li><a href="invitro_mac_dge.html">Differential gene expression for experimental macrophage conditions</a>.</li>
+</ul>
 </div>
 
 
