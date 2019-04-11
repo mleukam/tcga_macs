@@ -14,3 +14,9 @@ data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
 data/GSE46903_non-normalized.txt.gz
 data/GSE46903_RAW.tar
 output/processed_lumi_46903.txt
+data/GSE46903_non-normalized.txt
+data/GSE46903_nonnormalized copy.tsv
+data/gse_46903.rds
+output/processed_lumi_46903.tsv
+output/processed_lumi_46903.Rds
+output/processed_lumi_exprs.txt
