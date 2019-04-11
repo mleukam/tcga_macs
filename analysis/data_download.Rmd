@@ -1,5 +1,5 @@
 ---
-title: "data_download"
+title: "Download GEO data"
 author: "mleukam"
 date: "2019-04-10"
 output: workflowr::wflow_html
@@ -68,6 +68,9 @@ GEO ID is: [GSE46903](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE4690
 ```{r}
 # download normalized data with full metadata from GEO as a list of ExpressionSets
 gse46903 <- getGEO("GSE46903")
+
+# save for downstream use in another notebook
+saveRDS(gse46903, "~/tcga_macs/data/gse_46903.rds")
 ```
 
 Accessing raw data from the GEO: http://genomicsclass.github.io/book/pages/GEOquery.html
