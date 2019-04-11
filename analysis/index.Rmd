@@ -14,4 +14,7 @@ A T cell inflamed signature has been defined and described across tumor types in
 
 ## Defining macrophage gene sets
 
-See R notebook [here](https://mleukam.github.io/tcga_macs/invitro_mac_dge.html).
+Find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. The original data is obtained from GEO, ID=[GSE46903](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903).
+
+ * [Download data from GEO](data_download.html)
+ * [Differential gene expression for experimental macrophage conditions](invitro_mac_dge.html).
