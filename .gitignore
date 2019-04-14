@@ -20,3 +20,4 @@ data/gse_46903.rds
 output/processed_lumi_46903.tsv
 output/processed_lumi_46903.Rds
 output/processed_lumi_exprs.txt
+*.rds
