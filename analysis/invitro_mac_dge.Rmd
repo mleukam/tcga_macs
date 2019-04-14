@@ -5,23 +5,14 @@ date: "2019-04-09"
 output: workflowr::wflow_html
 ---
 
-## Introduction
-
-The pupose of this analysis is to find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. 
-
-We are roughly following the methods described in:
-
-> Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19. 
-
-For more details regarding the data source and experimental design, please refer to the [data_download](data_download.html) notebook.
-
-### Setup workspace
-
+## Setup
 Clear workspace prior to analysis and load necessary packages
-```{r}
+
+```{r clear workspace}
 rm(list = ls())
 ```
 
+## Load Packages
 ```{r packages, message=FALSE, warning=FALSE}
 library("tidyverse")
 library("GEOquery")
@@ -36,229 +27,24 @@ library("ggsci")
 library("ggpubr")
 ```
 
-## Data preparation and cleaning
+## Read data
+```{r read data}
+# Expression set created in PCA_MCA notebook 
+# Contains normalized expression matrix made from raw illumina beadchip data
+# Also contains metadata from GEO
+# Probe ID is unique sequence ID from lumiHumanIDMapping
+mac_eset <- readRDS("~/tcga_macs/output/expression_set.rds")
 
-### Read in raw expression data
-```{r}
-lumi_input <- lumiR("~/tcga_macs/data/GSE46903_non-normalized.txt",
-                    sep = "\t",
-                    lib.mapping = 'lumiHumanIDMapping',
-                    parseColumnName = TRUE,
-                    columnNameGrepPattern = list(
-                      exprs = 'AVG_Signal', 
-                      se.exprs = 'BEAD_STD', 
-                      detection = 'Detection', 
-                      beadNum = 'Avg_NBEADS')) 
+# Expression set created by lumi
+# Contains raw reads from illumina beadchip
+# variance stablized by log2 transformation
+# normalized with RSN (robust spline normalization)
+lumi_46903 <- readRDS("~/tcga_macs/output/normalized_probe_intensities.Rds")
 ```
 
-### Normalize expression values
+## Filter
 
- * The original authors collected individual experiments into a single output frame, which would have resulted in background correction from the Illumina Genome Studio software.
- * Due to the lack of 'se.exprs' information, 'log2' transformation will be used.
- * Variance Stabilizing Transform method: log2 
- * Normalization method: rsn 
- 
-```{r message=FALSE, warning=FALSE, results="hide"}
-lumi_46903 <- lumiExpresso(lumi_input, 
-                         normalize.param = list(method = 'rsn'))
-
-write.exprs(lumi_46903, 
-            file = "~/tcga_macs/output/processed_lumi_exprs.txt")
-```
-
-### Format and subset metadata
-```{r paged.print=TRUE}
-# review metadata
-show(lumi_46903)
-raw_metadata <- pData(phenoData(lumi_46903))
-head(raw_metadata)
-```
-
-The raw data is labeled with sample names (a 10-digit number followed by underscore and a letter), not the GEO accession number, whereas the sample names in the processed data GSE ExpressionSet object are GEO accession numbers.
-
-* I will go back to the published pre-processed GSE in the GEO and see if the metadata there can be merged into an expression set with the expression matrix I generated from the raw values.
-
-* [Documentation for manipulating ExpressionSet objects](https://www.bioconductor.org/packages/devel/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf)
-
-* [Documentation for ExpressionSets created by GEOquery](https://www.bioconductor.org/packages/devel/bioc/vignettes/GEOquery/inst/doc/GEOquery.html#getting-gse-series-matrix-files-as-an-expressionset)
-
-```{r paged.print=TRUE}
-# read in previously downloaded GSE containing pre-normalized reads and full metadata
-gse46903 <- readRDS("~/tcga_macs/data/gse_46903.rds")
-show(pData(phenoData(gse46903[[1]]))[1:20,c(1,6,8)])
-```
-
-The 10-digit sample names correspond to experimental conditions, but are stuck in the same column as the description of the experiment.
-
-* [Documentation for working with AnnotatedDataFrame objects](https://www.rdocumentation.org/packages/Biobase/versions/2.32.0/topics/AnnotatedDataFrame)
-
-```{r phenodata, paged.print=TRUE}
-# pull phenoData from expression set as an AnnotatedDataFrame
-meta46903 <- phenoData(gse46903[[1]])
-
-# get data and annotations separately from AnnotatedDataFrame
-meta_data46903 <- pData(meta46903)
-anno_data46903 <- varMetadata(meta46903)
-
-# review metadata
-class(meta_data46903)
-str(meta_data46903)
-head(meta_data46903)
-
-# review annotations
-class(anno_data46903)
-str(anno_data46903)
-head(anno_data46903)
-
-# anno_data is pretty useless - just empty variables with matching rownames from pData. Will drop this from further analysis.
-```
-
-Format metadata to get raw_id in its own column
-```{r format_metadata}
-# split "title" column into cell type and raw_id
-meta_data46903 <- meta_data46903 %>%
-  tidyr::separate(title, 
-                  c("cell_type", "raw_id"), 
-                  sep = "\\[")
-
-# review results
-meta_data46903[1:5, c(1,2)]
-
-# remove trailing closed bracket
-# preserve rownames by moving to column
-meta_data46903 <- meta_data46903 %>%
-  rownames_to_column(var = "geo_id") %>%
-  mutate(raw_id = str_remove(raw_id, "]"))
-
-# review results
-meta_data46903[1:5, 1:5]
-```
-
-Subset metadata 
-```{r}
-# use macrophages cultured for 72 hours (endpoint)
-mac_metadata <- meta_data46903 %>%
-  as_tibble() %>%
-  filter(`initial differentiation:ch1` %in% c("GM-CSF", "M-CSF"),
-         grepl("72h", characteristics_ch1.2)) %>%
-  print()
-
-# get the raw IDs to select expression profiles later
-mac_samples <- mac_metadata %>% pull(raw_id)
-
-# convert back to data.frame and add rownames back in 
-# for compatability with expressionset class
-mac_metadata <- as.data.frame(mac_metadata)
-rownames(mac_metadata) <- mac_metadata$raw_id
-mac_metadata[1:5, 1:5]
-```
-
-
-### Subset expression data
-Next step is to subset the expression data, and to ensure column names exactly match rownames of phenotype data
-
-Review and subset expression matrix
-```{r}
-exp_data <- exprs(lumi_46903)
-  
-# review expression matrix
-class(exp_data)
-str(exp_data)
-exp_data[1:10, 1:3]
-
-# rownames are unique sequence identifiers from lumiHumanIDmapping package
-# colnames are 10-digit and letter sample names
-# values are log-2 RDS normalized expression values 
-# 384 samples and 47462 probes
-
-# convert to tbl for subsetting
-exp_data <- exp_data %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "probe_id") %>%
-  as_tibble()
-
-# remove probe_id for subsetting, will add back in aferwards
-probe_id <- exp_data %>% pull(probe_id)
-  
-# use vector of sample names to select cases  
-mac_exprs <- exp_data %>%
-  dplyr::select(one_of(mac_samples)) %>%
-  add_column(probe_id, .before = "4487653414_E") 
-
-# compare representative columns to ensure the order wasn't lost
-mac_exprs %>%
-  dplyr::select(probe_id, "4487653414_E", "4487653415_E") %>%
-  print()
-exp_data %>%
-  dplyr::select(probe_id, "4487653414_E", "4487653415_E") %>%
-  print()
-
-# they match exactly
-
-# convert back to data.frame and add rownames
-mac_exprs <- mac_exprs %>%
-  as.data.frame()
-rownames(mac_exprs) <- mac_exprs$probe_id
-
-# double check that rownames match probe_id
-mac_exprs[1:5, 1:5]
-
-# remove temporary probe_id column
-mac_exprs <- subset(mac_exprs, select = -probe_id)
-mac_exprs[1:5, 1:5]
-```
-
-Ensure that rownames of metadata and column names of expression data match exactly
-```{r}
-# are they the same length?
-length(rownames(mac_metadata))
-length(colnames(mac_exprs))
-
-# ask R to check identity
-identical(rownames(mac_metadata), colnames(mac_exprs))
-
-# eyeball a few too
-rownames(mac_metadata)[1:10]
-colnames(mac_exprs)[1:10]
-
-# looks good!
-```
-
-### Build Eset
-
-Following the [documentation](https://www.bioconductor.org/packages/3.7/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf) for Biconductor ExpressionSet
-
-```{r}
-# create a frame for annotation of column names in metadata
-# will be empty for now
-varnames <- colnames(mac_metadata)
-vardata <- data.frame(labelDescription = varnames, 
-                      row.names = varnames)
-
-# build an AnnotatedDataFrame
-mac_phenoData <- new("AnnotatedDataFrame",
-                       data = mac_metadata, 
-                       varMetadata = vardata)
-
-# convert expression data to matrix
-mac_exprs <- as.matrix(mac_exprs)
-
-
-mac_eset <- ExpressionSet(assayData = mac_exprs, 
-                            phenoData = mac_phenoData,
-                            annotation = "Illumina Human HT-12 v3.0 beadchip")
-
-# check the eset properties
-featureNames(mac_eset)[1:5]
-sampleNames(mac_eset)[1:5]
-varLabels(mac_eset)
-mat <- exprs(mac_eset)
-dim(mat)
-mat[1:5, 1:5]
-```
-
-### Filter probes
-```{r}
+```{r filter}
 # retreive normalized data
 dataMatrix <- exprs(mac_eset)
 
@@ -327,75 +113,10 @@ summary(pheno_data$treatment)
 summary(pheno_data$clusternum)
 ```
 
-Detailed instructions for building a contrast matrix and filtering low-expression scores can be found in the [Limma User's Guide](http://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf), particularly chapters 9.2 and 9.3
-
-## PCA probe intensities
-
-Source: https://rpkgs.datanovia.com/factoextra/index.html
-
-```{r}
-# transpose matrix to tidy data format
-t_DataMatrix <- t(selDataMatrix)
-t_DataMatrix[1:5, 1:5]
-
-# add categories and factors
-# select columns of interest from phenotype data
-pheno_pca <- pheno_data %>%
-  dplyr::select(raw_id, treatment, clusternum)
-
-df_pca <- t_DataMatrix %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "raw_id") %>%
-  left_join(pheno_pca, by = "raw_id") %>%
-  as_tibble() %>%
-  dplyr::select(raw_id, treatment, clusternum, everything()) %>%
-  print()
-
-norm_probe_pca <- PCA(df_pca[,c(4:39471)], graph = FALSE)
-head(get_eig(norm_probe_pca))
-fviz_eig(norm_probe_pca)
-```
-
-```{r}
-# visualize eigenvalues
-mypal <- pal_igv("default", alpha = 1)(23)
-pca1 <- fviz_pca_ind(norm_probe_pca,
-             label = "none", # hide individual labels
-             habillage = "none",
-             col.ind = df_pca$treatment,
-             palette = mypal,
-             geom.ind = "point",
-             invisible = "quali",
-             pointshape = 19,
-             title = "PCA of normalized expression"
-) +
-  labs(subtitle = "By activation agent")
-print(pca1)
-
-pca2 <- fviz_pca_ind(norm_probe_pca,
-             label = "none", # hide individual labels
-             habillage = "none",
-             col.ind = df_pca$clusternum,
-             palette = mypal,
-             geom.ind = "point",
-             invisible = "quali",
-             pointshape = 19, 
-             addEllipses = TRUE,
-             title = "PCA of normalized expression"
-) +
-  labs(subtitle = "By cluster assignment")
-print(pca2)
-```
-
-
-## Correspondence Analysis
-Correspondence Analysis for Microarray data: https://www.bioconductor.org/packages/devel/bioc/vignettes/made4/inst/doc/introduction.pdf
-
-Another method source: http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
-
 ## Limma
 
-Design and contrast matrices for individual treatments
+Design matrix and contrast matrix for individual treatments
+
 ```{r}
 # set up design matrix
 rnames <- pheno_data$raw_id
@@ -637,36 +358,4 @@ subtable_TPP_IFNb
 subtable_TPP_IFNb_IFNg
 subtable_upLPS_IC
 ```
-
-
-topTable(fit2, coef = 1, adjust = "BH")
-```
-# set up log fkpm "read count" matrix
-log_fpkm_matrix <- as.matrix(log_fpkm_matrix)
-```
-
-
-```
-
-##
-if (require(limma)) {
-## compare '95:5' and '100:0'
-+ design <- model.matrix(~ factor(sampleType))
-+ colnames(design) <- c('100:0', '95:5-100:0')
-+ fit <- lmFit(selDataMatrix, design)
-+ fit <- eBayes(fit)
-+ ## Add gene symbols to gene properties
-+ if (require(lumiHumanAll.db) & require(annotate)) {
-+ geneSymbol <- getSYMBOL(probeList, 'lumiHumanAll.db')
-+ geneName <- sapply(lookUp(probeList, 'lumiHumanAll.db', 'GENENAME'), function(x) x[1])
-+ fit$genes <- data.frame(ID= probeList, geneSymbol=geneSymbol, geneName=geneName, stringsAsFactors=FALSE)
-+ }
-
-
-
-
-
-
-```
-
 
