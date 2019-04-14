@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="mleukam" />
+
+<meta name="date" content="2019-04-14" />
+
+<title>PCA_MCA</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Macrophage signatures in TCGA</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mleukam/tcga_macs">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">PCA_MCA</h1>
+<h4 class="author">mleukam</h4>
+<h4 class="date">2019-04-14</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#report"> Report <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2019-04-14
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>tcga_macs/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.2.0). The <em>Report</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="report" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20190409code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20190409)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20190409code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20190409)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree2d0c6dacc8e10b1be88c2aacf9b039f5889f6681targetblank2d0c6daa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/2d0c6dacc8e10b1be88c2aacf9b039f5889f6681" target="_blank">2d0c6da</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree2d0c6dacc8e10b1be88c2aacf9b039f5889f6681targetblank2d0c6daa" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/.DS_Store
+    Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+    Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
+    Ignored:    data/GSE46903_RAW.tar
+    Ignored:    data/GSE46903_non-normalized.txt
+    Ignored:    data/GSE46903_nonnormalized copy.tsv
+    Ignored:    data/gse_46903.rds
+    Ignored:    output/processed_lumi_46903.Rds
+    Ignored:    output/processed_lumi_46903.tsv
+    Ignored:    output/processed_lumi_exprs.txt
+
+Untracked files:
+    Untracked:  output/expression_set.rds
+    Untracked:  output/normalized_probe_intensities.Rds
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The pupose of this analysis is to find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses.</p>
+<p>We are roughly following the methods described in:</p>
+<blockquote>
+<p>Gubin, Matthew M., Ekaterina Esaulova, Jeffrey P. Ward, Olga N. Malkova, Daniele Runci, Pamela Wong, Takuro Noguchi, et al. 2018. “High-Dimensional Analysis Delineates Myeloid and Lymphoid Compartment Remodeling during Successful Immune-Checkpoint Cancer Therapy.” Cell 175 (4): 1014–30.e19.</p>
+</blockquote>
+<p>For more details regarding the data source and experimental design, please refer to the <a href="data_download.html">data_download</a> notebook.</p>
+<div id="setup-workspace" class="section level3">
+<h3>Setup workspace</h3>
+<p>Clear workspace prior to analysis and load necessary packages</p>
+<pre class="r"><code>rm(list = ls())</code></pre>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;GEOquery&quot;)
+library(&quot;lumi&quot;)
+library(&quot;lumiHumanIDMapping&quot;)
+library(&quot;lumiHumanAll.db&quot;)
+library(&quot;limma&quot;)
+library(&quot;annotate&quot;)
+library(&quot;factoextra&quot;)
+library(&quot;FactoMineR&quot;)
+library(&quot;ggsci&quot;)
+library(&quot;ggpubr&quot;)</code></pre>
+</div>
+</div>
+<div id="data-preparation-and-cleaning" class="section level2">
+<h2>Data preparation and cleaning</h2>
+<div id="read-in-raw-expression-data" class="section level3">
+<h3>Read in raw expression data</h3>
+<pre class="r"><code>lumi_input &lt;- lumiR(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt&quot;,
+                    sep = &quot;\t&quot;,
+                    lib.mapping = &#39;lumiHumanIDMapping&#39;,
+                    parseColumnName = TRUE,
+                    columnNameGrepPattern = list(
+                      exprs = &#39;AVG_Signal&#39;, 
+                      se.exprs = &#39;BEAD_STD&#39;, 
+                      detection = &#39;Detection&#39;, 
+                      beadNum = &#39;Avg_NBEADS&#39;)) </code></pre>
+<pre><code>Duplicated IDs found and were merged!</code></pre>
+</div>
+<div id="normalize-expression-values" class="section level3">
+<h3>Normalize expression values</h3>
+<ul>
+<li>The original authors collected individual experiments into a single output frame, which would have resulted in background correction from the Illumina Genome Studio software.</li>
+<li>Due to the lack of ‘se.exprs’ information, ‘log2’ transformation will be used.</li>
+<li>Variance Stabilizing Transform method: log2</li>
+<li>Normalization method: rsn</li>
+</ul>
+<pre class="r"><code>lumi_46903 &lt;- lumiExpresso(lumi_input, 
+                         normalize.param = list(method = &#39;rsn&#39;))
+
+saveRDS(lumi_46903, &quot;~/tcga_macs/output/normalized_probe_intensities.Rds&quot;)</code></pre>
+</div>
+<div id="format-and-subset-metadata" class="section level3">
+<h3>Format and subset metadata</h3>
+<pre class="r"><code># review metadata
+show(lumi_46903)</code></pre>
+<pre><code>ExpressionSet (storageMode: lockedEnvironment)
+assayData: 47462 features, 384 samples 
+  element names: detection, exprs 
+protocolData: none
+phenoData
+  sampleNames: 4233291007_A 4233291007_B ... 5376074056_L (384
+    total)
+  varLabels: sampleID
+  varMetadata: labelDescription
+featureData
+  featureNames: Ku8QhfS0n_hIOABXuE fqPEquJRRlSVSfL.8A ...
+    N8t5EuJCr0Tk9.zHno (47462 total)
+  fvarLabels: ProbeID
+  fvarMetadata: labelDescription
+experimentData: use &#39;experimentData(object)&#39;
+Annotation: lumiHumanAll.db </code></pre>
+<pre class="r"><code>raw_metadata &lt;- pData(phenoData(lumi_46903))
+head(raw_metadata)</code></pre>
+<pre><code>                 sampleID
+4233291007_A 4233291007_A
+4233291007_B 4233291007_B
+4233291007_C 4233291007_C
+4233291007_D 4233291007_D
+4233291007_E 4233291007_E
+4233291007_F 4233291007_F</code></pre>
+<p>The raw data is labeled with sample names (a 10-digit number followed by underscore and a letter), not the GEO accession number, whereas the sample names in the processed data GSE ExpressionSet object are GEO accession numbers.</p>
+<ul>
+<li><p>I will go back to the published pre-processed GSE in the GEO and see if the metadata there can be merged into an expression set with the expression matrix I generated from the raw values.</p></li>
+<li><p><a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf">Documentation for manipulating ExpressionSet objects</a></p></li>
+<li><p><a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/GEOquery/inst/doc/GEOquery.html#getting-gse-series-matrix-files-as-an-expressionset">Documentation for ExpressionSets created by GEOquery</a></p></li>
+</ul>
+<pre class="r"><code># read in previously downloaded GSE containing pre-normalized reads and full metadata
+gse46903 &lt;- readRDS(&quot;~/tcga_macs/data/gse_46903.rds&quot;)
+show(pData(phenoData(gse46903[[1]]))[1:20,c(1,6,8)])</code></pre>
+<pre><code>                                    title type  source_name_ch1
+GSM1140407          B cell [5342595013_G]  RNA peripheral blood
+GSM1140408          B cell [5342595013_I]  RNA peripheral blood
+GSM1140409          B cell [5342595027_I]  RNA peripheral blood
+GSM1140410          DC_reg [5342595013_D]  RNA peripheral blood
+GSM1140411          DC_imm [5342595013_E]  RNA peripheral blood
+GSM1140412          DC_mat [5342595013_H]  RNA peripheral blood
+GSM1140413          DC_mat [5342595013_L]  RNA peripheral blood
+GSM1140414          DC_imm [5342595027_A]  RNA peripheral blood
+GSM1140415          DC_mat [5342595027_D]  RNA peripheral blood
+GSM1140416          DC_reg [5342595027_E]  RNA peripheral blood
+GSM1140417          DC_imm [5342595027_H]  RNA peripheral blood
+GSM1140418          DC_reg [5342595027_J]  RNA peripheral blood
+GSM1140419          DC_imm [5376074046_A]  RNA peripheral blood
+GSM1140420 DC_upLPS_10_24h [5376074046_B]  RNA peripheral blood
+GSM1140421 DC_upLPS_10_24h [5376074046_C]  RNA peripheral blood
+GSM1140422 DC_upLPS_10_24h [5376074046_D]  RNA peripheral blood
+GSM1140423 DC_upLPS_10_24h [5376074046_E]  RNA peripheral blood
+GSM1140424          DC_imm [5376074046_F]  RNA peripheral blood
+GSM1140425          DC_imm [5376074046_G]  RNA peripheral blood
+GSM1140426 DC_upLPS_10_24h [5376074046_H]  RNA peripheral blood</code></pre>
+<p>The 10-digit sample names correspond to experimental conditions, but are stuck in the same column as the description of the experiment.</p>
+<ul>
+<li><a href="https://www.rdocumentation.org/packages/Biobase/versions/2.32.0/topics/AnnotatedDataFrame">Documentation for working with AnnotatedDataFrame objects</a></li>
+</ul>
+<pre class="r"><code># pull phenoData from expression set as an AnnotatedDataFrame
+meta46903 &lt;- phenoData(gse46903[[1]])
+
+# get data and annotations separately from AnnotatedDataFrame
+meta_data46903 &lt;- pData(meta46903)
+anno_data46903 &lt;- varMetadata(meta46903)
+
+# review metadata
+class(meta_data46903)</code></pre>
+<pre><code>[1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>str(meta_data46903)</code></pre>
+<pre><code>&#39;data.frame&#39;:   384 obs. of  38 variables:
+ $ title                      : Factor w/ 384 levels &quot;B cell [5342595013_G]&quot;,..: 1 2 3 22 4 19 20 5 21 23 ...
+ $ geo_accession              : chr  &quot;GSM1140407&quot; &quot;GSM1140408&quot; &quot;GSM1140409&quot; &quot;GSM1140410&quot; ...
+ $ status                     : Factor w/ 1 level &quot;Public on Feb 13 2014&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ submission_date            : Factor w/ 1 level &quot;May 14 2013&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ last_update_date           : Factor w/ 3 levels &quot;Feb 13 2014&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ type                       : Factor w/ 1 level &quot;RNA&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ channel_count              : Factor w/ 1 level &quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ source_name_ch1            : Factor w/ 1 level &quot;peripheral blood&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ organism_ch1               : Factor w/ 1 level &quot;Homo sapiens&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ characteristics_ch1        : Factor w/ 13 levels &quot;initial differentiation: -&quot;,..: 1 1 1 9 9 9 9 9 9 9 ...
+ $ characteristics_ch1.1      : Factor w/ 41 levels &quot;activation stimuli: CD3/28&quot;,..: 39 39 39 34 21 33 33 21 33 34 ...
+ $ characteristics_ch1.2      : Factor w/ 12 levels &quot;time: 0h&quot;,&quot;time: 12h&quot;,..: 1 1 1 11 1 11 11 1 11 11 ...
+ $ characteristics_ch1.3      : Factor w/ 73 levels &quot;donor: BC 65&quot;,..: 56 68 67 71 70 69 70 71 71 70 ...
+ $ molecule_ch1               : Factor w/ 1 level &quot;total RNA&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ extract_protocol_ch1       : Factor w/ 1 level &quot;RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit i&quot;| __truncated__: 1 1 1 1 1 1 1 1 1 1 ...
+ $ label_ch1                  : Factor w/ 1 level &quot;biotin&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ label_protocol_ch1         : Factor w/ 1 level &quot;Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ taxid_ch1                  : Factor w/ 1 level &quot;9606&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ hyb_protocol               : Factor w/ 1 level &quot;Standard Illumina hybridization protocol&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ scan_protocol              : Factor w/ 1 level &quot;Standard Illumina scanning protocol&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ description                : Factor w/ 6 levels &quot;B cell&quot;,&quot;Dendritic cell&quot;,..: 1 1 1 2 2 2 2 2 2 2 ...
+ $ data_processing            : Factor w/ 1 level &quot;The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ platform_id                : Factor w/ 1 level &quot;GPL6947&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_name               : Factor w/ 1 level &quot;Joachim,,Schultze&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_email              : Factor w/ 1 level &quot;j.schultze@uni-bonn.de&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_department         : Factor w/ 1 level &quot;Genomics and Immunoregulation&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_institute          : Factor w/ 1 level &quot;LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_address            : Factor w/ 1 level &quot;Carl-Troll-Strasse 31&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_city               : Factor w/ 1 level &quot;Bonn&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_state              : Factor w/ 1 level &quot;NRW&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_zip/postal_code    : Factor w/ 1 level &quot;53115&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_country            : Factor w/ 1 level &quot;Germany&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ supplementary_file         : Factor w/ 1 level &quot;NONE&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ data_row_count             : Factor w/ 1 level &quot;47463&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ activation stimuli:ch1     : chr  &quot;unstimulated&quot; &quot;unstimulated&quot; &quot;unstimulated&quot; &quot;TNFa 800 u/ml+ PGE2 1µg/ml+ P3C 1µg/ml&quot; ...
+ $ donor:ch1                  : chr  &quot;D1&quot; &quot;D4&quot; &quot;D3&quot; &quot;D7&quot; ...
+ $ initial differentiation:ch1: chr  &quot;-&quot; &quot;-&quot; &quot;-&quot; &quot;GM-CSF + IL4&quot; ...
+ $ time:ch1                   : chr  &quot;0h&quot; &quot;0h&quot; &quot;0h&quot; &quot;72h&quot; ...</code></pre>
+<pre class="r"><code>head(meta_data46903)</code></pre>
+<pre><code>                           title geo_accession                status
+GSM1140407 B cell [5342595013_G]    GSM1140407 Public on Feb 13 2014
+GSM1140408 B cell [5342595013_I]    GSM1140408 Public on Feb 13 2014
+GSM1140409 B cell [5342595027_I]    GSM1140409 Public on Feb 13 2014
+GSM1140410 DC_reg [5342595013_D]    GSM1140410 Public on Feb 13 2014
+GSM1140411 DC_imm [5342595013_E]    GSM1140411 Public on Feb 13 2014
+GSM1140412 DC_mat [5342595013_H]    GSM1140412 Public on Feb 13 2014
+           submission_date last_update_date type channel_count
+GSM1140407     May 14 2013      Feb 13 2014  RNA             1
+GSM1140408     May 14 2013      Feb 13 2014  RNA             1
+GSM1140409     May 14 2013      Feb 13 2014  RNA             1
+GSM1140410     May 14 2013      Feb 13 2014  RNA             1
+GSM1140411     May 14 2013      Feb 13 2014  RNA             1
+GSM1140412     May 14 2013      Feb 13 2014  RNA             1
+            source_name_ch1 organism_ch1
+GSM1140407 peripheral blood Homo sapiens
+GSM1140408 peripheral blood Homo sapiens
+GSM1140409 peripheral blood Homo sapiens
+GSM1140410 peripheral blood Homo sapiens
+GSM1140411 peripheral blood Homo sapiens
+GSM1140412 peripheral blood Homo sapiens
+                             characteristics_ch1
+GSM1140407            initial differentiation: -
+GSM1140408            initial differentiation: -
+GSM1140409            initial differentiation: -
+GSM1140410 initial differentiation: GM-CSF + IL4
+GSM1140411 initial differentiation: GM-CSF + IL4
+GSM1140412 initial differentiation: GM-CSF + IL4
+                                                characteristics_ch1.1
+GSM1140407                           activation stimuli: unstimulated
+GSM1140408                           activation stimuli: unstimulated
+GSM1140409                           activation stimuli: unstimulated
+GSM1140410 activation stimuli: TNFa 800 u/ml+ PGE2 1µg/ml+ P3C 1µg/ml
+GSM1140411                                   activation stimuli: none
+GSM1140412                          activation stimuli: TNFa 800 u/ml
+           characteristics_ch1.2 characteristics_ch1.3 molecule_ch1
+GSM1140407              time: 0h             donor: D1    total RNA
+GSM1140408              time: 0h             donor: D4    total RNA
+GSM1140409              time: 0h             donor: D3    total RNA
+GSM1140410             time: 72h             donor: D7    total RNA
+GSM1140411              time: 0h             donor: D6    total RNA
+GSM1140412             time: 72h             donor: D5    total RNA
+                                                                                                                                                                                                                              extract_protocol_ch1
+GSM1140407 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140408 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140409 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140410 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140411 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+GSM1140412 RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit in accordance with the prescribed protocol provided with the kit. Quality control was performed with Agilent Bioanalyser.
+           label_ch1
+GSM1140407    biotin
+GSM1140408    biotin
+GSM1140409    biotin
+GSM1140410    biotin
+GSM1140411    biotin
+GSM1140412    biotin
+                                                                           label_protocol_ch1
+GSM1140407 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140408 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140409 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140410 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140411 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+GSM1140412 Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays
+           taxid_ch1                             hyb_protocol
+GSM1140407      9606 Standard Illumina hybridization protocol
+GSM1140408      9606 Standard Illumina hybridization protocol
+GSM1140409      9606 Standard Illumina hybridization protocol
+GSM1140410      9606 Standard Illumina hybridization protocol
+GSM1140411      9606 Standard Illumina hybridization protocol
+GSM1140412      9606 Standard Illumina hybridization protocol
+                                 scan_protocol    description
+GSM1140407 Standard Illumina scanning protocol         B cell
+GSM1140408 Standard Illumina scanning protocol         B cell
+GSM1140409 Standard Illumina scanning protocol         B cell
+GSM1140410 Standard Illumina scanning protocol Dendritic cell
+GSM1140411 Standard Illumina scanning protocol Dendritic cell
+GSM1140412 Standard Illumina scanning protocol Dendritic cell
+                                                                                                 data_processing
+GSM1140407 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140408 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140409 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140410 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140411 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+GSM1140412 The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite
+           platform_id      contact_name          contact_email
+GSM1140407     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140408     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140409     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140410     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140411     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+GSM1140412     GPL6947 Joachim,,Schultze j.schultze@uni-bonn.de
+                      contact_department
+GSM1140407 Genomics and Immunoregulation
+GSM1140408 Genomics and Immunoregulation
+GSM1140409 Genomics and Immunoregulation
+GSM1140410 Genomics and Immunoregulation
+GSM1140411 Genomics and Immunoregulation
+GSM1140412 Genomics and Immunoregulation
+                                                                contact_institute
+GSM1140407 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140408 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140409 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140410 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140411 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+GSM1140412 LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)
+                 contact_address contact_city contact_state
+GSM1140407 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140408 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140409 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140410 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140411 Carl-Troll-Strasse 31         Bonn           NRW
+GSM1140412 Carl-Troll-Strasse 31         Bonn           NRW
+           contact_zip/postal_code contact_country supplementary_file
+GSM1140407                   53115         Germany               NONE
+GSM1140408                   53115         Germany               NONE
+GSM1140409                   53115         Germany               NONE
+GSM1140410                   53115         Germany               NONE
+GSM1140411                   53115         Germany               NONE
+GSM1140412                   53115         Germany               NONE
+           data_row_count                 activation stimuli:ch1 donor:ch1
+GSM1140407          47463                           unstimulated        D1
+GSM1140408          47463                           unstimulated        D4
+GSM1140409          47463                           unstimulated        D3
+GSM1140410          47463 TNFa 800 u/ml+ PGE2 1µg/ml+ P3C 1µg/ml        D7
+GSM1140411          47463                                   none        D6
+GSM1140412          47463                          TNFa 800 u/ml        D5
+           initial differentiation:ch1 time:ch1
+GSM1140407                           -       0h
+GSM1140408                           -       0h
+GSM1140409                           -       0h
+GSM1140410                GM-CSF + IL4      72h
+GSM1140411                GM-CSF + IL4       0h
+GSM1140412                GM-CSF + IL4      72h</code></pre>
+<pre class="r"><code># review annotations
+class(anno_data46903)</code></pre>
+<pre><code>[1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>str(anno_data46903)</code></pre>
+<pre><code>&#39;data.frame&#39;:   38 obs. of  1 variable:
+ $ labelDescription: chr  NA NA NA NA ...</code></pre>
+<pre class="r"><code>head(anno_data46903)</code></pre>
+<pre><code>                 labelDescription
+title                        &lt;NA&gt;
+geo_accession                &lt;NA&gt;
+status                       &lt;NA&gt;
+submission_date              &lt;NA&gt;
+last_update_date             &lt;NA&gt;
+type                         &lt;NA&gt;</code></pre>
+<pre class="r"><code># anno_data is pretty useless - just empty variables with matching rownames from pData. Will drop this from further analysis.</code></pre>
+<p>Format metadata to get raw_id in its own column</p>
+<pre class="r"><code># split &quot;title&quot; column into cell type and raw_id
+meta_data46903 &lt;- meta_data46903 %&gt;%
+  tidyr::separate(title, 
+                  c(&quot;cell_type&quot;, &quot;raw_id&quot;), 
+                  sep = &quot;\\[&quot;)
+
+# review results
+meta_data46903[1:5, c(1,2)]</code></pre>
+<pre><code>           cell_type        raw_id
+GSM1140407   B cell  5342595013_G]
+GSM1140408   B cell  5342595013_I]
+GSM1140409   B cell  5342595027_I]
+GSM1140410   DC_reg  5342595013_D]
+GSM1140411   DC_imm  5342595013_E]</code></pre>
+<pre class="r"><code># remove trailing closed bracket
+# preserve rownames by moving to column
+meta_data46903 &lt;- meta_data46903 %&gt;%
+  rownames_to_column(var = &quot;geo_id&quot;) %&gt;%
+  mutate(raw_id = str_remove(raw_id, &quot;]&quot;))
+
+# review results
+meta_data46903[1:5, 1:5]</code></pre>
+<pre><code>      geo_id cell_type       raw_id geo_accession                status
+1 GSM1140407   B cell  5342595013_G    GSM1140407 Public on Feb 13 2014
+2 GSM1140408   B cell  5342595013_I    GSM1140408 Public on Feb 13 2014
+3 GSM1140409   B cell  5342595027_I    GSM1140409 Public on Feb 13 2014
+4 GSM1140410   DC_reg  5342595013_D    GSM1140410 Public on Feb 13 2014
+5 GSM1140411   DC_imm  5342595013_E    GSM1140411 Public on Feb 13 2014</code></pre>
+<p>Subset metadata</p>
+<pre class="r"><code># use macrophages cultured for 72 hours (endpoint)
+mac_metadata &lt;- meta_data46903 %&gt;%
+  as_tibble() %&gt;%
+  filter(`initial differentiation:ch1` %in% c(&quot;GM-CSF&quot;, &quot;M-CSF&quot;),
+         grepl(&quot;72h&quot;, characteristics_ch1.2)) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 111 x 40
+   geo_id cell_type raw_id geo_accession status submission_date
+   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;         &lt;fct&gt;  &lt;fct&gt;          
+ 1 GSM11… &quot;M0_GMCS… 44876… GSM1140443    Publi… May 14 2013    
+ 2 GSM11… &quot;M_GMCSF… 44876… GSM1140444    Publi… May 14 2013    
+ 3 GSM11… &quot;M_GMCSF… 44876… GSM1140445    Publi… May 14 2013    
+ 4 GSM11… &quot;M_GMCSF… 44876… GSM1140446    Publi… May 14 2013    
+ 5 GSM11… &quot;M_GMCSF… 46761… GSM1140484    Publi… May 14 2013    
+ 6 GSM11… &quot;M_GMCSF… 46761… GSM1140485    Publi… May 14 2013    
+ 7 GSM11… &quot;M_GMCSF… 46761… GSM1140486    Publi… May 14 2013    
+ 8 GSM11… &quot;M_GMCSF… 46761… GSM1140489    Publi… May 14 2013    
+ 9 GSM11… &quot;M_GMCSF… 46761… GSM1140490    Publi… May 14 2013    
+10 GSM11… &quot;M_GMCSF… 46761… GSM1140492    Publi… May 14 2013    
+# … with 101 more rows, and 34 more variables: last_update_date &lt;fct&gt;,
+#   type &lt;fct&gt;, channel_count &lt;fct&gt;, source_name_ch1 &lt;fct&gt;,
+#   organism_ch1 &lt;fct&gt;, characteristics_ch1 &lt;fct&gt;,
+#   characteristics_ch1.1 &lt;fct&gt;, characteristics_ch1.2 &lt;fct&gt;,
+#   characteristics_ch1.3 &lt;fct&gt;, molecule_ch1 &lt;fct&gt;,
+#   extract_protocol_ch1 &lt;fct&gt;, label_ch1 &lt;fct&gt;, label_protocol_ch1 &lt;fct&gt;,
+#   taxid_ch1 &lt;fct&gt;, hyb_protocol &lt;fct&gt;, scan_protocol &lt;fct&gt;,
+#   description &lt;fct&gt;, data_processing &lt;fct&gt;, platform_id &lt;fct&gt;,
+#   contact_name &lt;fct&gt;, contact_email &lt;fct&gt;, contact_department &lt;fct&gt;,
+#   contact_institute &lt;fct&gt;, contact_address &lt;fct&gt;, contact_city &lt;fct&gt;,
+#   contact_state &lt;fct&gt;, `contact_zip/postal_code` &lt;fct&gt;,
+#   contact_country &lt;fct&gt;, supplementary_file &lt;fct&gt;, data_row_count &lt;fct&gt;,
+#   `activation stimuli:ch1` &lt;chr&gt;, `donor:ch1` &lt;chr&gt;, `initial
+#   differentiation:ch1` &lt;chr&gt;, `time:ch1` &lt;chr&gt;</code></pre>
+<pre class="r"><code># get the raw IDs to select expression profiles later
+mac_samples &lt;- mac_metadata %&gt;% pull(raw_id)
+
+# convert back to data.frame and add rownames back in 
+# for compatability with expressionset class
+mac_metadata &lt;- as.data.frame(mac_metadata)
+rownames(mac_metadata) &lt;- mac_metadata$raw_id
+mac_metadata[1:5, 1:5]</code></pre>
+<pre><code>                 geo_id            cell_type       raw_id geo_accession
+4487653414_E GSM1140443        M0_GMCSF_72h  4487653414_E    GSM1140443
+4487653415_E GSM1140444     M_GMCSF_IL4_72h  4487653415_E    GSM1140444
+4487653415_G GSM1140445     M_GMCSF_TPP_72h  4487653415_G    GSM1140445
+4487653415_H GSM1140446    M_GMCSF_IFNg_72h  4487653415_H    GSM1140446
+4676163025_B GSM1140484 M_GMCSF_sLPS_IC_72h  4676163025_B    GSM1140484
+                            status
+4487653414_E Public on Feb 13 2014
+4487653415_E Public on Feb 13 2014
+4487653415_G Public on Feb 13 2014
+4487653415_H Public on Feb 13 2014
+4676163025_B Public on Feb 13 2014</code></pre>
+</div>
+<div id="subset-expression-data" class="section level3">
+<h3>Subset expression data</h3>
+<p>Next step is to subset the expression data, and to ensure column names exactly match rownames of phenotype data</p>
+<p>Review and subset expression matrix</p>
+<pre class="r"><code>exp_data &lt;- exprs(lumi_46903)
+  
+# review expression matrix
+class(exp_data)</code></pre>
+<pre><code>[1] &quot;matrix&quot;</code></pre>
+<pre class="r"><code>str(exp_data)</code></pre>
+<pre><code> num [1:47462, 1:384] 6.01 6.39 6.22 5.76 6.18 ...
+ - attr(*, &quot;dimnames&quot;)=List of 2
+  ..$ : chr [1:47462] &quot;Ku8QhfS0n_hIOABXuE&quot; &quot;fqPEquJRRlSVSfL.8A&quot; &quot;ckiehnugOno9d7vf1Q&quot; &quot;x57Vw5B5Fbt5JUnQkI&quot; ...
+  ..$ : chr [1:384] &quot;4233291007_A&quot; &quot;4233291007_B&quot; &quot;4233291007_C&quot; &quot;4233291007_D&quot; ...</code></pre>
+<pre class="r"><code>exp_data[1:10, 1:3]</code></pre>
+<pre><code>                   4233291007_A 4233291007_B 4233291007_C
+Ku8QhfS0n_hIOABXuE     6.009324     6.286724     5.713170
+fqPEquJRRlSVSfL.8A     6.393203     6.472865     6.347411
+ckiehnugOno9d7vf1Q     6.216930     6.025322     6.073459
+x57Vw5B5Fbt5JUnQkI     5.759332     6.263537     6.079730
+ritxUH.kuHlYqjozpE     6.180835     6.338829     6.352346
+QpE5UiUgmJOJEkPXpc     6.346132     6.304481     6.306198
+EedxN6XeUOgPSCywB0     6.548205     6.576319     6.493038
+ZtOcIegchMOATSJScI     6.245075     6.037263     6.026732
+3l3lDoD0gssAdeehIY     6.245733     6.206580     6.226167
+WS4S8aGL855YVcUUZE     6.216706     6.111139     6.149239</code></pre>
+<pre class="r"><code># rownames are unique sequence identifiers from lumiHumanIDmapping package
+# colnames are 10-digit and letter sample names
+# values are log-2 RDS normalized expression values 
+# 384 samples and 47462 probes
+
+# convert to tbl for subsetting
+exp_data &lt;- exp_data %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(var = &quot;probe_id&quot;) %&gt;%
+  as_tibble()
+
+# remove probe_id for subsetting, will add back in aferwards
+probe_id &lt;- exp_data %&gt;% pull(probe_id)
+  
+# use vector of sample names to select cases  
+mac_exprs &lt;- exp_data %&gt;%
+  dplyr::select(one_of(mac_samples)) %&gt;%
+  add_column(probe_id, .before = &quot;4487653414_E&quot;) 
+
+# compare representative columns to ensure the order wasn&#39;t lost
+mac_exprs %&gt;%
+  dplyr::select(probe_id, &quot;4487653414_E&quot;, &quot;4487653415_E&quot;) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 47,462 x 3
+   probe_id           `4487653414_E` `4487653415_E`
+   &lt;chr&gt;                       &lt;dbl&gt;          &lt;dbl&gt;
+ 1 Ku8QhfS0n_hIOABXuE           5.93           5.81
+ 2 fqPEquJRRlSVSfL.8A           6.33           6.14
+ 3 ckiehnugOno9d7vf1Q           6.31           6.10
+ 4 x57Vw5B5Fbt5JUnQkI           5.86           6.14
+ 5 ritxUH.kuHlYqjozpE           6.31           6.15
+ 6 QpE5UiUgmJOJEkPXpc           6.27           6.18
+ 7 EedxN6XeUOgPSCywB0           6.39           6.38
+ 8 ZtOcIegchMOATSJScI           5.68           5.98
+ 9 3l3lDoD0gssAdeehIY           6.16           6.11
+10 WS4S8aGL855YVcUUZE           6.18           6.04
+# … with 47,452 more rows</code></pre>
+<pre class="r"><code>exp_data %&gt;%
+  dplyr::select(probe_id, &quot;4487653414_E&quot;, &quot;4487653415_E&quot;) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 47,462 x 3
+   probe_id           `4487653414_E` `4487653415_E`
+   &lt;chr&gt;                       &lt;dbl&gt;          &lt;dbl&gt;
+ 1 Ku8QhfS0n_hIOABXuE           5.93           5.81
+ 2 fqPEquJRRlSVSfL.8A           6.33           6.14
+ 3 ckiehnugOno9d7vf1Q           6.31           6.10
+ 4 x57Vw5B5Fbt5JUnQkI           5.86           6.14
+ 5 ritxUH.kuHlYqjozpE           6.31           6.15
+ 6 QpE5UiUgmJOJEkPXpc           6.27           6.18
+ 7 EedxN6XeUOgPSCywB0           6.39           6.38
+ 8 ZtOcIegchMOATSJScI           5.68           5.98
+ 9 3l3lDoD0gssAdeehIY           6.16           6.11
+10 WS4S8aGL855YVcUUZE           6.18           6.04
+# … with 47,452 more rows</code></pre>
+<pre class="r"><code># they match exactly
+
+# convert back to data.frame and add rownames
+mac_exprs &lt;- mac_exprs %&gt;%
+  as.data.frame()
+rownames(mac_exprs) &lt;- mac_exprs$probe_id
+
+# double check that rownames match probe_id
+mac_exprs[1:5, 1:5]</code></pre>
+<pre><code>                             probe_id 4487653414_E 4487653415_E
+Ku8QhfS0n_hIOABXuE Ku8QhfS0n_hIOABXuE     5.927150     5.811502
+fqPEquJRRlSVSfL.8A fqPEquJRRlSVSfL.8A     6.329524     6.141837
+ckiehnugOno9d7vf1Q ckiehnugOno9d7vf1Q     6.314675     6.100132
+x57Vw5B5Fbt5JUnQkI x57Vw5B5Fbt5JUnQkI     5.855040     6.135511
+ritxUH.kuHlYqjozpE ritxUH.kuHlYqjozpE     6.312922     6.152733
+                   4487653415_G 4487653415_H
+Ku8QhfS0n_hIOABXuE     6.056031     6.234910
+fqPEquJRRlSVSfL.8A     6.119038     6.390689
+ckiehnugOno9d7vf1Q     6.295151     6.000457
+x57Vw5B5Fbt5JUnQkI     5.902838     5.980478
+ritxUH.kuHlYqjozpE     5.910791     6.340384</code></pre>
+<pre class="r"><code># remove temporary probe_id column
+mac_exprs &lt;- subset(mac_exprs, select = -probe_id)
+mac_exprs[1:5, 1:5]</code></pre>
+<pre><code>                   4487653414_E 4487653415_E 4487653415_G 4487653415_H
+Ku8QhfS0n_hIOABXuE     5.927150     5.811502     6.056031     6.234910
+fqPEquJRRlSVSfL.8A     6.329524     6.141837     6.119038     6.390689
+ckiehnugOno9d7vf1Q     6.314675     6.100132     6.295151     6.000457
+x57Vw5B5Fbt5JUnQkI     5.855040     6.135511     5.902838     5.980478
+ritxUH.kuHlYqjozpE     6.312922     6.152733     5.910791     6.340384
+                   4676163025_B
+Ku8QhfS0n_hIOABXuE     6.080220
+fqPEquJRRlSVSfL.8A     6.017910
+ckiehnugOno9d7vf1Q     6.711265
+x57Vw5B5Fbt5JUnQkI     6.107331
+ritxUH.kuHlYqjozpE     5.980075</code></pre>
+<p>Ensure that rownames of metadata and column names of expression data match exactly</p>
+<pre class="r"><code># are they the same length?
+length(rownames(mac_metadata))</code></pre>
+<pre><code>[1] 111</code></pre>
+<pre class="r"><code>length(colnames(mac_exprs))</code></pre>
+<pre><code>[1] 111</code></pre>
+<pre class="r"><code># ask R to check identity
+identical(rownames(mac_metadata), colnames(mac_exprs))</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code># eyeball a few too
+rownames(mac_metadata)[1:10]</code></pre>
+<pre><code> [1] &quot;4487653414_E&quot; &quot;4487653415_E&quot; &quot;4487653415_G&quot; &quot;4487653415_H&quot;
+ [5] &quot;4676163025_B&quot; &quot;4676163025_C&quot; &quot;4676163025_D&quot; &quot;4676163025_G&quot;
+ [9] &quot;4676163025_H&quot; &quot;4676163025_J&quot;</code></pre>
+<pre class="r"><code>colnames(mac_exprs)[1:10]</code></pre>
+<pre><code> [1] &quot;4487653414_E&quot; &quot;4487653415_E&quot; &quot;4487653415_G&quot; &quot;4487653415_H&quot;
+ [5] &quot;4676163025_B&quot; &quot;4676163025_C&quot; &quot;4676163025_D&quot; &quot;4676163025_G&quot;
+ [9] &quot;4676163025_H&quot; &quot;4676163025_J&quot;</code></pre>
+<pre class="r"><code># looks good!</code></pre>
+</div>
+<div id="build-expressionset" class="section level3">
+<h3>Build ExpressionSet</h3>
+<p>Following the <a href="https://www.bioconductor.org/packages/3.7/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf">documentation</a> for Biconductor ExpressionSet</p>
+<pre class="r"><code># create a frame for annotation of column names in metadata
+# will be empty for now
+varnames &lt;- colnames(mac_metadata)
+vardata &lt;- data.frame(labelDescription = varnames, 
+                      row.names = varnames)
+
+# build an AnnotatedDataFrame
+mac_phenoData &lt;- new(&quot;AnnotatedDataFrame&quot;,
+                       data = mac_metadata, 
+                       varMetadata = vardata)
+
+# convert expression data to matrix
+mac_exprs &lt;- as.matrix(mac_exprs)
+
+
+mac_eset &lt;- ExpressionSet(assayData = mac_exprs, 
+                            phenoData = mac_phenoData,
+                            annotation = &quot;Illumina Human HT-12 v3.0 beadchip&quot;)
+
+# check properties
+featureNames(mac_eset)[1:5]</code></pre>
+<pre><code>[1] &quot;Ku8QhfS0n_hIOABXuE&quot; &quot;fqPEquJRRlSVSfL.8A&quot; &quot;ckiehnugOno9d7vf1Q&quot;
+[4] &quot;x57Vw5B5Fbt5JUnQkI&quot; &quot;ritxUH.kuHlYqjozpE&quot;</code></pre>
+<pre class="r"><code>sampleNames(mac_eset)[1:5]</code></pre>
+<pre><code>[1] &quot;4487653414_E&quot; &quot;4487653415_E&quot; &quot;4487653415_G&quot; &quot;4487653415_H&quot;
+[5] &quot;4676163025_B&quot;</code></pre>
+<pre class="r"><code>varLabels(mac_eset)</code></pre>
+<pre><code> [1] &quot;geo_id&quot;                      &quot;cell_type&quot;                  
+ [3] &quot;raw_id&quot;                      &quot;geo_accession&quot;              
+ [5] &quot;status&quot;                      &quot;submission_date&quot;            
+ [7] &quot;last_update_date&quot;            &quot;type&quot;                       
+ [9] &quot;channel_count&quot;               &quot;source_name_ch1&quot;            
+[11] &quot;organism_ch1&quot;                &quot;characteristics_ch1&quot;        
+[13] &quot;characteristics_ch1.1&quot;       &quot;characteristics_ch1.2&quot;      
+[15] &quot;characteristics_ch1.3&quot;       &quot;molecule_ch1&quot;               
+[17] &quot;extract_protocol_ch1&quot;        &quot;label_ch1&quot;                  
+[19] &quot;label_protocol_ch1&quot;          &quot;taxid_ch1&quot;                  
+[21] &quot;hyb_protocol&quot;                &quot;scan_protocol&quot;              
+[23] &quot;description&quot;                 &quot;data_processing&quot;            
+[25] &quot;platform_id&quot;                 &quot;contact_name&quot;               
+[27] &quot;contact_email&quot;               &quot;contact_department&quot;         
+[29] &quot;contact_institute&quot;           &quot;contact_address&quot;            
+[31] &quot;contact_city&quot;                &quot;contact_state&quot;              
+[33] &quot;contact_zip/postal_code&quot;     &quot;contact_country&quot;            
+[35] &quot;supplementary_file&quot;          &quot;data_row_count&quot;             
+[37] &quot;activation stimuli:ch1&quot;      &quot;donor:ch1&quot;                  
+[39] &quot;initial differentiation:ch1&quot; &quot;time:ch1&quot;                   </code></pre>
+<pre class="r"><code>mat &lt;- exprs(mac_eset)
+dim(mat)</code></pre>
+<pre><code>[1] 47462   111</code></pre>
+<pre class="r"><code>mat[1:5, 1:5]</code></pre>
+<pre><code>                   4487653414_E 4487653415_E 4487653415_G 4487653415_H
+Ku8QhfS0n_hIOABXuE     5.927150     5.811502     6.056031     6.234910
+fqPEquJRRlSVSfL.8A     6.329524     6.141837     6.119038     6.390689
+ckiehnugOno9d7vf1Q     6.314675     6.100132     6.295151     6.000457
+x57Vw5B5Fbt5JUnQkI     5.855040     6.135511     5.902838     5.980478
+ritxUH.kuHlYqjozpE     6.312922     6.152733     5.910791     6.340384
+                   4676163025_B
+Ku8QhfS0n_hIOABXuE     6.080220
+fqPEquJRRlSVSfL.8A     6.017910
+ckiehnugOno9d7vf1Q     6.711265
+x57Vw5B5Fbt5JUnQkI     6.107331
+ritxUH.kuHlYqjozpE     5.980075</code></pre>
+<pre class="r"><code># save expression set
+saveRDS(mac_eset, &quot;~/tcga_macs/output/expression_set.rds&quot;)</code></pre>
+</div>
+<div id="filter-probes" class="section level3">
+<h3>Filter probes</h3>
+<pre class="r"><code># retreive normalized data
+dataMatrix &lt;- exprs(mac_eset)
+
+# remove the probes that are not detected in raw data
+presentCount &lt;- detectionCall(lumi_46903)
+selDataMatrix &lt;- dataMatrix[presentCount &gt; 0,]
+probeList &lt;- rownames(selDataMatrix)</code></pre>
+</div>
+</div>
+<div id="define-groups" class="section level2">
+<h2>Define Groups</h2>
+<pre class="r"><code># Get phenotype data from expressionset
+pheno_data &lt;- pData(mac_eset)
+str(pheno_data)</code></pre>
+<pre><code>&#39;data.frame&#39;:   111 obs. of  40 variables:
+ $ geo_id                     : chr  &quot;GSM1140443&quot; &quot;GSM1140444&quot; &quot;GSM1140445&quot; &quot;GSM1140446&quot; ...
+ $ cell_type                  : chr  &quot;M0_GMCSF_72h &quot; &quot;M_GMCSF_IL4_72h &quot; &quot;M_GMCSF_TPP_72h &quot; &quot;M_GMCSF_IFNg_72h &quot; ...
+ $ raw_id                     : chr  &quot;4487653414_E&quot; &quot;4487653415_E&quot; &quot;4487653415_G&quot; &quot;4487653415_H&quot; ...
+ $ geo_accession              : chr  &quot;GSM1140443&quot; &quot;GSM1140444&quot; &quot;GSM1140445&quot; &quot;GSM1140446&quot; ...
+ $ status                     : Factor w/ 1 level &quot;Public on Feb 13 2014&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ submission_date            : Factor w/ 1 level &quot;May 14 2013&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ last_update_date           : Factor w/ 3 levels &quot;Feb 13 2014&quot;,..: 1 1 1 1 2 1 1 2 1 1 ...
+ $ type                       : Factor w/ 1 level &quot;RNA&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ channel_count              : Factor w/ 1 level &quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ source_name_ch1            : Factor w/ 1 level &quot;peripheral blood&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ organism_ch1               : Factor w/ 1 level &quot;Homo sapiens&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ characteristics_ch1        : Factor w/ 13 levels &quot;initial differentiation: -&quot;,..: 8 8 8 8 8 8 8 8 8 8 ...
+ $ characteristics_ch1.1      : Factor w/ 41 levels &quot;activation stimuli: CD3/28&quot;,..: 4 16 37 12 30 15 14 29 12 16 ...
+ $ characteristics_ch1.2      : Factor w/ 12 levels &quot;time: 0h&quot;,&quot;time: 12h&quot;,..: 11 11 11 11 11 11 11 11 11 11 ...
+ $ characteristics_ch1.3      : Factor w/ 73 levels &quot;donor: BC 65&quot;,..: 48 48 48 48 39 31 40 31 40 40 ...
+ $ molecule_ch1               : Factor w/ 1 level &quot;total RNA&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ extract_protocol_ch1       : Factor w/ 1 level &quot;RNA was extracted with Trizol reagent, followed by clean-up and DNase I treatment with QIAGEN RNeasy mini kit i&quot;| __truncated__: 1 1 1 1 1 1 1 1 1 1 ...
+ $ label_ch1                  : Factor w/ 1 level &quot;biotin&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ label_protocol_ch1         : Factor w/ 1 level &quot;Biotinylated cRNA were prepared with the Ambion MessageAmp kit for Illumina arrays&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ taxid_ch1                  : Factor w/ 1 level &quot;9606&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ hyb_protocol               : Factor w/ 1 level &quot;Standard Illumina hybridization protocol&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ scan_protocol              : Factor w/ 1 level &quot;Standard Illumina scanning protocol&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ description                : Factor w/ 6 levels &quot;B cell&quot;,&quot;Dendritic cell&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ data_processing            : Factor w/ 1 level &quot;The data were log2-transformed and normalized using quantile normalization with Partek Genomics Suite&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ platform_id                : Factor w/ 1 level &quot;GPL6947&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_name               : Factor w/ 1 level &quot;Joachim,,Schultze&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_email              : Factor w/ 1 level &quot;j.schultze@uni-bonn.de&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_department         : Factor w/ 1 level &quot;Genomics and Immunoregulation&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_institute          : Factor w/ 1 level &quot;LIMES (Life and Medical Sciences Center Genomics and Immunoregulation)&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_address            : Factor w/ 1 level &quot;Carl-Troll-Strasse 31&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_city               : Factor w/ 1 level &quot;Bonn&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_state              : Factor w/ 1 level &quot;NRW&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_zip/postal_code    : Factor w/ 1 level &quot;53115&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ contact_country            : Factor w/ 1 level &quot;Germany&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ supplementary_file         : Factor w/ 1 level &quot;NONE&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ data_row_count             : Factor w/ 1 level &quot;47463&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+ $ activation stimuli:ch1     : chr  &quot;con&quot; &quot;IL4&quot; &quot;TNFa+PGE2+P3C&quot; &quot;IFNg&quot; ...
+ $ donor:ch1                  : chr  &quot;BC9&quot; &quot;BC9&quot; &quot;BC9&quot; &quot;BC9&quot; ...
+ $ initial differentiation:ch1: chr  &quot;GM-CSF&quot; &quot;GM-CSF&quot; &quot;GM-CSF&quot; &quot;GM-CSF&quot; ...
+ $ time:ch1                   : chr  &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; ...</code></pre>
+<pre class="r"><code># OK if rownames are dropped, column is duplicated as &quot;raw_id&quot;
+pheno_data &lt;- pheno_data %&gt;%
+  as_tibble() %&gt;%
+# clean up experimental group data
+  mutate(treatment = str_sub(cell_type, 9, 25),
+         treatment = str_replace(treatment, &quot;_72h&quot;, &quot;&quot;),
+         treatment = ifelse(`activation stimuli:ch1` == &quot;con&quot;, &quot;control&quot;, treatment),
+         treatment = trimws(treatment)) %&gt;%
+  dplyr::select(raw_id, geo_id, treatment, everything()) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 111 x 41
+   raw_id geo_id treatment cell_type geo_accession status submission_date
+   &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;         &lt;fct&gt;  &lt;fct&gt;          
+ 1 44876… GSM11… control   &quot;M0_GMCS… GSM1140443    Publi… May 14 2013    
+ 2 44876… GSM11… IL4       &quot;M_GMCSF… GSM1140444    Publi… May 14 2013    
+ 3 44876… GSM11… TPP       &quot;M_GMCSF… GSM1140445    Publi… May 14 2013    
+ 4 44876… GSM11… IFNg      &quot;M_GMCSF… GSM1140446    Publi… May 14 2013    
+ 5 46761… GSM11… sLPS_IC   &quot;M_GMCSF… GSM1140484    Publi… May 14 2013    
+ 6 46761… GSM11… IL13      &quot;M_GMCSF… GSM1140485    Publi… May 14 2013    
+ 7 46761… GSM11… IL10      &quot;M_GMCSF… GSM1140486    Publi… May 14 2013    
+ 8 46761… GSM11… sLPS      &quot;M_GMCSF… GSM1140489    Publi… May 14 2013    
+ 9 46761… GSM11… IFNg      &quot;M_GMCSF… GSM1140490    Publi… May 14 2013    
+10 46761… GSM11… IL4       &quot;M_GMCSF… GSM1140492    Publi… May 14 2013    
+# … with 101 more rows, and 34 more variables: last_update_date &lt;fct&gt;,
+#   type &lt;fct&gt;, channel_count &lt;fct&gt;, source_name_ch1 &lt;fct&gt;,
+#   organism_ch1 &lt;fct&gt;, characteristics_ch1 &lt;fct&gt;,
+#   characteristics_ch1.1 &lt;fct&gt;, characteristics_ch1.2 &lt;fct&gt;,
+#   characteristics_ch1.3 &lt;fct&gt;, molecule_ch1 &lt;fct&gt;,
+#   extract_protocol_ch1 &lt;fct&gt;, label_ch1 &lt;fct&gt;, label_protocol_ch1 &lt;fct&gt;,
+#   taxid_ch1 &lt;fct&gt;, hyb_protocol &lt;fct&gt;, scan_protocol &lt;fct&gt;,
+#   description &lt;fct&gt;, data_processing &lt;fct&gt;, platform_id &lt;fct&gt;,
+#   contact_name &lt;fct&gt;, contact_email &lt;fct&gt;, contact_department &lt;fct&gt;,
+#   contact_institute &lt;fct&gt;, contact_address &lt;fct&gt;, contact_city &lt;fct&gt;,
+#   contact_state &lt;fct&gt;, `contact_zip/postal_code` &lt;fct&gt;,
+#   contact_country &lt;fct&gt;, supplementary_file &lt;fct&gt;, data_row_count &lt;fct&gt;,
+#   `activation stimuli:ch1` &lt;chr&gt;, `donor:ch1` &lt;chr&gt;, `initial
+#   differentiation:ch1` &lt;chr&gt;, `time:ch1` &lt;chr&gt;</code></pre>
+<pre class="r"><code># assign treatments into clusters from Xue et al PMID: 24530056
+pheno_data &lt;- pheno_data %&gt;%
+  mutate(treatment = as.factor(treatment),
+         clusternum = fct_recode(treatment,
+                                 &quot;0&quot; = &quot;control&quot;,
+                                 &quot;1&quot; = &quot;IFNb&quot;,
+                                 &quot;1&quot; = &quot;IL10&quot;,
+                                 &quot;1&quot; = &quot;GC&quot;,
+                                 &quot;2&quot; = &quot;IL4&quot;,
+                                 &quot;2&quot; = &quot;L4&quot;,
+                                 &quot;2&quot; = &quot;IL13&quot;,
+                                 &quot;2&quot; = &quot;IL4_upLPS&quot;,
+                                 &quot;2&quot; = &quot;L4_upLPS&quot;,
+                                 &quot;3&quot; = &quot;upLPS_IC&quot;,
+                                 &quot;3&quot; = &quot;upLPS&quot;,
+                                 &quot;3&quot; = &quot;pLPS&quot;,
+                                 &quot;4&quot; = &quot;P3C_PGE2&quot;,
+                                 &quot;4&quot; = &quot;P3C&quot;,
+                                 &quot;4&quot; = &quot;PGE2&quot;,
+                                 &quot;6&quot; = &quot;IFNg&quot;,
+                                 &quot;6&quot; = &quot;TNFa&quot;,
+                                 &quot;6&quot; = &quot;IFNg_TNFa&quot;,
+                                 &quot;7&quot; = &quot;sLPS&quot;,
+                                 &quot;7&quot; = &quot;sLPS_IFNg&quot;,
+                                 &quot;7&quot; = &quot;sLPS_IC&quot;,
+                                 &quot;8&quot; = &quot;TNFa_PGE2&quot;,
+                                 &quot;8&quot; = &quot;TNFa_P3C&quot;,
+                                 &quot;9&quot; = &quot;TPP&quot;,
+                                 &quot;9&quot; = &quot;TPP_IFNb&quot;,
+                                 &quot;9&quot; = &quot;TPP_IFNb_IFNg&quot;),
+         treatment = fct_recode(treatment, 
+                                &quot;IL4_upLPS&quot; = &quot;L4_upLPS&quot;,
+                                &quot;upLPS&quot; = &quot;pLPS&quot;,
+                                &quot;IL4&quot; = &quot;L4&quot;)) %&gt;%
+  dplyr::select(raw_id, geo_id, treatment, clusternum, everything()) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 111 x 42
+   raw_id geo_id treatment clusternum cell_type geo_accession status
+   &lt;chr&gt;  &lt;chr&gt;  &lt;fct&gt;     &lt;fct&gt;      &lt;chr&gt;     &lt;chr&gt;         &lt;fct&gt; 
+ 1 44876… GSM11… control   0          &quot;M0_GMCS… GSM1140443    Publi…
+ 2 44876… GSM11… IL4       2          &quot;M_GMCSF… GSM1140444    Publi…
+ 3 44876… GSM11… TPP       9          &quot;M_GMCSF… GSM1140445    Publi…
+ 4 44876… GSM11… IFNg      6          &quot;M_GMCSF… GSM1140446    Publi…
+ 5 46761… GSM11… sLPS_IC   7          &quot;M_GMCSF… GSM1140484    Publi…
+ 6 46761… GSM11… IL13      2          &quot;M_GMCSF… GSM1140485    Publi…
+ 7 46761… GSM11… IL10      1          &quot;M_GMCSF… GSM1140486    Publi…
+ 8 46761… GSM11… sLPS      7          &quot;M_GMCSF… GSM1140489    Publi…
+ 9 46761… GSM11… IFNg      6          &quot;M_GMCSF… GSM1140490    Publi…
+10 46761… GSM11… IL4       2          &quot;M_GMCSF… GSM1140492    Publi…
+# … with 101 more rows, and 35 more variables: submission_date &lt;fct&gt;,
+#   last_update_date &lt;fct&gt;, type &lt;fct&gt;, channel_count &lt;fct&gt;,
+#   source_name_ch1 &lt;fct&gt;, organism_ch1 &lt;fct&gt;, characteristics_ch1 &lt;fct&gt;,
+#   characteristics_ch1.1 &lt;fct&gt;, characteristics_ch1.2 &lt;fct&gt;,
+#   characteristics_ch1.3 &lt;fct&gt;, molecule_ch1 &lt;fct&gt;,
+#   extract_protocol_ch1 &lt;fct&gt;, label_ch1 &lt;fct&gt;, label_protocol_ch1 &lt;fct&gt;,
+#   taxid_ch1 &lt;fct&gt;, hyb_protocol &lt;fct&gt;, scan_protocol &lt;fct&gt;,
+#   description &lt;fct&gt;, data_processing &lt;fct&gt;, platform_id &lt;fct&gt;,
+#   contact_name &lt;fct&gt;, contact_email &lt;fct&gt;, contact_department &lt;fct&gt;,
+#   contact_institute &lt;fct&gt;, contact_address &lt;fct&gt;, contact_city &lt;fct&gt;,
+#   contact_state &lt;fct&gt;, `contact_zip/postal_code` &lt;fct&gt;,
+#   contact_country &lt;fct&gt;, supplementary_file &lt;fct&gt;, data_row_count &lt;fct&gt;,
+#   `activation stimuli:ch1` &lt;chr&gt;, `donor:ch1` &lt;chr&gt;, `initial
+#   differentiation:ch1` &lt;chr&gt;, `time:ch1` &lt;chr&gt;</code></pre>
+<pre class="r"><code>summary(pheno_data$treatment)</code></pre>
+<pre><code>      control            GC          IFNb          IFNg     IFNg_TNFa 
+            7             3             3             7             3 
+         IL10          IL13           IL4     IL4_upLPS           P3C 
+            3             3            13             6             3 
+     P3C_PGE2          PGE2         upLPS          sLPS       sLPS_IC 
+            3             3             9             8             3 
+    sLPS_IFNg          TNFa      TNFa_P3C     TNFa_PGE2           TPP 
+            3             6             3             3            10 
+     TPP_IFNb TPP_IFNb_IFNg      upLPS_IC 
+            3             3             3 </code></pre>
+<pre class="r"><code>summary(pheno_data$clusternum)</code></pre>
+<pre><code> 0  1  6  2  4  3  7  8  9 
+ 7  9 16 22  9 12 14  6 16 </code></pre>
+<p>Detailed instructions for building a contrast matrix and filtering low-expression scores can be found in the <a href="http://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf">Limma User’s Guide</a>, particularly chapters 9.2 and 9.3</p>
+</div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<p>Source: <a href="https://rpkgs.datanovia.com/factoextra/index.html" class="uri">https://rpkgs.datanovia.com/factoextra/index.html</a></p>
+<pre class="r"><code># transpose matrix to tidy data format
+t_DataMatrix &lt;- t(selDataMatrix)
+t_DataMatrix[1:5, 1:5]</code></pre>
+<pre><code>             fqPEquJRRlSVSfL.8A ckiehnugOno9d7vf1Q ritxUH.kuHlYqjozpE
+4487653414_E           6.329524           6.314675           6.312922
+4487653415_E           6.141837           6.100132           6.152733
+4487653415_G           6.119038           6.295151           5.910791
+4487653415_H           6.390689           6.000457           6.340384
+4676163025_B           6.017910           6.711265           5.980075
+             QpE5UiUgmJOJEkPXpc EedxN6XeUOgPSCywB0
+4487653414_E           6.271391           6.391397
+4487653415_E           6.178287           6.381247
+4487653415_G           6.044671           6.518846
+4487653415_H           6.351849           6.470969
+4676163025_B           6.025952           6.122285</code></pre>
+<pre class="r"><code># add categories and factors
+# select columns of interest from phenotype data
+pheno_pca &lt;- pheno_data %&gt;%
+  dplyr::select(raw_id, treatment, clusternum)
+
+df_pca &lt;- t_DataMatrix %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(var = &quot;raw_id&quot;) %&gt;%
+  left_join(pheno_pca, by = &quot;raw_id&quot;) %&gt;%
+  as_tibble() %&gt;%
+  dplyr::select(raw_id, treatment, clusternum, everything()) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 111 x 39,471
+   raw_id treatment clusternum fqPEquJRRlSVSfL… ckiehnugOno9d7v…
+   &lt;chr&gt;  &lt;fct&gt;     &lt;fct&gt;                 &lt;dbl&gt;            &lt;dbl&gt;
+ 1 44876… control   0                      6.33             6.31
+ 2 44876… IL4       2                      6.14             6.10
+ 3 44876… TPP       9                      6.12             6.30
+ 4 44876… IFNg      6                      6.39             6.00
+ 5 46761… sLPS_IC   7                      6.02             6.71
+ 6 46761… IL13      2                      6.13             6.52
+ 7 46761… IL10      1                      6.11             6.03
+ 8 46761… sLPS      7                      6.83             6.27
+ 9 46761… IFNg      6                      6.51             6.30
+10 46761… IL4       2                      6.08             6.12
+# … with 101 more rows, and 39,466 more variables:
+#   ritxUH.kuHlYqjozpE &lt;dbl&gt;, QpE5UiUgmJOJEkPXpc &lt;dbl&gt;,
+#   EedxN6XeUOgPSCywB0 &lt;dbl&gt;, `3l3lDoD0gssAdeehIY` &lt;dbl&gt;,
+#   WS4S8aGL855YVcUUZE &lt;dbl&gt;, KS8aGL855YVcUUZH50 &lt;dbl&gt;,
+#   TdSfOuLunqrkiJkag8 &lt;dbl&gt;, ZfoDn4IUQp4Auf56LU &lt;dbl&gt;,
+#   `97DZJV_gpQpKINl0Ec` &lt;dbl&gt;, W38p0ogk.wIBVRXllY &lt;dbl&gt;,
+#   QUTgUoqmp7jyKCQRHo &lt;dbl&gt;, BZKiEvS0eQ305U0v34 &lt;dbl&gt;,
+#   HshT.TuzF13i0V0rKg &lt;dbl&gt;, `6Rff76jvd6HDh1KYhQ` &lt;dbl&gt;,
+#   `6TheVd.HiE1UF3lX6g` &lt;dbl&gt;, QueXUXiL5yqvftiNO0 &lt;dbl&gt;,
+#   xSoSAshSJ89KgqiIgo &lt;dbl&gt;, l1KvXI7ipJV.vp44QQ &lt;dbl&gt;,
+#   TOThf8F.h.nz9UcYKo &lt;dbl&gt;, xpKvX0PpP9VIPuJQJc &lt;dbl&gt;,
+#   `3lKHxISSJPFfvpQ490` &lt;dbl&gt;, ljjP4gnSDe9zlUP.e8 &lt;dbl&gt;,
+#   NVYooKpCzodxSAWrn8 &lt;dbl&gt;, EpvlIuKLySkofhinf4 &lt;dbl&gt;,
+#   cQchF.wLl3A9NI6UB4 &lt;dbl&gt;, WpeTkd6Xk6SBCFe3cA &lt;dbl&gt;,
+#   EiRfvEvWl3SzupwOUk &lt;dbl&gt;, NajKinX6sOcFzkCC8U &lt;dbl&gt;,
+#   uy8FDV6oMleUVSCUKc &lt;dbl&gt;, `9KKuqV6OH9SXfQeH50` &lt;dbl&gt;,
+#   NIwad1IXif1m0kLKDY &lt;dbl&gt;, `6pIQKnV6ceoIxIFNe4` &lt;dbl&gt;,
+#   `9HupjiArrod98ekqUU` &lt;dbl&gt;, Hekkk3HjqAu6N_g3SI &lt;dbl&gt;,
+#   BgnCcruCDoPoJUeX1Q &lt;dbl&gt;, TtLPvPp.2z13wbgW3s &lt;dbl&gt;,
+#   EW6rxUWU6SUA75_OuA &lt;dbl&gt;, WpcOqV.0CiNzoUM_iY &lt;dbl&gt;,
+#   fgexZ3f.pSdRXVhgpQ &lt;dbl&gt;, `64Va9Z4jSCkEneL1Ko` &lt;dbl&gt;,
+#   WSzete5VJ5QKIuqlOU &lt;dbl&gt;, `67nRKEfAUoYpOlWIR4` &lt;dbl&gt;,
+#   TB0kgnrABOqJWihKec &lt;dbl&gt;, `3nTrIAUycLJNkh8JsQ` &lt;dbl&gt;,
+#   uud.vTT6V09Qkfxnt4 &lt;dbl&gt;, inSONXXEOiU0y7euFI &lt;dbl&gt;,
+#   lQKyzSyky0.3s3.RdE &lt;dbl&gt;, `3uijtRXe3Sl.9A8Cks` &lt;dbl&gt;,
+#   `0pf.QRwb4sWsn7jQKQ` &lt;dbl&gt;, `9qaJ6tLVs.P_f4ginU` &lt;dbl&gt;,
+#   ZFcKnq6e3QoRPgxvuE &lt;dbl&gt;, `3WpTVHJJ.pdTPndP0I` &lt;dbl&gt;,
+#   Q0VkeLQSHiZtSl4Sd4 &lt;dbl&gt;, `63Oiusg8JTF.19NHfo` &lt;dbl&gt;,
+#   Nonl3upr2ojFAogAsU &lt;dbl&gt;, NXMJ5W6SG.FdzRIX9E &lt;dbl&gt;,
+#   ESI0LuiXXiImyJI07g &lt;dbl&gt;, BGm6KH.W4lIY56KKz0 &lt;dbl&gt;,
+#   xSJnoVcuLvQDT7VX7o &lt;dbl&gt;, KlBdd0SXezd5KUx69Q &lt;dbl&gt;,
+#   oe5.ueJNeqBW0uufeg &lt;dbl&gt;, `3Vz4fWrCqLQ_PFSSRI` &lt;dbl&gt;,
+#   frS7Up6BAmUuB3h7OI &lt;dbl&gt;, Qq3xIFN6fT336H4154 &lt;dbl&gt;,
+#   cnvl0IALn.3U6OKchU &lt;dbl&gt;, rknSUUdLn3e5KJS148 &lt;dbl&gt;,
+#   lldNIQXQNde_jgnE0k &lt;dbl&gt;, HpR9XdAhwVIKgwju3U &lt;dbl&gt;,
+#   QukxEiSW7kgU4wVQOo &lt;dbl&gt;, `6IrsRJZWoJg50YvTRQ` &lt;dbl&gt;,
+#   cWeufQ01JXsb9L_j8k &lt;dbl&gt;, ulXud57eilG6O9OI5M &lt;dbl&gt;,
+#   QJUo3p.lIr5BO_IgVo &lt;dbl&gt;, WuCFSiISI5gUVAEZEU &lt;dbl&gt;,
+#   iFJN0mUncUvdv_pSKQ &lt;dbl&gt;, fiuenn78T3Xeqdxd1E &lt;dbl&gt;,
+#   TtEeFJI3qOX6IoT14U &lt;dbl&gt;, TVXfennQpiNwn33B14 &lt;dbl&gt;,
+#   KuSfYpUS3mF9_.ojiA &lt;dbl&gt;, cVQq9dO7.RQBRVLl4g &lt;dbl&gt;,
+#   `61RbnpngeHtZ5QqC4Q` &lt;dbl&gt;, Nu.SkSgsSS4qgOELUk &lt;dbl&gt;,
+#   `0aSV4IHnEDV6Ff8fzo` &lt;dbl&gt;, `95wFeFd5qnl5an0XVU` &lt;dbl&gt;,
+#   lHLVWt1Y9UHi7z_RHk &lt;dbl&gt;, `0r_C6LdOF3SDCu0XV4` &lt;dbl&gt;,
+#   rREnB5QDE_FssnvQdc &lt;dbl&gt;, rIh7pCCJ4OC_pSGefU &lt;dbl&gt;,
+#   Tv67vVkBVf7nuqesnQ &lt;dbl&gt;, KW2iFI4XvI6ctezB2E &lt;dbl&gt;,
+#   `9NEiTSJaChckMRK3lY` &lt;dbl&gt;, ruOh7lavetOhCqSukg &lt;dbl&gt;,
+#   rjoe5Wr3rToQqkrpIg &lt;dbl&gt;, ZE7Ep0K55I4r5raU0c &lt;dbl&gt;,
+#   ETpapxdaO1Ud9AlCOs &lt;dbl&gt;, fYsRHPeGkhevPuOCYo &lt;dbl&gt;,
+#   WorcjmvtHgrqiD.Juo &lt;dbl&gt;, cXorcjmvtHgrqiD.Js &lt;dbl&gt;,
+#   N1c9slN1ulDuHFuUkk &lt;dbl&gt;, rUkoguun1KcB9Asggo &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>norm_probe_pca &lt;- PCA(df_pca[,c(4:39471)], graph = FALSE)
+head(get_eig(norm_probe_pca))</code></pre>
+<pre><code>      eigenvalue variance.percent cumulative.variance.percent
+Dim.1  4362.4687        11.053179                    11.05318
+Dim.2  1979.9550         5.016608                    16.06979
+Dim.3  1837.4059         4.655432                    20.72522
+Dim.4  1348.3194         3.416234                    24.14145
+Dim.5  1122.6519         2.844461                    26.98591
+Dim.6   933.7521         2.365846                    29.35176</code></pre>
+<pre class="r"><code>fviz_eig(norm_probe_pca)</code></pre>
+<p><img src="figure/PCA_MCA.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Source for overriding shape change with habillage argument: <a href="https://github.com/kassambara/factoextra/issues/20" class="uri">https://github.com/kassambara/factoextra/issues/20</a></p>
+<pre class="r"><code># visualize eigenvalues
+mypal &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
+pca1 &lt;- fviz_pca_ind(norm_probe_pca,
+             label = &quot;none&quot;, # hide individual labels
+             habillage = &quot;none&quot;,
+             col.ind = df_pca$treatment,
+             palette = mypal,
+             geom.ind = &quot;point&quot;,
+             invisible = &quot;quali&quot;,
+             pointshape = 19,
+             title = &quot;PCA of normalized expression&quot;
+) +
+  labs(subtitle = &quot;By activation agent&quot;)
+print(pca1)</code></pre>
+<p><img src="figure/PCA_MCA.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca2 &lt;- fviz_pca_ind(norm_probe_pca,
+             label = &quot;none&quot;, # hide individual labels
+             habillage = &quot;none&quot;,
+             col.ind = df_pca$clusternum,
+             palette = mypal,
+             geom.ind = &quot;point&quot;,
+             invisible = &quot;quali&quot;,
+             pointshape = 19, 
+             addEllipses = TRUE,
+             title = &quot;PCA of normalized expression&quot;
+) +
+  labs(subtitle = &quot;By cluster assignment&quot;)
+print(pca2)</code></pre>
+<p><img src="figure/PCA_MCA.Rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="correspondence-analysis" class="section level2">
+<h2>Correspondence Analysis</h2>
+<p>Correspondence Analysis for Microarray data: <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/made4/inst/doc/introduction.pdf" class="uri">https://www.bioconductor.org/packages/devel/bioc/vignettes/made4/inst/doc/introduction.pdf</a></p>
+<p>Another method source: <a href="http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/" class="uri">http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/</a></p>
+<br> <br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.5.3 (2019-03-11)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Mojave 10.14
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] ggpubr_0.2                magrittr_1.5             
+ [3] ggsci_2.9                 FactoMineR_1.41          
+ [5] factoextra_1.0.5          annotate_1.60.1          
+ [7] XML_3.98-1.19             limma_3.38.3             
+ [9] lumiHumanAll.db_1.22.0    org.Hs.eg.db_3.7.0       
+[11] lumiHumanIDMapping_1.10.1 AnnotationDbi_1.44.0     
+[13] IRanges_2.16.0            S4Vectors_0.20.1         
+[15] lumi_2.34.0               GEOquery_2.50.5          
+[17] Biobase_2.42.0            BiocGenerics_0.28.0      
+[19] forcats_0.4.0             stringr_1.4.0            
+[21] dplyr_0.8.0.1             purrr_0.3.2              
+[23] readr_1.3.1               tidyr_0.8.3              
+[25] tibble_2.1.1              ggplot2_3.1.1            
+[27] tidyverse_1.2.1          
+
+loaded via a namespace (and not attached):
+  [1] readxl_1.3.1                backports_1.1.4            
+  [3] workflowr_1.2.0             plyr_1.8.4                 
+  [5] lazyeval_0.2.2              splines_3.5.3              
+  [7] BiocParallel_1.16.6         GenomeInfoDb_1.18.2        
+  [9] digest_0.6.18               foreach_1.4.4              
+ [11] htmltools_0.3.6             fansi_0.4.0                
+ [13] memoise_1.1.0               cluster_2.0.8              
+ [15] Biostrings_2.50.2           modelr_0.1.4               
+ [17] matrixStats_0.54.0          askpass_1.1                
+ [19] siggenes_1.56.0             prettyunits_1.0.2          
+ [21] colorspace_1.4-1            ggrepel_0.8.0              
+ [23] blob_1.1.1                  rvest_0.3.3                
+ [25] haven_2.1.0                 xfun_0.6                   
+ [27] crayon_1.3.4                RCurl_1.95-4.12            
+ [29] jsonlite_1.6                genefilter_1.64.0          
+ [31] survival_2.44-1.1           iterators_1.0.10           
+ [33] glue_1.3.1                  registry_0.5-1             
+ [35] gtable_0.3.0                zlibbioc_1.28.0            
+ [37] XVector_0.22.0              DelayedArray_0.8.0         
+ [39] Rhdf5lib_1.4.3              HDF5Array_1.10.1           
+ [41] scales_1.0.0                DBI_1.0.0                  
+ [43] rngtools_1.3.1              bibtex_0.4.2               
+ [45] Rcpp_1.0.1                  xtable_1.8-3               
+ [47] progress_1.2.0              bumphunter_1.24.5          
+ [49] flashClust_1.01-2           bit_1.1-14                 
+ [51] mclust_5.4.3                preprocessCore_1.44.0      
+ [53] httr_1.4.0                  RColorBrewer_1.1-2         
+ [55] pkgconfig_2.0.2             reshape_0.8.8              
+ [57] utf8_1.1.4                  locfit_1.5-9.1             
+ [59] labeling_0.3                tidyselect_0.2.5           
+ [61] rlang_0.3.4                 munsell_0.5.0              
+ [63] cellranger_1.1.0            tools_3.5.3                
+ [65] cli_1.1.0                   generics_0.0.2             
+ [67] RSQLite_2.1.1               broom_0.5.2                
+ [69] evaluate_0.13               yaml_2.2.0                 
+ [71] knitr_1.22                  bit64_0.9-7                
+ [73] fs_1.2.7                    beanplot_1.2               
+ [75] methylumi_2.28.0            nlme_3.1-139               
+ [77] doRNG_1.7.1                 nor1mix_1.2-3              
+ [79] leaps_3.0                   xml2_1.2.0                 
+ [81] biomaRt_2.38.0              compiler_3.5.3             
+ [83] rstudioapi_0.10             affyio_1.52.0              
+ [85] stringi_1.4.3               GenomicFeatures_1.34.8     
+ [87] minfi_1.28.4                lattice_0.20-38            
+ [89] Matrix_1.2-17               multtest_2.38.0            
+ [91] pillar_1.3.1                BiocManager_1.30.4         
+ [93] data.table_1.12.2           bitops_1.0-6               
+ [95] rtracklayer_1.42.2          GenomicRanges_1.34.0       
+ [97] R6_2.4.0                    affy_1.60.0                
+ [99] KernSmooth_2.23-15          nleqslv_3.3.2              
+[101] codetools_0.2-16            MASS_7.3-51.4              
+[103] assertthat_0.2.1            rhdf5_2.26.2               
+[105] SummarizedExperiment_1.12.0 openssl_1.3                
+[107] pkgmaker_0.27               rprojroot_1.3-2            
+[109] withr_2.1.2                 GenomicAlignments_1.18.1   
+[111] Rsamtools_1.34.1            GenomeInfoDbData_1.2.0     
+[113] mgcv_1.8-28                 hms_0.4.2                  
+[115] quadprog_1.5-5              grid_3.5.3                 
+[117] base64_2.0                  rmarkdown_1.12             
+[119] DelayedMatrixStats_1.4.0    illuminaio_0.24.0          
+[121] git2r_0.25.2                scatterplot3d_0.3-41       
+[123] lubridate_1.7.4            </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
