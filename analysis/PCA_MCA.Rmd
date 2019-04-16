@@ -1,5 +1,5 @@
 ---
-title: "PCA_MCA"
+title: "Cleaning and clustering experimental macrophage gene expression data"
 author: "mleukam"
 date: "2019-04-14"
 output: workflowr::wflow_html
@@ -25,16 +25,15 @@ rm(list = ls())
 
 ```{r packages, message=FALSE, warning=FALSE}
 library("tidyverse")
-library("GEOquery")
 library("lumi")
 library("lumiHumanIDMapping")
 library("lumiHumanAll.db")
-library("limma")
 library("annotate")
 library("factoextra")
 library("FactoMineR")
 library("ggsci")
 library("ggpubr")
+library("WGCNA")
 ```
 
 ## Data preparation and cleaning
@@ -393,9 +392,28 @@ print(pca2)
 ```
 
 
-## Correspondence Analysis
-Correspondence Analysis for Microarray data: https://www.bioconductor.org/packages/devel/bioc/vignettes/made4/inst/doc/introduction.pdf
+## Correlation Coefficient Matrix Analysis
 
-Another method source: http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+Background and references:
+```
+Method source for correlation matrix: https://davetang.org/muse/2012/01/31/creating-a-correlation-matrix-with-r/
 
+More on constructing a correlation matrix:
+https://www.researchgate.net/post/How_to_calculate_Gene-Gene_Pearson_correlation
 
+WGCNA package: https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/index.html
+```
+
+Following Xue et al Immunity (2014), select the 1000 probes with the highest variance to reduce the computational load to make a correlation matrix
+
+Source for selecting highest variance: http://r.789695.n4.nabble.com/Help-on-selecting-genes-showing-highest-variance-td3580645.html
+
+```{r}
+# select 1000 highest probes with highest variation
+# input is normalized expression matrix with zero expression genes removed
+myvars <- apply(selDataMatrix, 1, var, na.rm = TRUE) 
+myvars <- sort(myvars, decreasing = TRUE) 
+myvars <- myvars[1:1000] 
+data_matrix_onek <- selDataMatrix[names(myvars), ] 
+dim(data_matrix_onek) 
+```
