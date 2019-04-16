@@ -269,93 +269,128 @@ Collecting results
 # pull out t value and gene symbol
 subtable_GC <- table_GC %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, GC = t)
 subtable_IFNb <- table_IFNb %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IFNb = t)
 subtable_IFNg <- table_IFNg %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IFNg = t)
 subtable_IFNg_TNFa <- table_IFNg_TNFa %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IFNg_TNFa = t)
 subtable_IL10 <- table_IL10 %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IL10 = t)
 subtable_IL13 <- table_IL13 %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IL13 = t)
 subtable_IL4 <- table_IL4 %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IL4 = t)
 subtable_IL4_upLPS <- table_IL4_upLPS %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, IL4_upLPS = t)
 subtable_P3C <- table_P3C %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, P3C = t)
 subtable_P3C_PGE2 <- table_P3C_PGE2 %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, P3C_PGE2 = t)
 subtable_PGE2 <- table_PGE2 %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, PGE2 = t)
 subtable_upLPS <- table_upLPS %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, upLPS = t)
 subtable_sLPS <- table_sLPS %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, sLPS = t)
 subtable_sLPS_IC <- table_sLPS_IC %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, sLPS_IC = t)
 subtable_sLPS_IFNg <- table_sLPS_IFNg %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, sLPS_IFNg = t)
 subtable_TNFa <- table_TNFa %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, TNFa = t)
 subtable_TNFa_P3C <- table_TNFa_P3C %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, TNFa_P3C = t)
 subtable_TNFa_PGE2 <- table_TNFa_PGE2 %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, TNFa_PGE2 = t)
 subtable_TPP <- table_TPP %>% 
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, TPP = t)
 subtable_TPP_IFNb <- table_TPP_IFNb %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, TPP_IFNb = t)
 subtable_TPP_IFNb_IFNg <- table_TPP_IFNb_IFNg %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, TPP_IFNb_IFNg = t)
 subtable_upLPS_IC <- table_upLPS_IC %>%
   filter(adj.P.Val < 0.05) %>%
-  dplyr::select(ID, geneSymbol, t)
+  dplyr::select(ID, geneSymbol, upLPS = t)
 
-# get a list of all the gene symbols in all the lists
-subtable_GC 
-subtable_IFNb 
-subtable_IFNg
-subtable_IFNg_TNFa
-subtable_IL10
-subtable_IL13
-subtable_IL4
-subtable_IL4_upLPS
-subtable_P3C
-subtable_P3C_PGE2
-subtable_PGE2
-subtable_upLPS
-subtable_sLPS 
-subtable_sLPS_IC
-subtable_sLPS_IFNg
-subtable_TNFa
-subtable_TNFa_P3C
-subtable_TNFa_PGE2
-subtable_TPP
-subtable_TPP_IFNb 
-subtable_TPP_IFNb_IFNg
-subtable_upLPS_IC
+# get  of all the probe symbols in all the lists
+GC        <- pull(subtable_GC, ID) 
+IFNb      <- pull(subtable_IFNb, ID)
+IFNg      <- pull(subtable_IFNg, ID)
+IFNg_TNFa <- pull(subtable_IFNg_TNFa, ID)
+IL10      <- pull(subtable_IL10, ID)
+IL13      <- pull(subtable_IL13, ID)
+IL4       <- pull(subtable_IL4, ID)
+IL4_upLPS <- pull(subtable_IL4_upLPS, ID)
+P3C       <- pull(subtable_P3C, ID)
+P3C_PGE2  <- pull(subtable_P3C_PGE2, ID)
+PGE2      <- pull(subtable_PGE2, ID)
+upLPS     <- pull(subtable_upLPS, ID)
+sLPS      <- pull(subtable_sLPS, ID)
+sLPS_IC   <- pull(subtable_sLPS_IC, ID)
+sLPS_IFNg <- pull(subtable_sLPS_IFNg, ID)
+TNFa      <- pull(subtable_TNFa, ID)
+TNFa_P3C  <- pull(subtable_TNFa_P3C, ID)
+TNFa_PGE2 <- pull(subtable_TNFa_PGE2, ID)
+TPP       <- pull(subtable_TPP, ID)
+TPP_IFNb  <- pull(subtable_TPP_IFNb, ID)
+TPP_IFNbg <- pull(subtable_TPP_IFNb_IFNg, ID)
+upLPS_IC  <- pull(subtable_upLPS_IC, ID)
+
+unique_ids <- unique(c(GC, IFNb, IFNg, IFNg_TNFa, IL10, IL13, IL4, IL4_upLPS, P3C, P3C_PGE2, PGE2, upLPS, sLPS, sLPS_IC, sLPS_IFNg, TNFa, TNFa_P3C, TNFa_PGE2, TPP, TPP_IFNb, TPP_IFNbg, upLPS_IC))
+
+# get gene symbols for each of the unique probe IDs
+unique_ids_geneSymbol <- getSYMBOL(unique_ids, 'lumiHumanAll.db') %>%
+  enframe() %>%
+  dplyr::rename(ID = name, geneSymbol = value)
+
+# make table of differential gene expression t values
+dge_frame <- enframe(unique_ids) %>%
+  dplyr::rename(ID = value) %>%
+  left_join(unique_ids_geneSymbol, by = "ID") %>%
+  left_join(subtable_GC, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IFNb, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IFNg, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IFNg_TNFa, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL10, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL13, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL4, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL4_upLPS, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_P3C, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_P3C_PGE2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_PGE2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_upLPS, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_sLPS, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_sLPS_IC, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_sLPS_IFNg, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TNFa, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TNFa_P3C, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TNFa_PGE2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TPP, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TPP_IFNb, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TPP_IFNb_IFNg, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_upLPS_IC, by = c("ID", "geneSymbol"))
+
 ```
-
+ 
