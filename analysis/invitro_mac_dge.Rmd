@@ -48,9 +48,21 @@ lumi_46903 <- readRDS("~/tcga_macs/output/normalized_probe_intensities.Rds")
 # retreive normalized data
 dataMatrix <- exprs(mac_eset)
 
-# remove the probes that are not detected in raw data
-presentCount <- detectionCall(lumi_46903)
-selDataMatrix <- dataMatrix[presentCount > 0,]
+# find "valley" in density plot for low value filtering
+density(mac_eset)
+abline(v = 5, col = "blue")
+
+# remove the probes without at least expression value 5 in at least 3 samples 
+dataMatrix <- as.data.frame(dataMatrix)
+mat_stats <- data.frame(total = apply(dataMatrix, 1, function(x) sum(
+      x > 5, na.rm = TRUE)))
+keep = which(mat_stats$total >= 3) 
+
+dim(dataMatrix)
+selDataMatrix = dataMatrix[keep,]
+dim(selDataMatrix)
+
+# gather list of selected probes
 probeList <- rownames(selDataMatrix)
 
 ```
