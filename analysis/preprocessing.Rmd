@@ -417,3 +417,57 @@ myvars <- myvars[1:1000]
 data_matrix_onek <- selDataMatrix[names(myvars), ] 
 dim(data_matrix_onek) 
 ```
+
+Quick look at clustering
+```{r}
+# heirarchical cluster
+datExpr <- t(data_matrix_onek)
+sampleTree = hclust(dist(datExpr), method = "average")
+sizeGrWindow(16,9)
+par(cex = 0.4)
+plot(sampleTree, main = "Sample clustering to detect outliers", 
+     sub = "", 
+     xlab = "", 
+     cex.lab = 1.5,
+     cex.axis = 1.5, 
+     cex.main = 2.5)
+
+# no significant outliers
+```
+
+Set up phenotype data for WGCNA
+```{r}
+# use pheno_data from above with treatment identification and cluster number
+# select columns I want to visualize
+traitData <- pheno_data %>%
+  dplyr::select(raw_id, treatment, clusternum) %>%
+  as.data.frame() %>%
+  column_to_rownames("raw_id") %>%
+  print()
+
+treat_colors <- pal_igv("default", alpha = 1)(23)
+names(treat_colors) <- levels(traitData$treatment)
+treat_colors <- enframe(treat_colors) %>%
+  dplyr::rename(treatment = name, treat_colors = value)
+clust_colors <- pal_igv("default", alpha = 1)(9)
+names(clust_colors) <- levels(traitData$clusternum)
+clust_colors <- enframe(clust_colors) %>%
+  dplyr::rename(clusternum = name, clust_colors = value)
+
+traitColors <- pheno_data %>% 
+  left_join(treat_colors, by = "treatment") %>%
+  left_join(clust_colors, by = "clusternum") %>%
+  dplyr::select(raw_id, treat_colors, clust_colors) %>%
+  as.data.frame() %>%
+  column_to_rownames("raw_id") %>%
+  print()
+
+```
+
+```{r}
+sampleTree2 <- hclust(dist(datExpr), method = "average")
+plotDendroAndColors(sampleTree2, traitColors,
+                    groupLabels = names(traitData), 
+                    main = "Sample dendrogram and treatment assignments")
+
+```
