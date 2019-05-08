@@ -25,6 +25,7 @@ rm(list = ls())
 
 ```{r packages, message=FALSE, warning=FALSE}
 library("tidyverse")
+library("limma")
 library("lumi")
 library("lumiHumanIDMapping")
 library("lumiHumanAll.db")
@@ -40,6 +41,15 @@ library("WGCNA")
 
 ### Read in raw expression data
 ```{r}
+raw_input <- read_delim("~/tcga_macs/data/GSE46903_non-normalized.txt", delim = "\t")
+```
+
+One source for methods (start on page 23): https://bioconductor.org/packages/release/data/experiment/vignettes/BeadArrayUseCases/inst/doc/BeadArrayUseCases.pdf
+
+NB: "We recommend users work with the non-normalized probe-specific data in their analysis where possible. Illumina’s background correction step, which subtracts the intensities of the negative control probes from the intensities of the regular probes, should also be avoided."
+
+```{r}
+# read in data using limma function for illumina beadchips
 lumi_input <- lumiR("~/tcga_macs/data/GSE46903_non-normalized.txt",
                     sep = "\t",
                     lib.mapping = 'lumiHumanIDMapping',
@@ -49,15 +59,20 @@ lumi_input <- lumiR("~/tcga_macs/data/GSE46903_non-normalized.txt",
                       se.exprs = 'BEAD_STD', 
                       detection = 'Detection', 
                       beadNum = 'Avg_NBEADS')) 
+# review results
+dim(lumi_input)
+lumi_input$E[1:5, 1:5]
 ```
 
 ### Normalize expression values
 
  * The original authors collected individual experiments into a single output frame, which would have resulted in background correction from the Illumina Genome Studio software.
  * Due to the lack of 'se.exprs' information, 'log2' transformation will be used.
- * Variance Stabilizing Transform method: log2 
+ * Variance Stabilizing Transform method: log2 - the lumi package takes advantage of controls and technical replicates in the probe list to stabilize variance
  * Normalization method: rsn 
  
+Citation for superiority of log2 rsn normalization for this specific beadchip: https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-11-349
+
 ```{r message=FALSE, warning=FALSE, results="hide"}
 lumi_46903 <- lumiExpresso(lumi_input, 
                          normalize.param = list(method = 'rsn'))
@@ -87,7 +102,7 @@ gse46903 <- readRDS("~/tcga_macs/data/gse_46903.rds")
 show(pData(phenoData(gse46903[[1]]))[1:20,c(1,6,8)])
 ```
 
-The 10-digit sample names correspond to experimental conditions, but are stuck in the same column as the description of the experiment.
+The sample names correspond to experimental conditions where the 10-digit number is the chip and the letter is the lane, forming a unique identifier for each sample. These are stuck in the same column as the description of the experiment.
 
 * [Documentation for working with AnnotatedDataFrame objects](https://www.rdocumentation.org/packages/Biobase/versions/2.32.0/topics/AnnotatedDataFrame)
 
