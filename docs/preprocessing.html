@@ -447,7 +447,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-04-16
+<strong>Last updated:</strong> 2019-05-08
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -526,10 +526,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree04c107abc24c8667b569a2334cef239d1b6822f2targetblank04c107aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/04c107abc24c8667b569a2334cef239d1b6822f2" target="_blank">04c107a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3ff66a482aa909617869ea27d840b4ba533e57e5targetblank3ff66a4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/3ff66a482aa909617869ea27d840b4ba533e57e5" target="_blank">3ff66a4</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree04c107abc24c8667b569a2334cef239d1b6822f2targetblank04c107aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3ff66a482aa909617869ea27d840b4ba533e57e5targetblank3ff66a4a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -547,6 +547,7 @@ Ignored files:
     Ignored:    data/GSE46903_non-normalized.txt
     Ignored:    data/GSE46903_nonnormalized copy.tsv
     Ignored:    data/gse_46903.rds
+    Ignored:    output/dge_frame.csv
     Ignored:    output/expression_set.rds
     Ignored:    output/normalized_probe_intensities.Rds
     Ignored:    output/processed_lumi_46903.Rds
@@ -595,16 +596,33 @@ Message
 Rmd
 </td>
 <td>
-<a href="https://github.com/mleukam/tcga_macs/blob/04c107abc24c8667b569a2334cef239d1b6822f2/analysis/PCA_MCA.Rmd" target="_blank">04c107a</a>
+<a href="https://github.com/mleukam/tcga_macs/blob/3ff66a482aa909617869ea27d840b4ba533e57e5/analysis/preprocessing.Rmd" target="_blank">3ff66a4</a>
 </td>
 <td>
 mleukam
 </td>
 <td>
-2019-04-16
+2019-05-08
 </td>
 <td>
-updates to cleaning and clustering
+rename and update preprocessing notebook, update index links
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/88719595f2580bea02ec2cf1d25f8e90e6b2189e/analysis/preprocessing.Rmd" target="_blank">8871959</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-17
+</td>
+<td>
+rename preprocessing notebook
 </td>
 </tr>
 <tr>
@@ -612,16 +630,16 @@ updates to cleaning and clustering
 html
 </td>
 <td>
-<a href="https://rawcdn.githack.com/mleukam/tcga_macs/b964e86bf21d6619ba5aec5855d2f0973e134e4d/docs/PCA_MCA.html" target="_blank">b964e86</a>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/88719595f2580bea02ec2cf1d25f8e90e6b2189e/docs/preprocessing.html" target="_blank">8871959</a>
 </td>
 <td>
 mleukam
 </td>
 <td>
-2019-04-14
+2019-04-17
 </td>
 <td>
-Build site.
+rename preprocessing notebook
 </td>
 </tr>
 </tbody>
@@ -644,6 +662,7 @@ Build site.
 <p>Clear workspace prior to analysis and load necessary packages</p>
 <pre class="r"><code>rm(list = ls())</code></pre>
 <pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;limma&quot;)
 library(&quot;lumi&quot;)
 library(&quot;lumiHumanIDMapping&quot;)
 library(&quot;lumiHumanAll.db&quot;)
@@ -659,7 +678,16 @@ library(&quot;WGCNA&quot;)</code></pre>
 <h2>Data preparation and cleaning</h2>
 <div id="read-in-raw-expression-data" class="section level3">
 <h3>Read in raw expression data</h3>
-<pre class="r"><code>lumi_input &lt;- lumiR(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt&quot;,
+<pre class="r"><code>raw_input &lt;- read_delim(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt&quot;, delim = &quot;\t&quot;)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  .default = col_double()
+)</code></pre>
+<pre><code>See spec(...) for full column specifications.</code></pre>
+<p>One source for methods (start on page 23): <a href="https://bioconductor.org/packages/release/data/experiment/vignettes/BeadArrayUseCases/inst/doc/BeadArrayUseCases.pdf" class="uri">https://bioconductor.org/packages/release/data/experiment/vignettes/BeadArrayUseCases/inst/doc/BeadArrayUseCases.pdf</a></p>
+<p>NB: “We recommend users work with the non-normalized probe-specific data in their analysis where possible. Illumina’s background correction step, which subtracts the intensities of the negative control probes from the intensities of the regular probes, should also be avoided.”</p>
+<pre class="r"><code># read in data using limma function for illumina beadchips
+lumi_input &lt;- lumiR(&quot;~/tcga_macs/data/GSE46903_non-normalized.txt&quot;,
                     sep = &quot;\t&quot;,
                     lib.mapping = &#39;lumiHumanIDMapping&#39;,
                     parseColumnName = TRUE,
@@ -669,15 +697,22 @@ library(&quot;WGCNA&quot;)</code></pre>
                       detection = &#39;Detection&#39;, 
                       beadNum = &#39;Avg_NBEADS&#39;)) </code></pre>
 <pre><code>Duplicated IDs found and were merged!</code></pre>
+<pre class="r"><code># review results
+dim(lumi_input)</code></pre>
+<pre><code>Features  Samples 
+   47462      384 </code></pre>
+<pre class="r"><code>lumi_input$E[1:5, 1:5]</code></pre>
+<pre><code>NULL</code></pre>
 </div>
 <div id="normalize-expression-values" class="section level3">
 <h3>Normalize expression values</h3>
 <ul>
 <li>The original authors collected individual experiments into a single output frame, which would have resulted in background correction from the Illumina Genome Studio software.</li>
 <li>Due to the lack of ‘se.exprs’ information, ‘log2’ transformation will be used.</li>
-<li>Variance Stabilizing Transform method: log2</li>
+<li>Variance Stabilizing Transform method: log2 - the lumi package takes advantage of controls and technical replicates in the probe list to stabilize variance</li>
 <li>Normalization method: rsn</li>
 </ul>
+<p>Citation for superiority of log2 rsn normalization for this specific beadchip: <a href="https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-11-349" class="uri">https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-11-349</a></p>
 <pre class="r"><code>lumi_46903 &lt;- lumiExpresso(lumi_input, 
                          normalize.param = list(method = &#39;rsn&#39;))
 
@@ -742,7 +777,7 @@ GSM1140423 DC_upLPS_10_24h [5376074046_E]  RNA peripheral blood
 GSM1140424          DC_imm [5376074046_F]  RNA peripheral blood
 GSM1140425          DC_imm [5376074046_G]  RNA peripheral blood
 GSM1140426 DC_upLPS_10_24h [5376074046_H]  RNA peripheral blood</code></pre>
-<p>The 10-digit sample names correspond to experimental conditions, but are stuck in the same column as the description of the experiment.</p>
+<p>The sample names correspond to experimental conditions where the 10-digit number is the chip and the letter is the lane, forming a unique identifier for each sample. These are stuck in the same column as the description of the experiment.</p>
 <ul>
 <li><a href="https://www.rdocumentation.org/packages/Biobase/versions/2.32.0/topics/AnnotatedDataFrame">Documentation for working with AnnotatedDataFrame objects</a></li>
 </ul>
@@ -1511,60 +1546,7 @@ Dim.4  1348.3194         3.416234                    24.14145
 Dim.5  1122.6519         2.844461                    26.98591
 Dim.6   933.7521         2.365846                    29.35176</code></pre>
 <pre class="r"><code>fviz_eig(norm_probe_pca)</code></pre>
-<p><img src="figure/PCA_MCA.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
-Past versions of unnamed-chunk-12-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-12-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/mleukam/tcga_macs/blob/b964e86bf21d6619ba5aec5855d2f0973e134e4d/docs/figure/PCA_MCA.Rmd/unnamed-chunk-12-1.png" target="_blank">b964e86</a>
-</td>
-<td>
-mleukam
-</td>
-<td>
-2019-04-14
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Source for overriding shape change with habillage argument: <a href="https://github.com/kassambara/factoextra/issues/20" class="uri">https://github.com/kassambara/factoextra/issues/20</a></p>
-<pre class="r"><code># visualize eigenvalues
-mypal &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
-pca1 &lt;- fviz_pca_ind(norm_probe_pca,
-             label = &quot;none&quot;, # hide individual labels
-             habillage = &quot;none&quot;,
-             col.ind = df_pca$treatment,
-             palette = mypal,
-             geom.ind = &quot;point&quot;,
-             invisible = &quot;quali&quot;,
-             pointshape = 19,
-             title = &quot;PCA of normalized expression&quot;
-) +
-  labs(subtitle = &quot;By activation agent&quot;)
-print(pca1)</code></pre>
-<p><img src="figure/PCA_MCA.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
 Past versions of unnamed-chunk-13-1.png
@@ -1589,19 +1571,35 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/mleukam/tcga_macs/blob/b964e86bf21d6619ba5aec5855d2f0973e134e4d/docs/figure/PCA_MCA.Rmd/unnamed-chunk-13-1.png" target="_blank">b964e86</a>
+<a href="https://github.com/mleukam/tcga_macs/blob/88719595f2580bea02ec2cf1d25f8e90e6b2189e/docs/figure/preprocessing.Rmd/unnamed-chunk-13-1.png" target="_blank">8871959</a>
 </td>
 <td>
 mleukam
 </td>
 <td>
-2019-04-14
+2019-04-17
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
+<p>Source for overriding shape change with habillage argument: <a href="https://github.com/kassambara/factoextra/issues/20" class="uri">https://github.com/kassambara/factoextra/issues/20</a></p>
+<pre class="r"><code># visualize eigenvalues
+mypal &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
+pca1 &lt;- fviz_pca_ind(norm_probe_pca,
+             label = &quot;none&quot;, # hide individual labels
+             habillage = &quot;none&quot;,
+             col.ind = df_pca$treatment,
+             palette = mypal,
+             geom.ind = &quot;point&quot;,
+             invisible = &quot;quali&quot;,
+             pointshape = 19,
+             title = &quot;PCA of normalized expression&quot;
+) +
+  labs(subtitle = &quot;By activation agent&quot;)
+print(pca1)</code></pre>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>pca2 &lt;- fviz_pca_ind(norm_probe_pca,
              label = &quot;none&quot;, # hide individual labels
              habillage = &quot;none&quot;,
@@ -1615,44 +1613,7 @@ mleukam
 ) +
   labs(subtitle = &quot;By cluster assignment&quot;)
 print(pca2)</code></pre>
-<p><img src="figure/PCA_MCA.Rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-2">
-Past versions of unnamed-chunk-13-2.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-13-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/mleukam/tcga_macs/blob/b964e86bf21d6619ba5aec5855d2f0973e134e4d/docs/figure/PCA_MCA.Rmd/unnamed-chunk-13-2.png" target="_blank">b964e86</a>
-</td>
-<td>
-mleukam
-</td>
-<td>
-2019-04-14
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="correlation-coefficient-matrix-analysis" class="section level2">
 <h2>Correlation Coefficient Matrix Analysis</h2>
@@ -1673,7 +1634,277 @@ myvars &lt;- myvars[1:1000]
 data_matrix_onek &lt;- selDataMatrix[names(myvars), ] 
 dim(data_matrix_onek) </code></pre>
 <pre><code>[1] 1000  111</code></pre>
-<br> <br>
+<p>Quick look at clustering</p>
+<pre class="r"><code># heirarchical cluster
+datExpr &lt;- t(data_matrix_onek)
+sampleTree = hclust(dist(datExpr), method = &quot;average&quot;)
+sizeGrWindow(16,9)
+par(cex = 0.4)
+plot(sampleTree, main = &quot;Sample clustering to detect outliers&quot;, 
+     sub = &quot;&quot;, 
+     xlab = &quot;&quot;, 
+     cex.lab = 1.5,
+     cex.axis = 1.5, 
+     cex.main = 2.5)
+
+# no significant outliers</code></pre>
+<p>Set up phenotype data for WGCNA</p>
+<pre class="r"><code># use pheno_data from above with treatment identification and cluster number
+# select columns I want to visualize
+traitData &lt;- pheno_data %&gt;%
+  dplyr::select(raw_id, treatment, clusternum) %&gt;%
+  as.data.frame() %&gt;%
+  column_to_rownames(&quot;raw_id&quot;) %&gt;%
+  print()</code></pre>
+<pre><code>                 treatment clusternum
+4487653414_E       control          0
+4487653415_E           IL4          2
+4487653415_G           TPP          9
+4487653415_H          IFNg          6
+4676163025_B       sLPS_IC          7
+4676163025_C          IL13          2
+4676163025_D          IL10          1
+4676163025_G          sLPS          7
+4676163025_H          IFNg          6
+4676163025_J           IL4          2
+4676163025_K       sLPS_IC          7
+4676163025_L            GC          1
+4676163030_A       control          0
+4676163030_B           TPP          9
+4676163030_C           IL4          2
+4676163030_D          IFNg          6
+4676163030_E       control          0
+4676163030_F           TPP          9
+4676163030_G           IL4          2
+4676163030_H          IFNg          6
+4676163030_I       control          0
+4676163030_J           TPP          9
+4676163030_K           IL4          2
+4676163030_L          IFNg          6
+4676163034_B          IFNg          6
+4676163034_G           TPP          9
+4676163034_H       control          0
+4676163034_K           TPP          9
+4950679013_A          IL13          2
+4950679013_C           IL4          2
+4950679013_D          sLPS          7
+4950679013_E       control          0
+4950679013_F          IL13          2
+4950679013_G          IL10          1
+4950679013_J            GC          1
+4950679045_A          IL10          1
+4950679045_B            GC          1
+4950679045_C       control          0
+4950679045_F       sLPS_IC          7
+4950679045_G           IL4          2
+4950679045_I           TPP          9
+4950679045_K          IFNg          6
+4958478013_A         upLPS          3
+4958478013_C      upLPS_IC          3
+4958478013_D      upLPS_IC          3
+4958478013_F      upLPS_IC          3
+4958478013_J         upLPS          3
+4958478013_L         upLPS          3
+4958478033_C          sLPS          7
+4958478033_E          sLPS          7
+4958478044_B          sLPS          7
+4958478044_E          sLPS          7
+4958478044_I          sLPS          7
+4958478044_L          sLPS          7
+4958478053_A          TNFa          6
+4958478053_B          TNFa          6
+4958478053_F          TNFa          6
+5342595001_A     sLPS_IFNg          7
+5342595001_C     IFNg_TNFa          6
+5342595001_F     IFNg_TNFa          6
+5342595020_G     sLPS_IFNg          7
+5342595020_I     sLPS_IFNg          7
+5342595020_J     IFNg_TNFa          6
+5376074023_A           IL4          2
+5376074023_C         upLPS          3
+5376074023_D     IL4_upLPS          2
+5376074023_E     IL4_upLPS          2
+5376074023_F           IL4          2
+5376074023_G           IL4          2
+5376074023_I         upLPS          3
+5376074023_K     IL4_upLPS          2
+5376074032_A           P3C          4
+5376074032_B           TPP          9
+5376074032_C      P3C_PGE2          4
+5376074032_E      TNFa_P3C          8
+5376074032_F      P3C_PGE2          4
+5376074032_G      TNFa_P3C          8
+5376074032_H          TNFa          6
+5376074032_I          TNFa          6
+5376074032_J           P3C          4
+5376074032_K      TNFa_P3C          8
+5376074032_L      P3C_PGE2          4
+5376074033_A          PGE2          4
+5376074033_B           P3C          4
+5376074033_C     TNFa_PGE2          8
+5376074033_D          PGE2          4
+5376074033_G           TPP          9
+5376074033_H     TNFa_PGE2          8
+5376074033_I          PGE2          4
+5376074033_J           TPP          9
+5376074033_K     TNFa_PGE2          8
+5376074033_L          TNFa          6
+5376074038_C TPP_IFNb_IFNg          9
+5376074038_D TPP_IFNb_IFNg          9
+5376074038_E          IFNb          1
+5376074038_G          IFNb          1
+5376074038_H      TPP_IFNb          9
+5376074038_I          IFNb          1
+5376074038_J      TPP_IFNb          9
+5376074038_K TPP_IFNb_IFNg          9
+5376074038_L      TPP_IFNb          9
+5376074056_A         upLPS          3
+5376074056_D         upLPS          3
+5376074056_E     IL4_upLPS          2
+5376074056_F         upLPS          3
+5376074056_G         upLPS          3
+5376074056_H     IL4_upLPS          2
+5376074056_I           IL4          2
+5376074056_J           IL4          2
+5376074056_K           IL4          2
+5376074056_L     IL4_upLPS          2</code></pre>
+<pre class="r"><code>treat_colors &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
+names(treat_colors) &lt;- levels(traitData$treatment)
+treat_colors &lt;- enframe(treat_colors) %&gt;%
+  dplyr::rename(treatment = name, treat_colors = value)
+clust_colors &lt;- pal_igv(&quot;default&quot;, alpha = 1)(9)
+names(clust_colors) &lt;- levels(traitData$clusternum)
+clust_colors &lt;- enframe(clust_colors) %&gt;%
+  dplyr::rename(clusternum = name, clust_colors = value)
+
+traitColors &lt;- pheno_data %&gt;% 
+  left_join(treat_colors, by = &quot;treatment&quot;) %&gt;%
+  left_join(clust_colors, by = &quot;clusternum&quot;) %&gt;%
+  dplyr::select(raw_id, treat_colors, clust_colors) %&gt;%
+  as.data.frame() %&gt;%
+  column_to_rownames(&quot;raw_id&quot;) %&gt;%
+  print()</code></pre>
+<pre><code>Warning: Column `treatment` joining factor and character vector, coercing
+into character vector</code></pre>
+<pre><code>Warning: Column `clusternum` joining factor and character vector, coercing
+into character vector</code></pre>
+<pre><code>             treat_colors clust_colors
+4487653414_E    #5050FFFF    #5050FFFF
+4487653415_E    #802268FF    #F0E685FF
+4487653415_G    #AE1F63FF    #6BD76BFF
+4487653415_H    #F0E685FF    #749B58FF
+4676163025_B    #7A65A5FF    #5DB1DDFF
+4676163025_C    #5DB1DDFF    #F0E685FF
+4676163025_D    #BA6338FF    #CE3D32FF
+4676163025_G    #D58F5CFF    #5DB1DDFF
+4676163025_H    #F0E685FF    #749B58FF
+4676163025_J    #802268FF    #F0E685FF
+4676163025_K    #7A65A5FF    #5DB1DDFF
+4676163025_L    #CE3D32FF    #CE3D32FF
+4676163030_A    #5050FFFF    #5050FFFF
+4676163030_B    #AE1F63FF    #6BD76BFF
+4676163030_C    #802268FF    #F0E685FF
+4676163030_D    #F0E685FF    #749B58FF
+4676163030_E    #5050FFFF    #5050FFFF
+4676163030_F    #AE1F63FF    #6BD76BFF
+4676163030_G    #802268FF    #F0E685FF
+4676163030_H    #F0E685FF    #749B58FF
+4676163030_I    #5050FFFF    #5050FFFF
+4676163030_J    #AE1F63FF    #6BD76BFF
+4676163030_K    #802268FF    #F0E685FF
+4676163030_L    #F0E685FF    #749B58FF
+4676163034_B    #F0E685FF    #749B58FF
+4676163034_G    #AE1F63FF    #6BD76BFF
+4676163034_H    #5050FFFF    #5050FFFF
+4676163034_K    #AE1F63FF    #6BD76BFF
+4950679013_A    #5DB1DDFF    #F0E685FF
+4950679013_C    #802268FF    #F0E685FF
+4950679013_D    #D58F5CFF    #5DB1DDFF
+4950679013_E    #5050FFFF    #5050FFFF
+4950679013_F    #5DB1DDFF    #F0E685FF
+4950679013_G    #BA6338FF    #CE3D32FF
+4950679013_J    #CE3D32FF    #CE3D32FF
+4950679045_A    #BA6338FF    #CE3D32FF
+4950679045_B    #CE3D32FF    #CE3D32FF
+4950679045_C    #5050FFFF    #5050FFFF
+4950679045_F    #7A65A5FF    #5DB1DDFF
+4950679045_G    #802268FF    #F0E685FF
+4950679045_I    #AE1F63FF    #6BD76BFF
+4950679045_K    #F0E685FF    #749B58FF
+4958478013_A    #C75127FF    #BA6338FF
+4958478013_C    #CC9900FF    #BA6338FF
+4958478013_D    #CC9900FF    #BA6338FF
+4958478013_F    #CC9900FF    #BA6338FF
+4958478013_J    #C75127FF    #BA6338FF
+4958478013_L    #C75127FF    #BA6338FF
+4958478033_C    #D58F5CFF    #5DB1DDFF
+4958478033_E    #D58F5CFF    #5DB1DDFF
+4958478044_B    #D58F5CFF    #5DB1DDFF
+4958478044_E    #D58F5CFF    #5DB1DDFF
+4958478044_I    #D58F5CFF    #5DB1DDFF
+4958478044_L    #D58F5CFF    #5DB1DDFF
+4958478053_A    #3B1B53FF    #749B58FF
+4958478053_B    #3B1B53FF    #749B58FF
+4958478053_F    #3B1B53FF    #749B58FF
+5342595001_A    #E4AF69FF    #5DB1DDFF
+5342595001_C    #466983FF    #749B58FF
+5342595001_F    #466983FF    #749B58FF
+5342595020_G    #E4AF69FF    #5DB1DDFF
+5342595020_I    #E4AF69FF    #5DB1DDFF
+5342595020_J    #466983FF    #749B58FF
+5376074023_A    #802268FF    #F0E685FF
+5376074023_C    #C75127FF    #BA6338FF
+5376074023_D    #6BD76BFF    #F0E685FF
+5376074023_E    #6BD76BFF    #F0E685FF
+5376074023_F    #802268FF    #F0E685FF
+5376074023_G    #802268FF    #F0E685FF
+5376074023_I    #C75127FF    #BA6338FF
+5376074023_K    #6BD76BFF    #F0E685FF
+5376074032_A    #D595A7FF    #466983FF
+5376074032_B    #AE1F63FF    #6BD76BFF
+5376074032_C    #924822FF    #466983FF
+5376074032_E    #CDDEB7FF    #802268FF
+5376074032_F    #924822FF    #466983FF
+5376074032_G    #CDDEB7FF    #802268FF
+5376074032_H    #3B1B53FF    #749B58FF
+5376074032_I    #3B1B53FF    #749B58FF
+5376074032_J    #D595A7FF    #466983FF
+5376074032_K    #CDDEB7FF    #802268FF
+5376074032_L    #924822FF    #466983FF
+5376074033_A    #837B8DFF    #466983FF
+5376074033_B    #D595A7FF    #466983FF
+5376074033_C    #612A79FF    #802268FF
+5376074033_D    #837B8DFF    #466983FF
+5376074033_G    #AE1F63FF    #6BD76BFF
+5376074033_H    #612A79FF    #802268FF
+5376074033_I    #837B8DFF    #466983FF
+5376074033_J    #AE1F63FF    #6BD76BFF
+5376074033_K    #612A79FF    #802268FF
+5376074033_L    #3B1B53FF    #749B58FF
+5376074038_C    #5A655EFF    #6BD76BFF
+5376074038_D    #5A655EFF    #6BD76BFF
+5376074038_E    #749B58FF    #CE3D32FF
+5376074038_G    #749B58FF    #CE3D32FF
+5376074038_H    #E7C76FFF    #6BD76BFF
+5376074038_I    #749B58FF    #CE3D32FF
+5376074038_J    #E7C76FFF    #6BD76BFF
+5376074038_K    #5A655EFF    #6BD76BFF
+5376074038_L    #E7C76FFF    #6BD76BFF
+5376074056_A    #C75127FF    #BA6338FF
+5376074056_D    #C75127FF    #BA6338FF
+5376074056_E    #6BD76BFF    #F0E685FF
+5376074056_F    #C75127FF    #BA6338FF
+5376074056_G    #C75127FF    #BA6338FF
+5376074056_H    #6BD76BFF    #F0E685FF
+5376074056_I    #802268FF    #F0E685FF
+5376074056_J    #802268FF    #F0E685FF
+5376074056_K    #802268FF    #F0E685FF
+5376074056_L    #6BD76BFF    #F0E685FF</code></pre>
+<pre class="r"><code>sampleTree2 &lt;- hclust(dist(datExpr), method = &quot;average&quot;)
+plotDendroAndColors(sampleTree2, traitColors,
+                    groupLabels = names(traitData), 
+                    main = &quot;Sample dendrogram and treatment assignments&quot;)</code></pre>
+<img src="figure/preprocessing.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /> <br> <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
 <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
@@ -1683,7 +1914,7 @@ dim(data_matrix_onek) </code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.5.3 (2019-03-11)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Mojave 10.14
+Running under: macOS Mojave 10.14.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -1706,11 +1937,12 @@ other attached packages:
 [13] lumiHumanIDMapping_1.10.1 AnnotationDbi_1.44.0     
 [15] IRanges_2.16.0            S4Vectors_0.20.1         
 [17] lumi_2.34.0               Biobase_2.42.0           
-[19] BiocGenerics_0.28.0       forcats_0.4.0            
-[21] stringr_1.4.0             dplyr_0.8.0.1            
-[23] purrr_0.3.2               readr_1.3.1              
-[25] tidyr_0.8.3               tibble_2.1.1             
-[27] ggplot2_3.1.1             tidyverse_1.2.1          
+[19] BiocGenerics_0.28.0       limma_3.38.3             
+[21] forcats_0.4.0             stringr_1.4.0            
+[23] dplyr_0.8.0.1             purrr_0.3.2              
+[25] readr_1.3.1               tidyr_0.8.3              
+[27] tibble_2.1.1              ggplot2_3.1.1            
+[29] tidyverse_1.2.1          
 
 loaded via a namespace (and not attached):
   [1] utf8_1.1.4                  robust_0.4-18              
@@ -1779,14 +2011,14 @@ loaded via a namespace (and not attached):
 [127] DelayedMatrixStats_1.4.0    Rsamtools_1.34.1           
 [129] nlme_3.1-139                jsonlite_1.6               
 [131] Rhdf5lib_1.4.3              fansi_0.4.0                
-[133] askpass_1.1                 limma_3.38.3               
-[135] pillar_1.3.1                lattice_0.20-38            
-[137] DEoptimR_1.0-8              httr_1.4.0                 
-[139] survival_2.44-1.1           GO.db_3.7.0                
-[141] glue_1.3.1                  iterators_1.0.10           
-[143] bit_1.1-14                  stringi_1.4.3              
-[145] HDF5Array_1.10.1            blob_1.1.1                 
-[147] latticeExtra_0.6-28         memoise_1.1.0              </code></pre>
+[133] askpass_1.1                 pillar_1.3.1               
+[135] lattice_0.20-38             DEoptimR_1.0-8             
+[137] httr_1.4.0                  survival_2.44-1.1          
+[139] GO.db_3.7.0                 glue_1.3.1                 
+[141] iterators_1.0.10            bit_1.1-14                 
+[143] stringi_1.4.3               HDF5Array_1.10.1           
+[145] blob_1.1.1                  latticeExtra_0.6-28        
+[147] memoise_1.1.0              </code></pre>
 </div>
 </div>
 
