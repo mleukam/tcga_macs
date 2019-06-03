@@ -341,8 +341,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -438,7 +436,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#report"> Report <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -447,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-05-08
+<strong>Last updated:</strong> 2019-06-03
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -457,11 +455,11 @@ div.section {
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.2.0). The <em>Report</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.3.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
-<div id="report" class="tab-pane fade">
+<div id="checks" class="tab-pane fade">
 <div id="workflowr-checks" class="panel-group">
 <div class="panel panel-default">
 <div class="panel-heading">
@@ -526,10 +524,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3ff66a482aa909617869ea27d840b4ba533e57e5targetblank3ff66a4a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/3ff66a482aa909617869ea27d840b4ba533e57e5" target="_blank">3ff66a4</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreec22f4adcce557322f21bbf98c1c9af39a77fb7eftargetblankc22f4ada"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/c22f4adcce557322f21bbf98c1c9af39a77fb7ef" target="_blank">c22f4ad</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3ff66a482aa909617869ea27d840b4ba533e57e5targetblank3ff66a4a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreec22f4adcce557322f21bbf98c1c9af39a77fb7eftargetblankc22f4ada" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -553,6 +551,12 @@ Ignored files:
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+
+Untracked files:
+    Untracked:  docs/figure/invitro_mac_dge.Rmd/
+
+Unstaged changes:
+    Modified:   analysis/invitro_mac_dge.Rmd
 
 </code></pre>
 <p>
@@ -591,6 +595,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/c22f4adcce557322f21bbf98c1c9af39a77fb7ef/analysis/preprocessing.Rmd" target="_blank">c22f4ad</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-03
+</td>
+<td>
+wflow_publish(“analysis/preprocessing.Rmd”)
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/eeb13016ced56f75963afdfdc363e5b386fc496a/docs/preprocessing.html" target="_blank">eeb1301</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-05-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -661,7 +699,8 @@ rename preprocessing notebook
 <h3>Setup workspace</h3>
 <p>Clear workspace prior to analysis and load necessary packages</p>
 <pre class="r"><code>rm(list = ls())</code></pre>
-<pre class="r"><code>library(&quot;tidyverse&quot;)
+<pre class="r"><code>library(&quot;sva&quot;)
+library(&quot;tidyverse&quot;)
 library(&quot;limma&quot;)
 library(&quot;lumi&quot;)
 library(&quot;lumiHumanIDMapping&quot;)
@@ -1269,19 +1308,94 @@ ritxUH.kuHlYqjozpE     5.980075</code></pre>
 <pre class="r"><code># save expression set
 saveRDS(mac_eset, &quot;~/tcga_macs/output/expression_set.rds&quot;)</code></pre>
 </div>
-<div id="filter-probes" class="section level3">
-<h3>Filter probes</h3>
-<pre class="r"><code># retreive normalized data
-dataMatrix &lt;- exprs(mac_eset)
+</div>
+<div id="data-review-filtering-batch-correction" class="section level2">
+<h2>Data review, filtering, batch correction</h2>
+<div id="density-plots" class="section level3">
+<h3>Density plots</h3>
+<pre class="r"><code># load data
+pheno &lt;- pData(mac_eset)
+edata &lt;- exprs(mac_eset)
 
-# remove the probes that are not detected in raw data
-presentCount &lt;- detectionCall(lumi_46903)
-selDataMatrix &lt;- dataMatrix[presentCount &gt; 0,]
-probeList &lt;- rownames(selDataMatrix)</code></pre>
+# tidy data
+edata_tbl &lt;- edata %&gt;% 
+  as.data.frame() %&gt;%
+  rownames_to_column(var = &quot;probeID&quot;) %&gt;%
+  as_tibble() %&gt;%
+  gather(key = &quot;sampleID&quot;, value = &quot;intensity&quot;, -probeID) %&gt;%
+  group_by(sampleID)
+
+# find &quot;valley&quot; in density plot for low value filtering
+dplot &lt;- ggplot(edata_tbl, aes(intensity, color = sampleID)) +
+  geom_density() + 
+  theme(legend.position = &quot;none&quot;)
+
+dplot</code></pre>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># zoom in on peaks
+dplot + 
+  coord_cartesian(xlim = c(5.5, 7), ylim = c(0, 2.5)) + 
+  scale_x_continuous(breaks = c(5.9, 6.0, 6.1, 6.2, 6.3, 6.4, 6.5))</code></pre>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>There are two peaks in the density plot! Will need to find which sample corresponds to which peak and assign a variable for batch correction.</p>
+<pre class="r"><code># get the density function for each sample
+dens &lt;- edata_tbl %&gt;% 
+  split(.$sampleID) %&gt;% 
+  map(function(df) density(df$intensity))
+
+# find the max y
+ymax &lt;- dens %&gt;% 
+  map(function(df) max(df$y))
+
+# extract the corresponding x for the max y density for each
+xmax &lt;- dens %&gt;% 
+  map(function(df) df$x[df$y == max(df$y)])
+
+# quick plot of results
+hist(unlist(ymax))</code></pre>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/88719595f2580bea02ec2cf1d25f8e90e6b2189e/docs/figure/preprocessing.Rmd/unnamed-chunk-12-1.png" target="_blank">8871959</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-17
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<div id="define-groups" class="section level2">
-<h2>Define Groups</h2>
+<pre class="r"><code>hist(unlist(xmax))</code></pre>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="define-groups" class="section level3">
+<h3>Define Groups</h3>
 <pre class="r"><code># Get phenotype data from expressionset
 pheno_data &lt;- pData(mac_eset)
 str(pheno_data)</code></pre>
@@ -1440,7 +1554,45 @@ pheno_data &lt;- pheno_data %&gt;%
 <pre class="r"><code>summary(pheno_data$clusternum)</code></pre>
 <pre><code> 0  1  6  2  4  3  7  8  9 
  7  9 16 22  9 12 14  6 16 </code></pre>
+</div>
+<div id="evaluate-for-batch-effect" class="section level3">
+<h3>Evaluate for batch effect</h3>
+<p>Source: sva vignette and user’s manual: <a href="http://bioconductor.org/packages/release/bioc/vignettes/sva/inst/doc/sva.pdf" class="uri">http://bioconductor.org/packages/release/bioc/vignettes/sva/inst/doc/sva.pdf</a></p>
+<p>The sva function returns a list with four components: <code>sv</code>, <code>pprob.gam</code>, <code>pprob.b</code>, <code>n.sv</code>.</p>
+<ul>
+<li>sv is a matrix whose columns correspond to the estimated surrogate variables.</li>
+<li>pprob.gam is the posterior probability that each gene is associated with one or more latent variables.</li>
+<li>pprob.b is the posterior probability that each gene is associated with the variables of interest.</li>
+<li>n.sv is the number of surrogate variables estimated by the sva.</li>
+</ul>
+<pre class="r"><code># create full model matrix
+mod &lt;- model.matrix(~ as.factor(treatment), data = pheno_data)
+
+# create null model
+mod0 &lt;- model.matrix(~ 1, data = pheno_data)
+
+# apply the sva function to estimate the surrogate variables
+sv_obj &lt;- sva(edata, mod, mod0)</code></pre>
+<pre><code>Number of significant surrogate variables is:  26 
+Iteration (out of 5 ):1  2  3  4  5  </code></pre>
+<pre class="r"><code># calculate parametric F-test P-values for each row of data matrix
+pValues &lt;- f.pvalue(edata, mod, mod0)
+qValues &lt;- p.adjust(pValues, method = &quot;BH&quot;)</code></pre>
+<p>From the SVA users’ manual:</p>
+<p><em>The goal of the sva is to remove all unwanted sources of variation while protecting the contrasts due to the primary variables included in mod. This leads to the identification of features that are consistently different between groups, removing all common sources of latent variation. In some cases, the latent variables may be important sources of biological variability. If the goal of the analysis is to identify heterogeneity in one or more subgroups, the sva function may not be appropriate. For example, suppose that it is expected that cancer samples represent two distinct, but unknown subgroups. If these subgroups have a large impact on expression, then one or more of the estimated surrogate variables may be very highly correlated with subgroup. In contrast, direct adjustment only removes the effect of known batch variables. All sources of latent biological variation will remain in the data using this approach. In other words, if the samples were obtained in different environments, this effect will remain in the data. If important sources of heterogeneity (from different environments, lab effects, etc.) are not accounted for, this may lead to increased false positives.</em></p>
+<p>At this point, it would probably be best not to apply a global batch correction to avoid loss of biologic heterogeneity. There is not clear evidence of a small number of groups that may reflect a batch effect.</p>
+</div>
+<div id="filter-probes" class="section level3">
+<h3>Filter probes</h3>
+<pre class="r"><code># retreive normalized data
+dataMatrix &lt;- exprs(mac_eset)
+
+# remove the probes that are not detected in raw data
+presentCount &lt;- detectionCall(lumi_46903)
+selDataMatrix &lt;- dataMatrix[presentCount &gt; 0,]
+probeList &lt;- rownames(selDataMatrix)</code></pre>
 <p>Detailed instructions for building a contrast matrix and filtering low-expression scores can be found in the <a href="http://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf">Limma User’s Guide</a>, particularly chapters 9.2 and 9.3</p>
+</div>
 </div>
 <div id="pca" class="section level2">
 <h2>PCA</h2>
@@ -1546,44 +1698,7 @@ Dim.4  1348.3194         3.416234                    24.14145
 Dim.5  1122.6519         2.844461                    26.98591
 Dim.6   933.7521         2.365846                    29.35176</code></pre>
 <pre class="r"><code>fviz_eig(norm_probe_pca)</code></pre>
-<p><img src="figure/preprocessing.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
-Past versions of unnamed-chunk-13-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-13-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/mleukam/tcga_macs/blob/88719595f2580bea02ec2cf1d25f8e90e6b2189e/docs/figure/preprocessing.Rmd/unnamed-chunk-13-1.png" target="_blank">8871959</a>
-</td>
-<td>
-mleukam
-</td>
-<td>
-2019-04-17
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Source for overriding shape change with habillage argument: <a href="https://github.com/kassambara/factoextra/issues/20" class="uri">https://github.com/kassambara/factoextra/issues/20</a></p>
 <pre class="r"><code># visualize eigenvalues
 mypal &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
@@ -1599,7 +1714,7 @@ pca1 &lt;- fviz_pca_ind(norm_probe_pca,
 ) +
   labs(subtitle = &quot;By activation agent&quot;)
 print(pca1)</code></pre>
-<p><img src="figure/preprocessing.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>pca2 &lt;- fviz_pca_ind(norm_probe_pca,
              label = &quot;none&quot;, # hide individual labels
              habillage = &quot;none&quot;,
@@ -1613,7 +1728,7 @@ print(pca1)</code></pre>
 ) +
   labs(subtitle = &quot;By cluster assignment&quot;)
 print(pca2)</code></pre>
-<p><img src="figure/preprocessing.Rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="correlation-coefficient-matrix-analysis" class="section level2">
 <h2>Correlation Coefficient Matrix Analysis</h2>
@@ -1904,7 +2019,8 @@ into character vector</code></pre>
 plotDendroAndColors(sampleTree2, traitColors,
                     groupLabels = names(traitData), 
                     main = &quot;Sample dendrogram and treatment assignments&quot;)</code></pre>
-<img src="figure/preprocessing.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /> <br> <br>
+<p><img src="figure/preprocessing.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
 <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
@@ -1928,7 +2044,7 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] WGCNA_1.67                fastcluster_1.1.25       
+ [1] WGCNA_1.68                fastcluster_1.1.25       
  [3] dynamicTreeCut_1.63-1     ggpubr_0.2               
  [5] magrittr_1.5              ggsci_2.9                
  [7] FactoMineR_1.41           factoextra_1.0.5         
@@ -1939,86 +2055,87 @@ other attached packages:
 [17] lumi_2.34.0               Biobase_2.42.0           
 [19] BiocGenerics_0.28.0       limma_3.38.3             
 [21] forcats_0.4.0             stringr_1.4.0            
-[23] dplyr_0.8.0.1             purrr_0.3.2              
+[23] dplyr_0.8.1               purrr_0.3.2              
 [25] readr_1.3.1               tidyr_0.8.3              
 [27] tibble_2.1.1              ggplot2_3.1.1            
-[29] tidyverse_1.2.1          
+[29] tidyverse_1.2.1           sva_3.30.1               
+[31] BiocParallel_1.16.6       genefilter_1.64.0        
+[33] mgcv_1.8-28               nlme_3.1-140             
 
 loaded via a namespace (and not attached):
   [1] utf8_1.1.4                  robust_0.4-18              
-  [3] tidyselect_0.2.5            RSQLite_2.1.1              
-  [5] htmlwidgets_1.3             grid_3.5.3                 
-  [7] BiocParallel_1.16.6         munsell_0.5.0              
-  [9] codetools_0.2-16            preprocessCore_1.44.0      
- [11] nleqslv_3.3.2               withr_2.1.2                
- [13] colorspace_1.4-1            knitr_1.22                 
- [15] rstudioapi_0.10             leaps_3.0                  
- [17] robustbase_0.93-4           labeling_0.3               
- [19] git2r_0.25.2                GenomeInfoDbData_1.2.0     
- [21] bit64_0.9-7                 rhdf5_2.26.2               
- [23] rprojroot_1.3-2             generics_0.0.2             
- [25] xfun_0.6                    R6_2.4.0                   
+  [3] tidyselect_0.2.5            htmlwidgets_1.3            
+  [5] RSQLite_2.1.1               grid_3.5.3                 
+  [7] munsell_0.5.0               codetools_0.2-16           
+  [9] preprocessCore_1.44.0       nleqslv_3.3.2              
+ [11] withr_2.1.2                 colorspace_1.4-1           
+ [13] knitr_1.23                  rstudioapi_0.10            
+ [15] leaps_3.0                   robustbase_0.93-5          
+ [17] labeling_0.3                git2r_0.25.2               
+ [19] GenomeInfoDbData_1.2.0      bit64_0.9-7                
+ [21] rhdf5_2.26.2                rprojroot_1.3-2            
+ [23] vctrs_0.1.0                 generics_0.0.2             
+ [25] xfun_0.7                    R6_2.4.0                   
  [27] doParallel_1.0.14           GenomeInfoDb_1.18.2        
  [29] illuminaio_0.24.0           locfit_1.5-9.1             
  [31] bitops_1.0-6                reshape_0.8.8              
  [33] DelayedArray_0.8.0          assertthat_0.2.1           
  [35] scales_1.0.0                nnet_7.3-12                
  [37] gtable_0.3.0                affy_1.60.0                
- [39] methylumi_2.28.0            workflowr_1.2.0            
- [41] rlang_0.3.4                 genefilter_1.64.0          
+ [39] methylumi_2.28.0            workflowr_1.3.0            
+ [41] rlang_0.3.4                 zeallot_0.1.0              
  [43] scatterplot3d_0.3-41        splines_3.5.3              
  [45] rtracklayer_1.42.2          lazyeval_0.2.2             
  [47] impute_1.56.0               acepack_1.4.1              
  [49] GEOquery_2.50.5             broom_0.5.2                
- [51] checkmate_1.9.1             BiocManager_1.30.4         
+ [51] checkmate_1.9.3             BiocManager_1.30.4         
  [53] yaml_2.2.0                  modelr_0.1.4               
  [55] GenomicFeatures_1.34.8      backports_1.1.4            
  [57] Hmisc_4.2-0                 tools_3.5.3                
  [59] nor1mix_1.2-3               affyio_1.52.0              
  [61] RColorBrewer_1.1-2          siggenes_1.56.0            
  [63] Rcpp_1.0.1                  plyr_1.8.4                 
- [65] base64enc_0.1-3             progress_1.2.0             
+ [65] base64enc_0.1-3             progress_1.2.2             
  [67] zlibbioc_1.28.0             RCurl_1.95-4.12            
  [69] prettyunits_1.0.2           rpart_4.1-15               
  [71] openssl_1.3                 bumphunter_1.24.5          
  [73] SummarizedExperiment_1.12.0 haven_2.1.0                
- [75] ggrepel_0.8.0               cluster_2.0.8              
- [77] fs_1.2.7                    data.table_1.12.2          
+ [75] ggrepel_0.8.1               cluster_2.0.9              
+ [77] fs_1.3.1                    data.table_1.12.2          
  [79] mvtnorm_1.0-10              whisker_0.3-2              
  [81] matrixStats_0.54.0          hms_0.4.2                  
- [83] evaluate_0.13               xtable_1.8-3               
+ [83] evaluate_0.14               xtable_1.8-4               
  [85] mclust_5.4.3                readxl_1.3.1               
  [87] gridExtra_2.3               compiler_3.5.3             
  [89] biomaRt_2.38.0              minfi_1.28.4               
  [91] KernSmooth_2.23-15          crayon_1.3.4               
  [93] htmltools_0.3.6             pcaPP_1.9-73               
- [95] mgcv_1.8-28                 Formula_1.2-3              
- [97] rrcov_1.4-7                 lubridate_1.7.4            
- [99] DBI_1.0.0                   MASS_7.3-51.4              
-[101] Matrix_1.2-17               cli_1.1.0                  
-[103] quadprog_1.5-5              fit.models_0.5-14          
-[105] GenomicRanges_1.34.0        pkgconfig_2.0.2            
-[107] flashClust_1.01-2           GenomicAlignments_1.18.1   
-[109] registry_0.5-1              foreign_0.8-71             
-[111] xml2_1.2.0                  foreach_1.4.4              
-[113] rngtools_1.3.1              pkgmaker_0.27              
-[115] multtest_2.38.0             beanplot_1.2               
-[117] XVector_0.22.0              bibtex_0.4.2               
-[119] rvest_0.3.3                 doRNG_1.7.1                
-[121] digest_0.6.18               Biostrings_2.50.2          
-[123] rmarkdown_1.12              base64_2.0                 
-[125] cellranger_1.1.0            htmlTable_1.13.1           
-[127] DelayedMatrixStats_1.4.0    Rsamtools_1.34.1           
-[129] nlme_3.1-139                jsonlite_1.6               
-[131] Rhdf5lib_1.4.3              fansi_0.4.0                
-[133] askpass_1.1                 pillar_1.3.1               
-[135] lattice_0.20-38             DEoptimR_1.0-8             
-[137] httr_1.4.0                  survival_2.44-1.1          
-[139] GO.db_3.7.0                 glue_1.3.1                 
-[141] iterators_1.0.10            bit_1.1-14                 
-[143] stringi_1.4.3               HDF5Array_1.10.1           
-[145] blob_1.1.1                  latticeExtra_0.6-28        
-[147] memoise_1.1.0              </code></pre>
+ [95] Formula_1.2-3               rrcov_1.4-7                
+ [97] lubridate_1.7.4             DBI_1.0.0                  
+ [99] MASS_7.3-51.4               Matrix_1.2-17              
+[101] cli_1.1.0                   quadprog_1.5-7             
+[103] fit.models_0.5-14           GenomicRanges_1.34.0       
+[105] pkgconfig_2.0.2             flashClust_1.01-2          
+[107] GenomicAlignments_1.18.1    registry_0.5-1             
+[109] foreign_0.8-71              xml2_1.2.0                 
+[111] foreach_1.4.4               rngtools_1.3.1             
+[113] pkgmaker_0.27               multtest_2.38.0            
+[115] beanplot_1.2                XVector_0.22.0             
+[117] bibtex_0.4.2                rvest_0.3.4                
+[119] doRNG_1.7.1                 digest_0.6.19              
+[121] Biostrings_2.50.2           rmarkdown_1.13             
+[123] base64_2.0                  cellranger_1.1.0           
+[125] htmlTable_1.13.1            DelayedMatrixStats_1.4.0   
+[127] Rsamtools_1.34.1            jsonlite_1.6               
+[129] Rhdf5lib_1.4.3              fansi_0.4.0                
+[131] askpass_1.1                 pillar_1.4.1               
+[133] lattice_0.20-38             DEoptimR_1.0-8             
+[135] httr_1.4.0                  survival_2.44-1.1          
+[137] GO.db_3.7.0                 glue_1.3.1                 
+[139] iterators_1.0.10            bit_1.1-14                 
+[141] stringi_1.4.3               HDF5Array_1.10.1           
+[143] blob_1.1.1                  latticeExtra_0.6-28        
+[145] memoise_1.1.0              </code></pre>
 </div>
 </div>
 
