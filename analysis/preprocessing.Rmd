@@ -24,6 +24,7 @@ rm(list = ls())
 ```
 
 ```{r packages, message=FALSE, warning=FALSE}
+library("sva")
 library("tidyverse")
 library("limma")
 library("lumi")
@@ -35,6 +36,7 @@ library("FactoMineR")
 library("ggsci")
 library("ggpubr")
 library("WGCNA")
+
 ```
 
 ## Data preparation and cleaning
@@ -274,19 +276,58 @@ mat[1:5, 1:5]
 saveRDS(mac_eset, "~/tcga_macs/output/expression_set.rds")
 ```
 
-### Filter probes
+## Data review, filtering, batch correction
+
+### Density plots
+
 ```{r}
-# retreive normalized data
-dataMatrix <- exprs(mac_eset)
+# load data
+pheno <- pData(mac_eset)
+edata <- exprs(mac_eset)
 
-# remove the probes that are not detected in raw data
-presentCount <- detectionCall(lumi_46903)
-selDataMatrix <- dataMatrix[presentCount > 0,]
-probeList <- rownames(selDataMatrix)
+# tidy data
+edata_tbl <- edata %>% 
+  as.data.frame() %>%
+  rownames_to_column(var = "probeID") %>%
+  as_tibble() %>%
+  gather(key = "sampleID", value = "intensity", -probeID) %>%
+  group_by(sampleID)
 
+# find "valley" in density plot for low value filtering
+dplot <- ggplot(edata_tbl, aes(intensity, color = sampleID)) +
+  geom_density() + 
+  theme(legend.position = "none")
+
+dplot
+
+# zoom in on peaks
+dplot + 
+  coord_cartesian(xlim = c(5.5, 7), ylim = c(0, 2.5)) + 
+  scale_x_continuous(breaks = c(5.9, 6.0, 6.1, 6.2, 6.3, 6.4, 6.5))
 ```
 
-## Define Groups
+There are two peaks in the density plot! Will need to find which sample corresponds to which peak and assign a variable for batch correction.
+
+```{r}
+# get the density function for each sample
+dens <- edata_tbl %>% 
+  split(.$sampleID) %>% 
+  map(function(df) density(df$intensity))
+
+# find the max y
+ymax <- dens %>% 
+  map(function(df) max(df$y))
+
+# extract the corresponding x for the max y density for each
+xmax <- dens %>% 
+  map(function(df) df$x[df$y == max(df$y)])
+
+# quick plot of results
+hist(unlist(ymax))
+hist(unlist(xmax))
+```
+
+### Define Groups
 ```{r}
 # Get phenotype data from expressionset
 pheno_data <- pData(mac_eset)
@@ -342,6 +383,51 @@ pheno_data <- pheno_data %>%
 
 summary(pheno_data$treatment)
 summary(pheno_data$clusternum)
+```
+
+### Evaluate for batch effect
+
+Source: sva vignette and user's manual: http://bioconductor.org/packages/release/bioc/vignettes/sva/inst/doc/sva.pdf
+
+The sva function returns a list with four components: `sv`, `pprob.gam`, `pprob.b`, `n.sv`. 
+
+* sv is a matrix whose columns correspond to the estimated surrogate variables.
+* pprob.gam is the posterior probability that each gene is associated with one or more latent variables. 
+* pprob.b is the posterior probability that each gene is associated with the variables of interest. 
+* n.sv is the number of surrogate variables estimated by the sva.
+
+```{r}
+# create full model matrix
+mod <- model.matrix(~ as.factor(treatment), data = pheno_data)
+
+# create null model
+mod0 <- model.matrix(~ 1, data = pheno_data)
+
+# apply the sva function to estimate the surrogate variables
+sv_obj <- sva(edata, mod, mod0)
+
+# calculate parametric F-test P-values for each row of data matrix
+pValues <- f.pvalue(edata, mod, mod0)
+qValues <- p.adjust(pValues, method = "BH")
+
+```
+
+From the SVA users' manual:
+
+_The goal of the sva is to remove all unwanted sources of variation while protecting the contrasts due to the primary variables included in mod. This leads to the identification of features that are consistently different between groups, removing all common sources of latent variation.
+In some cases, the latent variables may be important sources of biological variability. If the goal of the analysis is to identify heterogeneity in one or more subgroups, the sva function may not be appropriate. For example, suppose that it is expected that cancer samples represent two distinct, but unknown subgroups. If these subgroups have a large impact on expression, then one or more of the estimated surrogate variables may be very highly correlated with subgroup. In contrast, direct adjustment only removes the effect of known batch variables. All sources of latent biological variation will remain in the data using this approach. In other words, if the samples were obtained in different environments, this effect will remain in the data. If important sources of heterogeneity (from different environments, lab effects, etc.) are not accounted for, this may lead to increased false positives._
+
+At this point, it would probably be best not to apply a global batch correction to avoid loss of biologic heterogeneity. There is not clear evidence of a small number of groups that may reflect a batch effect.
+
+### Filter probes
+```{r}
+# retreive normalized data
+dataMatrix <- exprs(mac_eset)
+
+# remove the probes that are not detected in raw data
+presentCount <- detectionCall(lumi_46903)
+selDataMatrix <- dataMatrix[presentCount > 0,]
+probeList <- rownames(selDataMatrix)
 ```
 
 Detailed instructions for building a contrast matrix and filtering low-expression scores can be found in the [Limma User's Guide](http://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf), particularly chapters 9.2 and 9.3
