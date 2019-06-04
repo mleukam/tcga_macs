@@ -1,5 +1,5 @@
 ---
-title: "Cleaning and clustering experimental macrophage gene expression data"
+title: "Preparing experimental macrophage gene expression data"
 author: "mleukam"
 date: "2019-04-14"
 output: workflowr::wflow_html
@@ -31,12 +31,9 @@ library("lumi")
 library("lumiHumanIDMapping")
 library("lumiHumanAll.db")
 library("annotate")
-library("factoextra")
 library("FactoMineR")
 library("ggsci")
 library("ggpubr")
-library("WGCNA")
-
 ```
 
 ## Data preparation and cleaning
@@ -261,8 +258,8 @@ mac_exprs <- as.matrix(mac_exprs)
 
 
 mac_eset <- ExpressionSet(assayData = mac_exprs, 
-                            phenoData = mac_phenoData,
-                            annotation = "Illumina Human HT-12 v3.0 beadchip")
+                          phenoData = mac_phenoData,
+                          annotation = "Illumina Human HT-12 v3.0 beadchip")
 
 # check properties
 featureNames(mac_eset)[1:5]
@@ -419,156 +416,44 @@ In some cases, the latent variables may be important sources of biological varia
 
 At this point, it would probably be best not to apply a global batch correction to avoid loss of biologic heterogeneity. There is not clear evidence of a small number of groups that may reflect a batch effect.
 
-### Filter probes
+## Rebuild expression set for export
 ```{r}
-# retreive normalized data
-dataMatrix <- exprs(mac_eset)
 
-# remove the probes that are not detected in raw data
-presentCount <- detectionCall(lumi_46903)
-selDataMatrix <- dataMatrix[presentCount > 0,]
-probeList <- rownames(selDataMatrix)
-```
-
-Detailed instructions for building a contrast matrix and filtering low-expression scores can be found in the [Limma User's Guide](http://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf), particularly chapters 9.2 and 9.3
-
-## PCA
-
-Source: https://rpkgs.datanovia.com/factoextra/index.html
-
-```{r}
-# transpose matrix to tidy data format
-t_DataMatrix <- t(selDataMatrix)
-t_DataMatrix[1:5, 1:5]
-
-# add categories and factors
-# select columns of interest from phenotype data
-pheno_pca <- pheno_data %>%
-  dplyr::select(raw_id, treatment, clusternum)
-
-df_pca <- t_DataMatrix %>%
+# add back rownames to phenodata
+mac_pData <- pheno_data %>%
   as.data.frame() %>%
-  rownames_to_column(var = "raw_id") %>%
-  left_join(pheno_pca, by = "raw_id") %>%
-  as_tibble() %>%
-  dplyr::select(raw_id, treatment, clusternum, everything()) %>%
-  print()
+  column_to_rownames(var = "raw_id")
 
-norm_probe_pca <- PCA(df_pca[,c(4:39471)], graph = FALSE)
-head(get_eig(norm_probe_pca))
-fviz_eig(norm_probe_pca)
-```
+# create a frame for annotation of column names in metadata
+# will be empty for now
+varnames <- colnames(mac_pData)
+vardata <- data.frame(labelDescription = varnames, 
+                      row.names = varnames)
 
-Source for overriding shape change with habillage argument: https://github.com/kassambara/factoextra/issues/20
+# rebuild AnnotatedDataFrame
+mac_phenoData_2 <- new("AnnotatedDataFrame",
+                       data = mac_pData, 
+                       varMetadata = vardata)
 
-```{r}
-# visualize eigenvalues
-mypal <- pal_igv("default", alpha = 1)(23)
-pca1 <- fviz_pca_ind(norm_probe_pca,
-             label = "none", # hide individual labels
-             habillage = "none",
-             col.ind = df_pca$treatment,
-             palette = mypal,
-             geom.ind = "point",
-             invisible = "quali",
-             pointshape = 19,
-             title = "PCA of normalized expression"
-) +
-  labs(subtitle = "By activation agent")
-print(pca1)
+# retreive expression data matrix
+mac_exprs_2 <- exprs(mac_eset)
 
-pca2 <- fviz_pca_ind(norm_probe_pca,
-             label = "none", # hide individual labels
-             habillage = "none",
-             col.ind = df_pca$clusternum,
-             palette = mypal,
-             geom.ind = "point",
-             invisible = "quali",
-             pointshape = 19, 
-             addEllipses = TRUE,
-             title = "PCA of normalized expression"
-) +
-  labs(subtitle = "By cluster assignment")
-print(pca2)
-```
+# create expression set
+mac_eset_2 <- ExpressionSet(assayData = mac_exprs_2,
+                            phenoData = mac_phenoData_2,
+                            annotation = "Illumina Human HT-12 v3.0 beadchip")
 
+# check properties
+featureNames(mac_eset_2)[1:5]
+sampleNames(mac_eset_2)[1:5]
+varLabels(mac_eset_2)
+mat <- exprs(mac_eset_2)
+dim(mat)
+mat[1:5, 1:5]
 
-## Correlation Coefficient Matrix Analysis
-
-Background and references:
-```
-Method source for correlation matrix: https://davetang.org/muse/2012/01/31/creating-a-correlation-matrix-with-r/
-
-More on constructing a correlation matrix:
-https://www.researchgate.net/post/How_to_calculate_Gene-Gene_Pearson_correlation
-
-WGCNA package: https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/index.html
-```
-
-Following Xue et al Immunity (2014), select the 1000 probes with the highest variance to reduce the computational load to make a correlation matrix
-
-Source for selecting highest variance: http://r.789695.n4.nabble.com/Help-on-selecting-genes-showing-highest-variance-td3580645.html
-
-```{r}
-# select 1000 highest probes with highest variation
-# input is normalized expression matrix with zero expression genes removed
-myvars <- apply(selDataMatrix, 1, var, na.rm = TRUE) 
-myvars <- sort(myvars, decreasing = TRUE) 
-myvars <- myvars[1:1000] 
-data_matrix_onek <- selDataMatrix[names(myvars), ] 
-dim(data_matrix_onek) 
-```
-
-Quick look at clustering
-```{r}
-# heirarchical cluster
-datExpr <- t(data_matrix_onek)
-sampleTree = hclust(dist(datExpr), method = "average")
-sizeGrWindow(16,9)
-par(cex = 0.4)
-plot(sampleTree, main = "Sample clustering to detect outliers", 
-     sub = "", 
-     xlab = "", 
-     cex.lab = 1.5,
-     cex.axis = 1.5, 
-     cex.main = 2.5)
-
-# no significant outliers
-```
-
-Set up phenotype data for WGCNA
-```{r}
-# use pheno_data from above with treatment identification and cluster number
-# select columns I want to visualize
-traitData <- pheno_data %>%
-  dplyr::select(raw_id, treatment, clusternum) %>%
-  as.data.frame() %>%
-  column_to_rownames("raw_id") %>%
-  print()
-
-treat_colors <- pal_igv("default", alpha = 1)(23)
-names(treat_colors) <- levels(traitData$treatment)
-treat_colors <- enframe(treat_colors) %>%
-  dplyr::rename(treatment = name, treat_colors = value)
-clust_colors <- pal_igv("default", alpha = 1)(9)
-names(clust_colors) <- levels(traitData$clusternum)
-clust_colors <- enframe(clust_colors) %>%
-  dplyr::rename(clusternum = name, clust_colors = value)
-
-traitColors <- pheno_data %>% 
-  left_join(treat_colors, by = "treatment") %>%
-  left_join(clust_colors, by = "clusternum") %>%
-  dplyr::select(raw_id, treat_colors, clust_colors) %>%
-  as.data.frame() %>%
-  column_to_rownames("raw_id") %>%
-  print()
+# save expression set
+saveRDS(mac_eset, "~/tcga_macs/output/mac_eset.rds")
 
 ```
 
-```{r}
-sampleTree2 <- hclust(dist(datExpr), method = "average")
-plotDendroAndColors(sampleTree2, traitColors,
-                    groupLabels = names(traitData), 
-                    main = "Sample dendrogram and treatment assignments")
 
-```
