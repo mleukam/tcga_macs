@@ -23,6 +23,7 @@ library("lumi")
 library("FactoMineR")
 library("ggsci")
 library("ggpubr")
+library("DESeq2")
 ```
 
 Load data
@@ -194,7 +195,7 @@ plotDendroAndColors(sampleTree2, traitColors,
 ```
 
 
-#### Correlation matrix
+#### Correlation matrix for individual samples
 
 Will also use top 1000 most variable probes for correlation clustering to limit memory usage and eliminate noise.
 
@@ -239,4 +240,120 @@ res_km$nbclust
 
 # Print result
 res_km
+```
+
+#### Combining cluster assignments with phenodata
+
+```{r}
+# extract cluster assignment from km results
+clust_asgn <- enframe(res_km$cluster) %>%
+  dplyr::rename(rawID = name, km_clust = value)
+
+# combine results with phenotype data
+# compare cluster assignments to treatments and original clusters
+pheno_tbl <- pData(mac_eset) %>%
+  rownames_to_column(var = "rawID") %>%
+  as_tibble() %>%
+  left_join(clust_asgn, by = "rawID") %>%
+  arrange(treatment) %>%
+  dplyr::select(rawID, treatment, km_clust, clusternum) %>%
+  print()
+
+write_csv(pheno_tbl, "~/tcga_macs/output/km_cluster_assignments.csv")
+```
+
+#### Correlation of collapsed treatment groups
+
+Data preparation
+```{r}
+# format data so probes are in rows and samples are in columns
+# will use only top 1000 most variable genes
+data_matrix_onek[1:5, 1:5]
+
+# pull out a table of treatment and samples names from pheno_data
+txgrp <- pheno_tbl %>%
+  dplyr::select(rawID, treatment)
+
+group_df <- colnames(data_matrix_onek) %>%
+  enframe() %>%
+  dplyr::rename(rawID = value) %>%
+  left_join(txgrp)
+
+# check that order of samples matches the data matrix perfectly
+identical(colnames(data_matrix_onek), group_df$rawID)
+
+# pull treatment assignment as a vector
+group_vect <- group_df$treatment
+
+# format data so probes are in columns and samples are in rows
+tx_row_matrix <- t(data_matrix_onek)
+tx_row_matrix[1:5, 1:5]
+
+# check the order of samples still matches the treatment source perfectly
+identical(rownames(tx_row_matrix), group_df$rawID)
+
+# use WGCNA function for collapsing identical probes
+tx_collapsed <- collapseRows(tx_row_matrix, 
+                          rowGroup = group_vect, 
+                          rowID = rownames(tx_row_matrix), 
+                          method = "Average")
+
+# pull out expression matrix by treatment
+tx_matrix <- tx_collapsed$datETcollapsed
+nrow(tx_matrix)
+tx_matrix[1:5, 1:5]
+```
+
+Correlation matrix by treatment group
+```{r}
+# create correlation matrix for each sample 
+# using 1000 most variable probes as defined above
+res_dist_tx <- get_dist(tx_matrix, method = "pearson")
+head(round(as.matrix(res_dist), 2))[, 1:6]
+
+# plot dissimilarity matrix
+fviz_dist(res_dist_tx, lab_size = 8)
+```
+
+Hierarchical and K-means clustering of treatment group correlations
+```{r}
+# Save correlation matrix as variable
+res_dist_tx_m <- as.matrix(res_dist_tx)
+
+# Compute hierarchical clustering
+res_hc_tx <- hclust(res_dist_tx, method = "ward.D2")
+
+# Visualize
+plot(res_hc_tx, cex = 0.5)
+
+# Enhanced k-means clustering
+res_km_tx <- eclust(res_dist_tx_m, "kmeans", nstart = 25)
+```
+
+Diagnostic plots
+```{r}
+# Gap statistic plot
+fviz_gap_stat(res_km_tx$gap_stat)
+
+# Silhouette plot
+fviz_silhouette(res_km_tx)
+
+# Optimal number of clusters using gap statistics
+res_km_tx$nbclust
+
+# Print result
+res_km_tx
+```
+
+
+Other values for k - visual review
+```{r}
+res_km_4 <- eclust(res_dist_tx_m, "kmeans", k = 4)
+res_km_5 <- eclust(res_dist_tx_m, "kmeans", k = 5)
+res_km_6 <- eclust(res_dist_tx_m, "kmeans", k = 6)
+res_km_7 <- eclust(res_dist_tx_m, "kmeans", k = 7)
+res_km_8 <- eclust(res_dist_tx_m, "kmeans", k = 8)
+res_km_9 <- eclust(res_dist_tx_m, "kmeans", k = 9)
+res_km_10 <- eclust(res_dist_tx_m, "kmeans", k = 10)
+
 ```
