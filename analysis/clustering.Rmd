@@ -1,0 +1,242 @@
+---
+title: "Clustering experimental macrophage gene expression data"
+author: "mleukam"
+date: "2019-06-04"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace prior to analysis and load necessary packages
+```{r}
+rm(list = ls())
+```
+
+```{r}
+library("tidyverse")
+library("factoextra")
+library("WGCNA")
+library("annotate")
+library("lumi")
+library("FactoMineR")
+library("ggsci")
+library("ggpubr")
+```
+
+Load data
+```{r}
+mac_eset <- readRDS("~/tcga_macs/output/mac_eset.rds")
+lumi_46903 <- readRDS("~/tcga_macs/output/normalized_probe_intensities.Rds")
+```
+
+#### Filter probes
+
+Detailed instructions for building a contrast matrix and filtering low-expression scores can be found in the [Limma User's Guide](http://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf), particularly chapters 9.2 and 9.3
+
+```{r}
+# retreive normalized data
+dataMatrix <- exprs(mac_eset)
+
+# remove the probes that are not detected in raw data
+presentCount <- detectionCall(lumi_46903)
+selDataMatrix <- dataMatrix[presentCount > 0,]
+probeList <- rownames(selDataMatrix)
+```
+
+## PCA
+
+To get a sense of the relationships among the samples, we will start with a simple PCA plot labeled by treatment and then by the clusters derived in the original paper.
+
+Source: https://rpkgs.datanovia.com/factoextra/index.html
+
+```{r}
+# transpose matrix to tidy data format
+t_DataMatrix <- t(selDataMatrix)
+t_DataMatrix[1:5, 1:5]
+
+# extract phenotype data
+pheno_data <- pData(mac_eset)
+
+# add categories and factors
+# select columns of interest from phenotype data
+pheno_pca <- pheno_data %>%
+  rownames_to_column(var = "raw_id") %>%
+  dplyr::select(raw_id, treatment, clusternum)
+
+df_pca <- t_DataMatrix %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "raw_id") %>%
+  left_join(pheno_pca, by = "raw_id") %>%
+  as_tibble() %>%
+  dplyr::select(raw_id, treatment, clusternum, everything()) %>%
+  print()
+
+norm_probe_pca <- PCA(df_pca[,c(4:39471)], graph = FALSE)
+head(get_eig(norm_probe_pca))
+fviz_eig(norm_probe_pca)
+```
+
+Source for overriding shape change with habillage argument: https://github.com/kassambara/factoextra/issues/20
+
+```{r}
+# visualize eigenvalues
+mypal <- pal_igv("default", alpha = 1)(23)
+pca1 <- fviz_pca_ind(norm_probe_pca,
+             label = "none", # hide individual labels
+             habillage = "none",
+             col.ind = df_pca$treatment,
+             palette = mypal,
+             geom.ind = "point",
+             invisible = "quali",
+             pointshape = 19,
+             title = "PCA of normalized expression"
+) +
+  labs(subtitle = "By activation agent")
+print(pca1)
+
+pca2 <- fviz_pca_ind(norm_probe_pca,
+             label = "none", # hide individual labels
+             habillage = "none",
+             col.ind = df_pca$clusternum,
+             palette = mypal,
+             geom.ind = "point",
+             invisible = "quali",
+             pointshape = 19, 
+             addEllipses = TRUE,
+             title = "PCA of normalized expression"
+) +
+  labs(subtitle = "By cluster assignment")
+print(pca2)
+```
+
+
+## Correlation Coefficient Matrix Analysis
+
+Background and references:
+```
+Method source for correlation matrix: https://davetang.org/muse/2012/01/31/creating-a-correlation-matrix-with-r/
+
+More on constructing a correlation matrix:
+https://www.researchgate.net/post/How_to_calculate_Gene-Gene_Pearson_correlation
+
+WGCNA package: https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/index.html
+```
+
+Following Xue et al Immunity (2014), select the 1000 probes with the highest variance to reduce the computational load to make a correlation matrix
+
+Source for selecting highest variance: http://r.789695.n4.nabble.com/Help-on-selecting-genes-showing-highest-variance-td3580645.html
+
+```{r}
+# select 1000 highest probes with highest variation
+# input is normalized expression matrix with zero expression genes removed
+myvars <- apply(selDataMatrix, 1, var, na.rm = TRUE) 
+myvars <- sort(myvars, decreasing = TRUE) 
+myvars <- myvars[1:1000] 
+data_matrix_onek <- selDataMatrix[names(myvars), ] 
+dim(data_matrix_onek) 
+```
+
+#### Heirarchical Clustering
+
+Quick hierarchical clustering to look for outliers. Will also visualize treatment condition and cluster assignment from the original paper.
+
+```{r}
+# heirarchical cluster
+datExpr <- t(data_matrix_onek)
+sampleTree = hclust(dist(datExpr), method = "average")
+sizeGrWindow(16,9)
+par(cex = 0.4)
+plot(sampleTree, main = "Sample clustering to detect outliers", 
+     sub = "", 
+     xlab = "", 
+     cex.lab = 1.5,
+     cex.axis = 1.5, 
+     cex.main = 2.5)
+
+# no significant outliers
+```
+
+Set up phenotype data for WGCNA
+```{r}
+# use pheno_data from above with treatment identification and cluster number
+# select columns I want to visualize
+traitData <- pheno_data %>%
+  dplyr::select(treatment, clusternum) %>%
+  print()
+
+treat_colors <- pal_igv("default", alpha = 1)(23)
+names(treat_colors) <- levels(traitData$treatment)
+treat_colors <- enframe(treat_colors) %>%
+  dplyr::rename(treatment = name, treat_colors = value) %>%
+  mutate(treatment = as.factor(treatment))
+clust_colors <- pal_igv("default", alpha = 1)(9)
+names(clust_colors) <- levels(traitData$clusternum)
+clust_colors <- enframe(clust_colors) %>%
+  dplyr::rename(clusternum = name, clust_colors = value) %>%
+  mutate(clusternum = as.factor(clusternum))
+
+traitColors <- pheno_data %>% 
+  left_join(treat_colors, by = "treatment") %>%
+  left_join(clust_colors, by = "clusternum") %>%
+  dplyr::select(treat_colors, clust_colors) %>%
+  print()
+
+```
+
+```{r}
+sampleTree2 <- hclust(dist(datExpr), method = "average")
+plotDendroAndColors(sampleTree2, traitColors,
+                    groupLabels = names(traitData), 
+                    main = "Sample dendrogram and treatment assignments")
+
+```
+
+
+#### Correlation matrix
+
+Will also use top 1000 most variable probes for correlation clustering to limit memory usage and eliminate noise.
+
+Source for plots: https://www.datanovia.com/en/blog/cluster-analysis-in-r-simplified-and-enhanced/
+
+
+```{r}
+# create correlation matrix for each sample 
+# using 1000 most variable probes as defined above
+res_dist <- get_dist(datExpr, method = "pearson")
+head(round(as.matrix(res_dist), 2))[, 1:6]
+
+# plot dissimilarity matrix
+fviz_dist(res_dist, lab_size = 8)
+```
+
+Hierarchical and K-means clustering of correlations
+```{r}
+# Save correlation matrix as variable
+res_dist_m <- as.matrix(res_dist)
+
+# Compute hierarchical clustering
+res_hc <- hclust(res_dist, method = "ward.D2")
+
+# Visualize
+plot(res_hc, cex = 0.5)
+
+# Enhanced k-means clustering
+res_km <- eclust(res_dist_m, "kmeans", nstart = 25)
+```
+
+Diagnostic plots
+```{r}
+# Gap statistic plot
+fviz_gap_stat(res_km$gap_stat)
+
+# Silhouette plot
+fviz_silhouette(res_km)
+
+# Optimal number of clusters using gap statistics
+res_km$nbclust
+
+# Print result
+res_km
+```

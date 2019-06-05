@@ -452,7 +452,7 @@ dim(mat)
 mat[1:5, 1:5]
 
 # save expression set
-saveRDS(mac_eset, "~/tcga_macs/output/mac_eset.rds")
+saveRDS(mac_eset_2, "~/tcga_macs/output/mac_eset.rds")
 
 ```
 
