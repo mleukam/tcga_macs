@@ -524,10 +524,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree25733dca8b5bf5ec76e3175a848b29f1641a0171targetblank25733dca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/25733dca8b5bf5ec76e3175a848b29f1641a0171" target="_blank">25733dc</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3bf9158117e022f4be8a533418dcb03c6bcdb7c5targetblank3bf9158a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/3bf9158117e022f4be8a533418dcb03c6bcdb7c5" target="_blank">3bf9158</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree25733dca8b5bf5ec76e3175a848b29f1641a0171targetblank25733dca" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3bf9158117e022f4be8a533418dcb03c6bcdb7c5targetblank3bf9158a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -555,6 +555,7 @@ Ignored files:
 
 Untracked files:
     Untracked:  docs/figure/invitro_mac_dge.Rmd/
+    Untracked:  output/km_cluster_assignments.csv
 
 Unstaged changes:
     Modified:   analysis/invitro_mac_dge.Rmd
@@ -601,6 +602,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/mleukam/tcga_macs/blob/3bf9158117e022f4be8a533418dcb03c6bcdb7c5/analysis/clustering.Rmd" target="_blank">3bf9158</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+<td>
+clustering by treatment group now updated
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/clustering.html" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/mleukam/tcga_macs/blob/25733dca8b5bf5ec76e3175a848b29f1641a0171/analysis/clustering.Rmd" target="_blank">25733dc</a>
 </td>
 <td>
@@ -625,12 +660,12 @@ major updates including clustering and correlation
 <p>Clear workspace prior to analysis and load necessary packages</p>
 <pre class="r"><code>rm(list = ls())</code></pre>
 <pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
-<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>── Attaching packages ────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>✔ ggplot2 3.1.1     ✔ purrr   0.3.2
 ✔ tibble  2.1.1     ✔ dplyr   0.8.1
 ✔ tidyr   0.8.3     ✔ stringr 1.4.0
 ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>── Conflicts ───────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(&quot;factoextra&quot;)</code></pre>
@@ -725,6 +760,37 @@ Attaching package: &#39;magrittr&#39;</code></pre>
 <pre><code>The following object is masked from &#39;package:tidyr&#39;:
 
     extract</code></pre>
+<pre class="r"><code>library(&quot;DESeq2&quot;)</code></pre>
+<pre><code>Loading required package: GenomicRanges</code></pre>
+<pre><code>Loading required package: GenomeInfoDb</code></pre>
+<pre><code>Loading required package: SummarizedExperiment</code></pre>
+<pre><code>Loading required package: DelayedArray</code></pre>
+<pre><code>Loading required package: matrixStats</code></pre>
+<pre><code>
+Attaching package: &#39;matrixStats&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:Biobase&#39;:
+
+    anyMissing, rowMedians</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    count</code></pre>
+<pre><code>Loading required package: BiocParallel</code></pre>
+<pre><code>
+Attaching package: &#39;DelayedArray&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
+
+    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges</code></pre>
+<pre><code>The following object is masked from &#39;package:purrr&#39;:
+
+    simplify</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    aperm, apply</code></pre>
+<pre><code>
+Attaching package: &#39;DESeq2&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:lumi&#39;:
+
+    vst</code></pre>
 <p>Load data</p>
 <pre class="r"><code>mac_eset &lt;- readRDS(&quot;~/tcga_macs/output/mac_eset.rds&quot;)
 lumi_46903 &lt;- readRDS(&quot;~/tcga_macs/output/normalized_probe_intensities.Rds&quot;)</code></pre>
@@ -850,6 +916,43 @@ Dim.5  1122.6519         2.844461                    26.98591
 Dim.6   933.7521         2.365846                    29.35176</code></pre>
 <pre class="r"><code>fviz_eig(norm_probe_pca)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-5-1.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Source for overriding shape change with habillage argument: <a href="https://github.com/kassambara/factoextra/issues/20" class="uri">https://github.com/kassambara/factoextra/issues/20</a></p>
 <pre class="r"><code># visualize eigenvalues
 mypal &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
@@ -866,6 +969,43 @@ pca1 &lt;- fviz_pca_ind(norm_probe_pca,
   labs(subtitle = &quot;By activation agent&quot;)
 print(pca1)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-6-1.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>pca2 &lt;- fviz_pca_ind(norm_probe_pca,
              label = &quot;none&quot;, # hide individual labels
              habillage = &quot;none&quot;,
@@ -880,6 +1020,43 @@ print(pca1)</code></pre>
   labs(subtitle = &quot;By cluster assignment&quot;)
 print(pca2)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
+Past versions of unnamed-chunk-6-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-6-2.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="correlation-coefficient-matrix-analysis" class="section level2">
 <h2>Correlation Coefficient Matrix Analysis</h2>
@@ -1171,9 +1348,46 @@ plotDendroAndColors(sampleTree2, traitColors,
                     groupLabels = names(traitData), 
                     main = &quot;Sample dendrogram and treatment assignments&quot;)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div id="correlation-matrix" class="section level4">
-<h4>Correlation matrix</h4>
+</div>
+</div>
+<div id="correlation-matrix-for-individual-samples" class="section level4">
+<h4>Correlation matrix for individual samples</h4>
 <p>Will also use top 1000 most variable probes for correlation clustering to limit memory usage and eliminate noise.</p>
 <p>Source for plots: <a href="https://www.datanovia.com/en/blog/cluster-analysis-in-r-simplified-and-enhanced/" class="uri">https://www.datanovia.com/en/blog/cluster-analysis-in-r-simplified-and-enhanced/</a></p>
 <pre class="r"><code># create correlation matrix for each sample 
@@ -1197,6 +1411,43 @@ head(round(as.matrix(res_dist), 2))[, 1:6]</code></pre>
 <pre class="r"><code># plot dissimilarity matrix
 fviz_dist(res_dist, lab_size = 8)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-11-1.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Hierarchical and K-means clustering of correlations</p>
 <pre class="r"><code># Save correlation matrix as variable
 res_dist_m &lt;- as.matrix(res_dist)
@@ -1207,13 +1458,124 @@ res_hc &lt;- hclust(res_dist, method = &quot;ward.D2&quot;)
 # Visualize
 plot(res_hc, cex = 0.5)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-12-1.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># Enhanced k-means clustering
 res_km &lt;- eclust(res_dist_m, &quot;kmeans&quot;, nstart = 25)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-2">
+Past versions of unnamed-chunk-12-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-12-2.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Diagnostic plots</p>
 <pre class="r"><code># Gap statistic plot
 fviz_gap_stat(res_km$gap_stat)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
+Past versions of unnamed-chunk-13-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-13-1.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># Silhouette plot
 fviz_silhouette(res_km)</code></pre>
 <pre><code>   cluster size ave.sil.width
@@ -1228,6 +1590,43 @@ fviz_silhouette(res_km)</code></pre>
 9        9   14          0.39
 10      10    8          0.24</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-2">
+Past versions of unnamed-chunk-13-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/788b028234e0a85eabd9431383ec9d3dd0c9ef17/docs/figure/clustering.Rmd/unnamed-chunk-13-2.png" target="_blank">788b028</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># Optimal number of clusters using gap statistics
 res_km$nbclust</code></pre>
 <pre><code>[1] 10</code></pre>
@@ -1549,6 +1948,220 @@ Available components:
  [5] &quot;tot.withinss&quot; &quot;betweenss&quot;    &quot;size&quot;         &quot;iter&quot;        
  [9] &quot;ifault&quot;       &quot;clust_plot&quot;   &quot;silinfo&quot;      &quot;nbclust&quot;     
 [13] &quot;data&quot;         &quot;gap_stat&quot;    </code></pre>
+</div>
+<div id="combining-cluster-assignments-with-phenodata" class="section level4">
+<h4>Combining cluster assignments with phenodata</h4>
+<pre class="r"><code># extract cluster assignment from km results
+clust_asgn &lt;- enframe(res_km$cluster) %&gt;%
+  dplyr::rename(rawID = name, km_clust = value)
+
+# combine results with phenotype data
+# compare cluster assignments to treatments and original clusters
+pheno_tbl &lt;- pData(mac_eset) %&gt;%
+  rownames_to_column(var = &quot;rawID&quot;) %&gt;%
+  as_tibble() %&gt;%
+  left_join(clust_asgn, by = &quot;rawID&quot;) %&gt;%
+  arrange(treatment) %&gt;%
+  dplyr::select(rawID, treatment, km_clust, clusternum) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 111 x 4
+   rawID        treatment km_clust clusternum
+   &lt;chr&gt;        &lt;fct&gt;        &lt;int&gt; &lt;fct&gt;     
+ 1 4487653414_E control          6 0         
+ 2 4676163030_A control         10 0         
+ 3 4676163030_E control          6 0         
+ 4 4676163030_I control          6 0         
+ 5 4676163034_H control         10 0         
+ 6 4950679013_E control         10 0         
+ 7 4950679045_C control         10 0         
+ 8 4676163025_L GC               6 1         
+ 9 4950679013_J GC               6 1         
+10 4950679045_B GC               6 1         
+# … with 101 more rows</code></pre>
+<pre class="r"><code>write_csv(pheno_tbl, &quot;~/tcga_macs/output/km_cluster_assignments.csv&quot;)</code></pre>
+</div>
+<div id="correlation-of-collapsed-treatment-groups" class="section level4">
+<h4>Correlation of collapsed treatment groups</h4>
+<p>Data preparation</p>
+<pre class="r"><code># format data so probes are in rows and samples are in columns
+# will use only top 1000 most variable genes
+data_matrix_onek[1:5, 1:5]</code></pre>
+<pre><code>                   4487653414_E 4487653415_E 4487653415_G 4487653415_H
+xp3z31EIih.dKV6_cU     6.827961     6.965351     6.854378     6.925266
+HofSUEo9eJ4DkjhRPQ    14.283924    14.191329    13.826138    13.414145
+KGhlVCGTOHRRnt3hTg    12.189399    12.182502    11.932899    13.768286
+ckL1dVHRJ.pV.RIsgU     8.950316     6.314712    14.664074     9.070597
+odF3XHR8CVl4SAUaUQ    10.897617     6.640058    14.848374    13.188258
+                   4676163025_B
+xp3z31EIih.dKV6_cU     6.359521
+HofSUEo9eJ4DkjhRPQ    12.765854
+KGhlVCGTOHRRnt3hTg    11.841879
+ckL1dVHRJ.pV.RIsgU    13.644214
+odF3XHR8CVl4SAUaUQ    15.463936</code></pre>
+<pre class="r"><code># pull out a table of treatment and samples names from pheno_data
+txgrp &lt;- pheno_tbl %&gt;%
+  dplyr::select(rawID, treatment)
+
+group_df &lt;- colnames(data_matrix_onek) %&gt;%
+  enframe() %&gt;%
+  dplyr::rename(rawID = value) %&gt;%
+  left_join(txgrp)</code></pre>
+<pre><code>Joining, by = &quot;rawID&quot;</code></pre>
+<pre class="r"><code># check that order of samples matches the data matrix perfectly
+identical(colnames(data_matrix_onek), group_df$rawID)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code># pull treatment assignment as a vector
+group_vect &lt;- group_df$treatment
+
+# format data so probes are in columns and samples are in rows
+tx_row_matrix &lt;- t(data_matrix_onek)
+tx_row_matrix[1:5, 1:5]</code></pre>
+<pre><code>             xp3z31EIih.dKV6_cU HofSUEo9eJ4DkjhRPQ KGhlVCGTOHRRnt3hTg
+4487653414_E           6.827961           14.28392           12.18940
+4487653415_E           6.965351           14.19133           12.18250
+4487653415_G           6.854378           13.82614           11.93290
+4487653415_H           6.925266           13.41414           13.76829
+4676163025_B           6.359521           12.76585           11.84188
+             ckL1dVHRJ.pV.RIsgU odF3XHR8CVl4SAUaUQ
+4487653414_E           8.950316          10.897617
+4487653415_E           6.314712           6.640058
+4487653415_G          14.664074          14.848374
+4487653415_H           9.070597          13.188258
+4676163025_B          13.644214          15.463936</code></pre>
+<pre class="r"><code># check the order of samples still matches the treatment source perfectly
+identical(rownames(tx_row_matrix), group_df$rawID)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code># use WGCNA function for collapsing identical probes
+tx_collapsed &lt;- collapseRows(tx_row_matrix, 
+                          rowGroup = group_vect, 
+                          rowID = rownames(tx_row_matrix), 
+                          method = &quot;Average&quot;)
+
+# pull out expression matrix by treatment
+tx_matrix &lt;- tx_collapsed$datETcollapsed
+nrow(tx_matrix)</code></pre>
+<pre><code>[1] 23</code></pre>
+<pre class="r"><code>tx_matrix[1:5, 1:5]</code></pre>
+<pre><code>          xp3z31EIih.dKV6_cU HofSUEo9eJ4DkjhRPQ KGhlVCGTOHRRnt3hTg
+control             8.984722          12.419733           9.717827
+GC                  6.976462          10.008359           9.577975
+IFNb                8.539152           9.723312          10.618232
+IFNg                8.848092          11.923210          10.181621
+IFNg_TNFa           8.999134          11.266278          11.433015
+          ckL1dVHRJ.pV.RIsgU odF3XHR8CVl4SAUaUQ
+control            10.717568          10.258034
+GC                  8.009513           7.933240
+IFNb                7.327740           9.839003
+IFNg                8.890192          12.350727
+IFNg_TNFa           8.570709          13.607968</code></pre>
+<p>Correlation matrix by treatment group</p>
+<pre class="r"><code># create correlation matrix for each sample 
+# using 1000 most variable probes as defined above
+res_dist_tx &lt;- get_dist(tx_matrix, method = &quot;pearson&quot;)
+head(round(as.matrix(res_dist), 2))[, 1:6]</code></pre>
+<pre><code>             4487653414_E 4487653415_E 4487653415_G 4487653415_H
+4487653414_E         0.00         0.20         0.46         0.43
+4487653415_E         0.20         0.00         0.65         0.62
+4487653415_G         0.46         0.65         0.00         0.47
+4487653415_H         0.43         0.62         0.47         0.00
+4676163025_B         0.58         0.76         0.18         0.49
+4676163025_C         0.43         0.33         0.68         0.54
+             4676163025_B 4676163025_C
+4487653414_E         0.58         0.43
+4487653415_E         0.76         0.33
+4487653415_G         0.18         0.68
+4487653415_H         0.49         0.54
+4676163025_B         0.00         0.67
+4676163025_C         0.67         0.00</code></pre>
+<pre class="r"><code># plot dissimilarity matrix
+fviz_dist(res_dist_tx, lab_size = 8)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hierarchical and K-means clustering of treatment group correlations</p>
+<pre class="r"><code># Save correlation matrix as variable
+res_dist_tx_m &lt;- as.matrix(res_dist_tx)
+
+# Compute hierarchical clustering
+res_hc_tx &lt;- hclust(res_dist_tx, method = &quot;ward.D2&quot;)
+
+# Visualize
+plot(res_hc_tx, cex = 0.5)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Enhanced k-means clustering
+res_km_tx &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, nstart = 25)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Diagnostic plots</p>
+<pre class="r"><code># Gap statistic plot
+fviz_gap_stat(res_km_tx$gap_stat)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Silhouette plot
+fviz_silhouette(res_km_tx)</code></pre>
+<pre><code>  cluster size ave.sil.width
+1       1    5          0.30
+2       2   11          0.42
+3       3    7          0.40</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Optimal number of clusters using gap statistics
+res_km_tx$nbclust</code></pre>
+<pre><code>[1] 3</code></pre>
+<pre class="r"><code># Print result
+res_km_tx</code></pre>
+<pre><code>K-means clustering with 3 clusters of sizes 5, 11, 7
+
+Cluster means:
+    control        GC      IFNb      IFNg IFNg_TNFa      IL10      IL13
+1 0.1314812 0.1998929 0.3571541 0.4225682 0.5434261 0.1425647 0.1829576
+2 0.4722622 0.6067682 0.5068018 0.3629687 0.3242165 0.4701534 0.6508065
+3 0.3092480 0.3252931 0.2187583 0.5732445 0.5338840 0.3356548 0.5247568
+        IL4 IL4_upLPS       P3C  P3C_PGE2      PGE2      sLPS   sLPS_IC
+1 0.1960954 0.4327929 0.3457509 0.4104975 0.3677820 0.5116512 0.5904574
+2 0.6347595 0.5225120 0.4478998 0.4552544 0.5314386 0.1828732 0.2643233
+3 0.3524461 0.2559187 0.1311986 0.1645955 0.1490386 0.4447212 0.6183368
+  sLPS_IFNg      TNFa  TNFa_P3C TNFa_PGE2       TPP  TPP_IFNb
+1 0.6256373 0.4880056 0.5182191 0.6362426 0.5233317 0.6329642
+2 0.2232490 0.2529695 0.2191896 0.2365094 0.2251606 0.2350651
+3 0.4533114 0.4671158 0.2975792 0.4549461 0.4784630 0.4079282
+  TPP_IFNb_IFNg     upLPS  upLPS_IC
+1     0.7439463 0.3173902 0.3549906
+2     0.2507119 0.3391722 0.5215323
+3     0.4948589 0.1395196 0.2365630
+
+Clustering vector:
+      control            GC          IFNb          IFNg     IFNg_TNFa 
+            1             1             3             2             2 
+         IL10          IL13           IL4     IL4_upLPS           P3C 
+            1             1             1             3             3 
+     P3C_PGE2          PGE2          sLPS       sLPS_IC     sLPS_IFNg 
+            3             3             2             2             2 
+         TNFa      TNFa_P3C     TNFa_PGE2           TPP      TPP_IFNb 
+            2             2             2             2             2 
+TPP_IFNb_IFNg         upLPS      upLPS_IC 
+            2             3             3 
+
+Within cluster sum of squares by cluster:
+[1] 1.127036 3.311561 1.164282
+ (between_SS / total_SS =  66.1 %)
+
+Available components:
+
+ [1] &quot;cluster&quot;      &quot;centers&quot;      &quot;totss&quot;        &quot;withinss&quot;    
+ [5] &quot;tot.withinss&quot; &quot;betweenss&quot;    &quot;size&quot;         &quot;iter&quot;        
+ [9] &quot;ifault&quot;       &quot;clust_plot&quot;   &quot;silinfo&quot;      &quot;nbclust&quot;     
+[13] &quot;data&quot;         &quot;gap_stat&quot;    </code></pre>
+<p>Other values for k - visual review</p>
+<pre class="r"><code>res_km_4 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 4)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res_km_5 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 5)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res_km_6 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 6)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res_km_7 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 7)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res_km_8 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 8)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res_km_9 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 9)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res_km_10 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 10)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-19-7.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1573,93 +2186,97 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] ggpubr_0.2            magrittr_1.5          ggsci_2.9            
- [4] FactoMineR_1.41       lumi_2.34.0           annotate_1.60.1      
- [7] XML_3.98-1.19         AnnotationDbi_1.44.0  IRanges_2.16.0       
-[10] S4Vectors_0.20.1      Biobase_2.42.0        BiocGenerics_0.28.0  
-[13] WGCNA_1.68            fastcluster_1.1.25    dynamicTreeCut_1.63-1
-[16] factoextra_1.0.5      forcats_0.4.0         stringr_1.4.0        
-[19] dplyr_0.8.1           purrr_0.3.2           readr_1.3.1          
-[22] tidyr_0.8.3           tibble_2.1.1          ggplot2_3.1.1        
-[25] tidyverse_1.2.1      
+ [1] DESeq2_1.22.2               SummarizedExperiment_1.12.0
+ [3] DelayedArray_0.8.0          BiocParallel_1.16.6        
+ [5] matrixStats_0.54.0          GenomicRanges_1.34.0       
+ [7] GenomeInfoDb_1.18.2         ggpubr_0.2                 
+ [9] magrittr_1.5                ggsci_2.9                  
+[11] FactoMineR_1.41             lumi_2.34.0                
+[13] annotate_1.60.1             XML_3.98-1.19              
+[15] AnnotationDbi_1.44.0        IRanges_2.16.0             
+[17] S4Vectors_0.20.1            Biobase_2.42.0             
+[19] BiocGenerics_0.28.0         WGCNA_1.68                 
+[21] fastcluster_1.1.25          dynamicTreeCut_1.63-1      
+[23] factoextra_1.0.5            forcats_0.4.0              
+[25] stringr_1.4.0               dplyr_0.8.1                
+[27] purrr_0.3.2                 readr_1.3.1                
+[29] tidyr_0.8.3                 tibble_2.1.1               
+[31] ggplot2_3.1.1               tidyverse_1.2.1            
 
 loaded via a namespace (and not attached):
-  [1] utf8_1.1.4                  tidyselect_0.2.5           
-  [3] robust_0.4-18               RSQLite_2.1.1              
-  [5] htmlwidgets_1.3             grid_3.5.3                 
-  [7] BiocParallel_1.16.6         munsell_0.5.0              
-  [9] codetools_0.2-16            preprocessCore_1.44.0      
- [11] nleqslv_3.3.2               withr_2.1.2                
- [13] colorspace_1.4-1            knitr_1.23                 
- [15] rstudioapi_0.10             leaps_3.0                  
- [17] robustbase_0.93-5           labeling_0.3               
- [19] git2r_0.25.2                GenomeInfoDbData_1.2.0     
- [21] bit64_0.9-7                 rhdf5_2.26.2               
- [23] rprojroot_1.3-2             vctrs_0.1.0                
- [25] generics_0.0.2              xfun_0.7                   
- [27] R6_2.4.0                    doParallel_1.0.14          
- [29] GenomeInfoDb_1.18.2         illuminaio_0.24.0          
- [31] locfit_1.5-9.1              bitops_1.0-6               
- [33] reshape_0.8.8               DelayedArray_0.8.0         
- [35] assertthat_0.2.1            scales_1.0.0               
- [37] nnet_7.3-12                 gtable_0.3.0               
- [39] affy_1.60.0                 methylumi_2.28.0           
- [41] workflowr_1.3.0             rlang_0.3.4                
- [43] zeallot_0.1.0               genefilter_1.64.0          
- [45] scatterplot3d_0.3-41        splines_3.5.3              
- [47] rtracklayer_1.42.2          lazyeval_0.2.2             
- [49] acepack_1.4.1               impute_1.56.0              
- [51] GEOquery_2.50.5             broom_0.5.2                
- [53] checkmate_1.9.3             reshape2_1.4.3             
- [55] BiocManager_1.30.4          yaml_2.2.0                 
- [57] modelr_0.1.4                GenomicFeatures_1.34.8     
- [59] backports_1.1.4             Hmisc_4.2-0                
- [61] tools_3.5.3                 nor1mix_1.2-3              
- [63] affyio_1.52.0               RColorBrewer_1.1-2         
- [65] siggenes_1.56.0             Rcpp_1.0.1                 
- [67] plyr_1.8.4                  base64enc_0.1-3            
- [69] progress_1.2.2              zlibbioc_1.28.0            
- [71] RCurl_1.95-4.12             prettyunits_1.0.2          
- [73] rpart_4.1-15                openssl_1.3                
- [75] bumphunter_1.24.5           SummarizedExperiment_1.12.0
- [77] haven_2.1.0                 ggrepel_0.8.1              
- [79] cluster_2.0.9               fs_1.3.1                   
- [81] data.table_1.12.2           mvtnorm_1.0-10             
- [83] whisker_0.3-2               matrixStats_0.54.0         
- [85] hms_0.4.2                   evaluate_0.14              
- [87] xtable_1.8-4                mclust_5.4.3               
- [89] readxl_1.3.1                gridExtra_2.3              
- [91] compiler_3.5.3              biomaRt_2.38.0             
- [93] minfi_1.28.4                KernSmooth_2.23-15         
- [95] crayon_1.3.4                htmltools_0.3.6            
- [97] mgcv_1.8-28                 pcaPP_1.9-73               
- [99] Formula_1.2-3               rrcov_1.4-7                
-[101] lubridate_1.7.4             DBI_1.0.0                  
-[103] MASS_7.3-51.4               Matrix_1.2-17              
-[105] cli_1.1.0                   quadprog_1.5-7             
-[107] GenomicRanges_1.34.0        pkgconfig_2.0.2            
-[109] fit.models_0.5-14           flashClust_1.01-2          
-[111] GenomicAlignments_1.18.1    registry_0.5-1             
-[113] foreign_0.8-71              xml2_1.2.0                 
-[115] foreach_1.4.4               rngtools_1.3.1             
-[117] pkgmaker_0.27               multtest_2.38.0            
-[119] beanplot_1.2                XVector_0.22.0             
-[121] bibtex_0.4.2                rvest_0.3.4                
-[123] doRNG_1.7.1                 digest_0.6.19              
-[125] Biostrings_2.50.2           rmarkdown_1.13             
-[127] base64_2.0                  cellranger_1.1.0           
-[129] htmlTable_1.13.1            DelayedMatrixStats_1.4.0   
-[131] Rsamtools_1.34.1            nlme_3.1-140               
-[133] jsonlite_1.6                Rhdf5lib_1.4.3             
-[135] fansi_0.4.0                 askpass_1.1                
-[137] limma_3.38.3                pillar_1.4.1               
-[139] lattice_0.20-38             httr_1.4.0                 
-[141] DEoptimR_1.0-8              survival_2.44-1.1          
-[143] GO.db_3.7.0                 glue_1.3.1                 
-[145] iterators_1.0.10            bit_1.1-14                 
-[147] stringi_1.4.3               HDF5Array_1.10.1           
-[149] blob_1.1.1                  latticeExtra_0.6-28        
-[151] memoise_1.1.0              </code></pre>
+  [1] utf8_1.1.4               tidyselect_0.2.5        
+  [3] robust_0.4-18            RSQLite_2.1.1           
+  [5] htmlwidgets_1.3          grid_3.5.3              
+  [7] munsell_0.5.0            codetools_0.2-16        
+  [9] preprocessCore_1.44.0    nleqslv_3.3.2           
+ [11] withr_2.1.2              colorspace_1.4-1        
+ [13] knitr_1.23               rstudioapi_0.10         
+ [15] leaps_3.0                robustbase_0.93-5       
+ [17] labeling_0.3             git2r_0.25.2            
+ [19] GenomeInfoDbData_1.2.0   bit64_0.9-7             
+ [21] rhdf5_2.26.2             rprojroot_1.3-2         
+ [23] vctrs_0.1.0              generics_0.0.2          
+ [25] xfun_0.7                 R6_2.4.0                
+ [27] doParallel_1.0.14        illuminaio_0.24.0       
+ [29] locfit_1.5-9.1           bitops_1.0-6            
+ [31] reshape_0.8.8            assertthat_0.2.1        
+ [33] scales_1.0.0             nnet_7.3-12             
+ [35] gtable_0.3.0             affy_1.60.0             
+ [37] methylumi_2.28.0         workflowr_1.3.0         
+ [39] rlang_0.3.4              zeallot_0.1.0           
+ [41] genefilter_1.64.0        scatterplot3d_0.3-41    
+ [43] splines_3.5.3            rtracklayer_1.42.2      
+ [45] lazyeval_0.2.2           acepack_1.4.1           
+ [47] impute_1.56.0            GEOquery_2.50.5         
+ [49] broom_0.5.2              checkmate_1.9.3         
+ [51] reshape2_1.4.3           BiocManager_1.30.4      
+ [53] yaml_2.2.0               modelr_0.1.4            
+ [55] GenomicFeatures_1.34.8   backports_1.1.4         
+ [57] Hmisc_4.2-0              tools_3.5.3             
+ [59] nor1mix_1.2-3            affyio_1.52.0           
+ [61] RColorBrewer_1.1-2       siggenes_1.56.0         
+ [63] Rcpp_1.0.1               plyr_1.8.4              
+ [65] base64enc_0.1-3          progress_1.2.2          
+ [67] zlibbioc_1.28.0          RCurl_1.95-4.12         
+ [69] prettyunits_1.0.2        rpart_4.1-15            
+ [71] openssl_1.4              bumphunter_1.24.5       
+ [73] haven_2.1.0              ggrepel_0.8.1           
+ [75] cluster_2.0.9            fs_1.3.1                
+ [77] data.table_1.12.2        mvtnorm_1.0-10          
+ [79] whisker_0.3-2            hms_0.4.2               
+ [81] evaluate_0.14            xtable_1.8-4            
+ [83] mclust_5.4.3             readxl_1.3.1            
+ [85] gridExtra_2.3            compiler_3.5.3          
+ [87] biomaRt_2.38.0           minfi_1.28.4            
+ [89] KernSmooth_2.23-15       crayon_1.3.4            
+ [91] htmltools_0.3.6          mgcv_1.8-28             
+ [93] pcaPP_1.9-73             Formula_1.2-3           
+ [95] geneplotter_1.60.0       rrcov_1.4-7             
+ [97] lubridate_1.7.4          DBI_1.0.0               
+ [99] MASS_7.3-51.4            Matrix_1.2-17           
+[101] cli_1.1.0                quadprog_1.5-7          
+[103] pkgconfig_2.0.2          fit.models_0.5-14       
+[105] flashClust_1.01-2        GenomicAlignments_1.18.1
+[107] registry_0.5-1           foreign_0.8-71          
+[109] xml2_1.2.0               foreach_1.4.4           
+[111] rngtools_1.3.1           pkgmaker_0.27           
+[113] multtest_2.38.0          beanplot_1.2            
+[115] XVector_0.22.0           bibtex_0.4.2            
+[117] rvest_0.3.4              doRNG_1.7.1             
+[119] digest_0.6.19            Biostrings_2.50.2       
+[121] rmarkdown_1.13           base64_2.0              
+[123] cellranger_1.1.0         htmlTable_1.13.1        
+[125] DelayedMatrixStats_1.4.0 Rsamtools_1.34.1        
+[127] nlme_3.1-140             jsonlite_1.6            
+[129] Rhdf5lib_1.4.3           fansi_0.4.0             
+[131] askpass_1.1              limma_3.38.3            
+[133] pillar_1.4.1             lattice_0.20-38         
+[135] httr_1.4.0               DEoptimR_1.0-8          
+[137] survival_2.44-1.1        GO.db_3.7.0             
+[139] glue_1.3.1               iterators_1.0.10        
+[141] bit_1.1-14               stringi_1.4.3           
+[143] HDF5Array_1.10.1         blob_1.1.1              
+[145] latticeExtra_0.6-28      memoise_1.1.0           </code></pre>
 </div>
 </div>
 </div>
