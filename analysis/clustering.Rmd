@@ -345,15 +345,119 @@ res_km_tx$nbclust
 res_km_tx
 ```
 
-
 Other values for k - visual review
 ```{r}
-res_km_4 <- eclust(res_dist_tx_m, "kmeans", k = 4)
-res_km_5 <- eclust(res_dist_tx_m, "kmeans", k = 5)
-res_km_6 <- eclust(res_dist_tx_m, "kmeans", k = 6)
-res_km_7 <- eclust(res_dist_tx_m, "kmeans", k = 7)
-res_km_8 <- eclust(res_dist_tx_m, "kmeans", k = 8)
-res_km_9 <- eclust(res_dist_tx_m, "kmeans", k = 9)
+res_km_4  <- eclust(res_dist_tx_m, "kmeans", k = 4)
+res_km_5  <- eclust(res_dist_tx_m, "kmeans", k = 5)
+res_km_6  <- eclust(res_dist_tx_m, "kmeans", k = 6)
+res_km_7  <- eclust(res_dist_tx_m, "kmeans", k = 7)
+res_km_8  <- eclust(res_dist_tx_m, "kmeans", k = 8)
+res_km_9  <- eclust(res_dist_tx_m, "kmeans", k = 9)
 res_km_10 <- eclust(res_dist_tx_m, "kmeans", k = 10)
+```
 
+K = 7 best approximates the different known biological subtypes, and most closely resembles the clusters derived from the original paper.
+
+## Summary and diagnostic plots
+
+Silhouette plot of km = 7 model
+```{r}
+# Silhouette plot
+fviz_silhouette(res_km_7)
+```
+
+PCA plot using all gene expression data for individual samples, now with new cluster labels applied
+```{r}
+# Get cluster assignments for each condition and add to phenodata
+myclust <- enframe(res_km_7$cluster) %>%
+  dplyr::rename(treatment = name, 
+                mycluster = value)
+
+pheno_tbl_clust <- pheno_tbl %>% 
+  left_join(myclust, by = "treatment") %>%
+  mutate(treatment = as.factor(treatment),
+         mycluster = as.factor(mycluster)) %>%
+  dplyr::rename(sample_cluster = km_clust,
+         treatment_cluster = mycluster,
+         orig_cluster = clusternum) %>%
+  mutate(sample_cluster = as.factor(sample_cluster)) %>%
+  mutate(adj_cluster = ifelse(treatment == "control", 0, treatment_cluster)) %>%
+  mutate(adj_cluster = as.factor(adj_cluster)) %>%
+  print()
+
+# use normalized gene expression values from PCA plots above
+# t_DataMatrix is gene expression matrix in tidy format from earlier in this notebook
+df_pca_clust <- t_DataMatrix %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "rawID") %>%
+  left_join(pheno_tbl_clust, by = "rawID") %>%
+  as_tibble() %>%
+  dplyr::select(rawID, treatment, adj_cluster, treatment_cluster, sample_cluster, orig_cluster, everything()) %>%
+  print()
+
+pca_clust <- PCA(df_pca_clust[,c(7:39474)], graph = FALSE)
+head(get_eig(pca_clust))
+fviz_eig(pca_clust)
+
+mypal <- pal_igv("default", alpha = 1)(23)
+
+pca3 <- fviz_pca_ind(pca_clust,
+             label = "none", # hide individual labels
+             habillage = "none",
+             col.ind = df_pca_clust$adj_cluster,
+             palette = mypal,
+             geom.ind = "point",
+             invisible = "quali",
+             pointshape = 19, 
+             addEllipses = TRUE,
+             title = "PCA of normalized expression"
+) +
+  labs(subtitle = "By treatment-level cluster")
+print(pca3)
+
+```
+
+## Remake expression set for export
+```{r}
+
+# add cluster information to phenodata
+pheno_data_3 <- pheno_data %>%
+  rownames_to_column(var = "rawID") %>%
+  as_tibble() %>%
+  left_join(pheno_tbl_clust)
+
+# add back rownames to phenodata
+mac_pData <- pheno_data_3 %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "rawID")
+
+# create a frame for annotation of column names in metadata
+# will be empty for now
+varnames <- colnames(mac_pData)
+vardata <- data.frame(labelDescription = varnames, 
+                      row.names = varnames)
+
+# rebuild AnnotatedDataFrame
+mac_phenoData_3 <- new("AnnotatedDataFrame",
+                       data = mac_pData, 
+                       varMetadata = vardata)
+
+# retreive expression data matrix
+mac_exprs_3 <- exprs(mac_eset)
+
+# create expression set
+mac_eset_3 <- ExpressionSet(assayData = mac_exprs_3,
+                            phenoData = mac_phenoData_3,
+                            annotation = "Illumina Human HT-12 v3.0 beadchip")
+
+# check properties
+featureNames(mac_eset_3)[1:5]
+sampleNames(mac_eset_3)[1:5]
+varLabels(mac_eset_3)
+mat <- exprs(mac_eset_3)
+dim(mat)
+mat[1:5, 1:5]
+
+# save expression set
+saveRDS(mac_eset_3, "~/tcga_macs/output/mac_eset_w_clusters.rds")
 ```
