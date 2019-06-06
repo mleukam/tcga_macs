@@ -445,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-05
+<strong>Last updated:</strong> 2019-06-06
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -524,10 +524,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3bf9158117e022f4be8a533418dcb03c6bcdb7c5targetblank3bf9158a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/3bf9158117e022f4be8a533418dcb03c6bcdb7c5" target="_blank">3bf9158</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3ff5865b967133cb50b0a621bbf16f3c96a948catargetblank3ff5865a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/3ff5865b967133cb50b0a621bbf16f3c96a948ca" target="_blank">3ff5865</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3bf9158117e022f4be8a533418dcb03c6bcdb7c5targetblank3bf9158a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree3ff5865b967133cb50b0a621bbf16f3c96a948catargetblank3ff5865a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -548,6 +548,7 @@ Ignored files:
     Ignored:    output/dge_frame.csv
     Ignored:    output/expression_set.rds
     Ignored:    output/mac_eset.rds
+    Ignored:    output/mac_eset_w_clusters.rds
     Ignored:    output/normalized_probe_intensities.Rds
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
@@ -555,6 +556,7 @@ Ignored files:
 
 Untracked files:
     Untracked:  docs/figure/invitro_mac_dge.Rmd/
+    Untracked:  output/PCA_with_km7cluster_labels.pdf
     Untracked:  output/km_cluster_assignments.csv
 
 Unstaged changes:
@@ -597,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/3ff5865b967133cb50b0a621bbf16f3c96a948ca/analysis/clustering.Rmd" target="_blank">3ff5865</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-06
+</td>
+<td>
+completed KM clustering by treatment group
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/clustering.html" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -660,12 +696,12 @@ major updates including clustering and correlation
 <p>Clear workspace prior to analysis and load necessary packages</p>
 <pre class="r"><code>rm(list = ls())</code></pre>
 <pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
-<pre><code>── Attaching packages ────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>── Attaching packages ──────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>✔ ggplot2 3.1.1     ✔ purrr   0.3.2
 ✔ tibble  2.1.1     ✔ dplyr   0.8.1
 ✔ tidyr   0.8.3     ✔ stringr 1.4.0
 ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>── Conflicts ───────────────────────────────── tidyverse_conflicts() ──
+<pre><code>── Conflicts ─────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(&quot;factoextra&quot;)</code></pre>
@@ -2076,6 +2112,43 @@ head(round(as.matrix(res_dist), 2))[, 1:6]</code></pre>
 <pre class="r"><code># plot dissimilarity matrix
 fviz_dist(res_dist_tx, lab_size = 8)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Hierarchical and K-means clustering of treatment group correlations</p>
 <pre class="r"><code># Save correlation matrix as variable
 res_dist_tx_m &lt;- as.matrix(res_dist_tx)
@@ -2086,13 +2159,124 @@ res_hc_tx &lt;- hclust(res_dist_tx, method = &quot;ward.D2&quot;)
 # Visualize
 plot(res_hc_tx, cex = 0.5)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># Enhanced k-means clustering
 res_km_tx &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, nstart = 25)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-2">
+Past versions of unnamed-chunk-17-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-17-2.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Diagnostic plots</p>
 <pre class="r"><code># Gap statistic plot
 fviz_gap_stat(res_km_tx$gap_stat)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-18-1">
+Past versions of unnamed-chunk-18-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-18-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># Silhouette plot
 fviz_silhouette(res_km_tx)</code></pre>
 <pre><code>  cluster size ave.sil.width
@@ -2100,6 +2284,43 @@ fviz_silhouette(res_km_tx)</code></pre>
 2       2   11          0.42
 3       3    7          0.40</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-18-2">
+Past versions of unnamed-chunk-18-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-18-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-18-2.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># Optimal number of clusters using gap statistics
 res_km_tx$nbclust</code></pre>
 <pre><code>[1] 3</code></pre>
@@ -2148,20 +2369,513 @@ Available components:
  [9] &quot;ifault&quot;       &quot;clust_plot&quot;   &quot;silinfo&quot;      &quot;nbclust&quot;     
 [13] &quot;data&quot;         &quot;gap_stat&quot;    </code></pre>
 <p>Other values for k - visual review</p>
-<pre class="r"><code>res_km_4 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 4)</code></pre>
+<pre class="r"><code>res_km_4  &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 4)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>res_km_5 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 5)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
+Past versions of unnamed-chunk-19-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>res_km_5  &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 5)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>res_km_6 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 6)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-2">
+Past versions of unnamed-chunk-19-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-2.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>res_km_6  &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 6)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-3.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>res_km_7 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 7)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-3">
+Past versions of unnamed-chunk-19-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-3.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>res_km_7  &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 7)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-4.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>res_km_8 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 8)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-4">
+Past versions of unnamed-chunk-19-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-4.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>res_km_8  &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 8)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-5.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>res_km_9 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 9)</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-5">
+Past versions of unnamed-chunk-19-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-5.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>res_km_9  &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 9)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-6.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-6">
+Past versions of unnamed-chunk-19-6.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-6" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-6.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>res_km_10 &lt;- eclust(res_dist_tx_m, &quot;kmeans&quot;, k = 10)</code></pre>
 <p><img src="figure/clustering.Rmd/unnamed-chunk-19-7.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-7">
+Past versions of unnamed-chunk-19-7.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-7" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e28f86aebbb4766d3f0ad96b77c13956a4701274/docs/figure/clustering.Rmd/unnamed-chunk-19-7.png" target="_blank">e28f86a</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>K = 7 best approximates the different known biological subtypes, and most closely resembles the clusters derived from the original paper.</p>
+</div>
+</div>
+<div id="summary-and-diagnostic-plots" class="section level2">
+<h2>Summary and diagnostic plots</h2>
+<p>Silhouette plot of km = 7 model</p>
+<pre class="r"><code># Silhouette plot
+fviz_silhouette(res_km_7)</code></pre>
+<pre><code>  cluster size ave.sil.width
+1       1    2          0.36
+2       2    3          0.36
+3       3    3          0.08
+4       4    4          0.36
+5       5    5          0.21
+6       6    3          0.44
+7       7    3          0.04</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>PCA plot using all gene expression data for individual samples, now with new cluster labels applied</p>
+<pre class="r"><code># Get cluster assignments for each condition and add to phenodata
+myclust &lt;- enframe(res_km_7$cluster) %&gt;%
+  dplyr::rename(treatment = name, 
+                mycluster = value)
+
+pheno_tbl_clust &lt;- pheno_tbl %&gt;% 
+  left_join(myclust, by = &quot;treatment&quot;) %&gt;%
+  mutate(treatment = as.factor(treatment),
+         mycluster = as.factor(mycluster)) %&gt;%
+  dplyr::rename(sample_cluster = km_clust,
+         treatment_cluster = mycluster,
+         orig_cluster = clusternum) %&gt;%
+  mutate(sample_cluster = as.factor(sample_cluster)) %&gt;%
+  mutate(adj_cluster = ifelse(treatment == &quot;control&quot;, 0, treatment_cluster)) %&gt;%
+  mutate(adj_cluster = as.factor(adj_cluster)) %&gt;%
+  print()</code></pre>
+<pre><code>Warning: Column `treatment` joining factor and character vector, coercing
+into character vector</code></pre>
+<pre><code># A tibble: 111 x 6
+   rawID treatment sample_cluster orig_cluster treatment_clust… adj_cluster
+   &lt;chr&gt; &lt;fct&gt;     &lt;fct&gt;          &lt;fct&gt;        &lt;fct&gt;            &lt;fct&gt;      
+ 1 4487… control   6              0            6                0          
+ 2 4676… control   10             0            6                0          
+ 3 4676… control   6              0            6                0          
+ 4 4676… control   6              0            6                0          
+ 5 4676… control   10             0            6                0          
+ 6 4950… control   10             0            6                0          
+ 7 4950… control   10             0            6                0          
+ 8 4676… GC        6              1            6                6          
+ 9 4950… GC        6              1            6                6          
+10 4950… GC        6              1            6                6          
+# … with 101 more rows</code></pre>
+<pre class="r"><code># use normalized gene expression values from PCA plots above
+# t_DataMatrix is gene expression matrix in tidy format from earlier in this notebook
+df_pca_clust &lt;- t_DataMatrix %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(var = &quot;rawID&quot;) %&gt;%
+  left_join(pheno_tbl_clust, by = &quot;rawID&quot;) %&gt;%
+  as_tibble() %&gt;%
+  dplyr::select(rawID, treatment, adj_cluster, treatment_cluster, sample_cluster, orig_cluster, everything()) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 111 x 39,474
+   rawID treatment adj_cluster treatment_clust… sample_cluster orig_cluster
+   &lt;chr&gt; &lt;fct&gt;     &lt;fct&gt;       &lt;fct&gt;            &lt;fct&gt;          &lt;fct&gt;       
+ 1 4487… control   0           6                6              0           
+ 2 4487… IL4       1           1                1              2           
+ 3 4487… TPP       5           5                8              9           
+ 4 4487… IFNg      2           2                9              6           
+ 5 4676… sLPS_IC   7           7                5              7           
+ 6 4676… IL13      1           1                7              2           
+ 7 4676… IL10      6           6                10             1           
+ 8 4676… sLPS      5           5                5              7           
+ 9 4676… IFNg      2           2                9              6           
+10 4676… IL4       1           1                7              2           
+# … with 101 more rows, and 39,468 more variables:
+#   fqPEquJRRlSVSfL.8A &lt;dbl&gt;, ckiehnugOno9d7vf1Q &lt;dbl&gt;,
+#   ritxUH.kuHlYqjozpE &lt;dbl&gt;, QpE5UiUgmJOJEkPXpc &lt;dbl&gt;,
+#   EedxN6XeUOgPSCywB0 &lt;dbl&gt;, `3l3lDoD0gssAdeehIY` &lt;dbl&gt;,
+#   WS4S8aGL855YVcUUZE &lt;dbl&gt;, KS8aGL855YVcUUZH50 &lt;dbl&gt;,
+#   TdSfOuLunqrkiJkag8 &lt;dbl&gt;, ZfoDn4IUQp4Auf56LU &lt;dbl&gt;,
+#   `97DZJV_gpQpKINl0Ec` &lt;dbl&gt;, W38p0ogk.wIBVRXllY &lt;dbl&gt;,
+#   QUTgUoqmp7jyKCQRHo &lt;dbl&gt;, BZKiEvS0eQ305U0v34 &lt;dbl&gt;,
+#   HshT.TuzF13i0V0rKg &lt;dbl&gt;, `6Rff76jvd6HDh1KYhQ` &lt;dbl&gt;,
+#   `6TheVd.HiE1UF3lX6g` &lt;dbl&gt;, QueXUXiL5yqvftiNO0 &lt;dbl&gt;,
+#   xSoSAshSJ89KgqiIgo &lt;dbl&gt;, l1KvXI7ipJV.vp44QQ &lt;dbl&gt;,
+#   TOThf8F.h.nz9UcYKo &lt;dbl&gt;, xpKvX0PpP9VIPuJQJc &lt;dbl&gt;,
+#   `3lKHxISSJPFfvpQ490` &lt;dbl&gt;, ljjP4gnSDe9zlUP.e8 &lt;dbl&gt;,
+#   NVYooKpCzodxSAWrn8 &lt;dbl&gt;, EpvlIuKLySkofhinf4 &lt;dbl&gt;,
+#   cQchF.wLl3A9NI6UB4 &lt;dbl&gt;, WpeTkd6Xk6SBCFe3cA &lt;dbl&gt;,
+#   EiRfvEvWl3SzupwOUk &lt;dbl&gt;, NajKinX6sOcFzkCC8U &lt;dbl&gt;,
+#   uy8FDV6oMleUVSCUKc &lt;dbl&gt;, `9KKuqV6OH9SXfQeH50` &lt;dbl&gt;,
+#   NIwad1IXif1m0kLKDY &lt;dbl&gt;, `6pIQKnV6ceoIxIFNe4` &lt;dbl&gt;,
+#   `9HupjiArrod98ekqUU` &lt;dbl&gt;, Hekkk3HjqAu6N_g3SI &lt;dbl&gt;,
+#   BgnCcruCDoPoJUeX1Q &lt;dbl&gt;, TtLPvPp.2z13wbgW3s &lt;dbl&gt;,
+#   EW6rxUWU6SUA75_OuA &lt;dbl&gt;, WpcOqV.0CiNzoUM_iY &lt;dbl&gt;,
+#   fgexZ3f.pSdRXVhgpQ &lt;dbl&gt;, `64Va9Z4jSCkEneL1Ko` &lt;dbl&gt;,
+#   WSzete5VJ5QKIuqlOU &lt;dbl&gt;, `67nRKEfAUoYpOlWIR4` &lt;dbl&gt;,
+#   TB0kgnrABOqJWihKec &lt;dbl&gt;, `3nTrIAUycLJNkh8JsQ` &lt;dbl&gt;,
+#   uud.vTT6V09Qkfxnt4 &lt;dbl&gt;, inSONXXEOiU0y7euFI &lt;dbl&gt;,
+#   lQKyzSyky0.3s3.RdE &lt;dbl&gt;, `3uijtRXe3Sl.9A8Cks` &lt;dbl&gt;,
+#   `0pf.QRwb4sWsn7jQKQ` &lt;dbl&gt;, `9qaJ6tLVs.P_f4ginU` &lt;dbl&gt;,
+#   ZFcKnq6e3QoRPgxvuE &lt;dbl&gt;, `3WpTVHJJ.pdTPndP0I` &lt;dbl&gt;,
+#   Q0VkeLQSHiZtSl4Sd4 &lt;dbl&gt;, `63Oiusg8JTF.19NHfo` &lt;dbl&gt;,
+#   Nonl3upr2ojFAogAsU &lt;dbl&gt;, NXMJ5W6SG.FdzRIX9E &lt;dbl&gt;,
+#   ESI0LuiXXiImyJI07g &lt;dbl&gt;, BGm6KH.W4lIY56KKz0 &lt;dbl&gt;,
+#   xSJnoVcuLvQDT7VX7o &lt;dbl&gt;, KlBdd0SXezd5KUx69Q &lt;dbl&gt;,
+#   oe5.ueJNeqBW0uufeg &lt;dbl&gt;, `3Vz4fWrCqLQ_PFSSRI` &lt;dbl&gt;,
+#   frS7Up6BAmUuB3h7OI &lt;dbl&gt;, Qq3xIFN6fT336H4154 &lt;dbl&gt;,
+#   cnvl0IALn.3U6OKchU &lt;dbl&gt;, rknSUUdLn3e5KJS148 &lt;dbl&gt;,
+#   lldNIQXQNde_jgnE0k &lt;dbl&gt;, HpR9XdAhwVIKgwju3U &lt;dbl&gt;,
+#   QukxEiSW7kgU4wVQOo &lt;dbl&gt;, `6IrsRJZWoJg50YvTRQ` &lt;dbl&gt;,
+#   cWeufQ01JXsb9L_j8k &lt;dbl&gt;, ulXud57eilG6O9OI5M &lt;dbl&gt;,
+#   QJUo3p.lIr5BO_IgVo &lt;dbl&gt;, WuCFSiISI5gUVAEZEU &lt;dbl&gt;,
+#   iFJN0mUncUvdv_pSKQ &lt;dbl&gt;, fiuenn78T3Xeqdxd1E &lt;dbl&gt;,
+#   TtEeFJI3qOX6IoT14U &lt;dbl&gt;, TVXfennQpiNwn33B14 &lt;dbl&gt;,
+#   KuSfYpUS3mF9_.ojiA &lt;dbl&gt;, cVQq9dO7.RQBRVLl4g &lt;dbl&gt;,
+#   `61RbnpngeHtZ5QqC4Q` &lt;dbl&gt;, Nu.SkSgsSS4qgOELUk &lt;dbl&gt;,
+#   `0aSV4IHnEDV6Ff8fzo` &lt;dbl&gt;, `95wFeFd5qnl5an0XVU` &lt;dbl&gt;,
+#   lHLVWt1Y9UHi7z_RHk &lt;dbl&gt;, `0r_C6LdOF3SDCu0XV4` &lt;dbl&gt;,
+#   rREnB5QDE_FssnvQdc &lt;dbl&gt;, rIh7pCCJ4OC_pSGefU &lt;dbl&gt;,
+#   Tv67vVkBVf7nuqesnQ &lt;dbl&gt;, KW2iFI4XvI6ctezB2E &lt;dbl&gt;,
+#   `9NEiTSJaChckMRK3lY` &lt;dbl&gt;, ruOh7lavetOhCqSukg &lt;dbl&gt;,
+#   rjoe5Wr3rToQqkrpIg &lt;dbl&gt;, ZE7Ep0K55I4r5raU0c &lt;dbl&gt;,
+#   ETpapxdaO1Ud9AlCOs &lt;dbl&gt;, fYsRHPeGkhevPuOCYo &lt;dbl&gt;,
+#   WorcjmvtHgrqiD.Juo &lt;dbl&gt;, cXorcjmvtHgrqiD.Js &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>pca_clust &lt;- PCA(df_pca_clust[,c(7:39474)], graph = FALSE)
+head(get_eig(pca_clust))</code></pre>
+<pre><code>      eigenvalue variance.percent cumulative.variance.percent
+Dim.1  4362.4687        11.053179                    11.05318
+Dim.2  1979.9550         5.016608                    16.06979
+Dim.3  1837.4059         4.655432                    20.72522
+Dim.4  1348.3194         3.416234                    24.14145
+Dim.5  1122.6519         2.844461                    26.98591
+Dim.6   933.7521         2.365846                    29.35176</code></pre>
+<pre class="r"><code>fviz_eig(pca_clust)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mypal &lt;- pal_igv(&quot;default&quot;, alpha = 1)(23)
+
+pca3 &lt;- fviz_pca_ind(pca_clust,
+             label = &quot;none&quot;, # hide individual labels
+             habillage = &quot;none&quot;,
+             col.ind = df_pca_clust$adj_cluster,
+             palette = mypal,
+             geom.ind = &quot;point&quot;,
+             invisible = &quot;quali&quot;,
+             pointshape = 19, 
+             addEllipses = TRUE,
+             title = &quot;PCA of normalized expression&quot;
+) +
+  labs(subtitle = &quot;By treatment-level cluster&quot;)
+print(pca3)</code></pre>
+<p><img src="figure/clustering.Rmd/unnamed-chunk-21-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="remake-expression-set-for-export" class="section level2">
+<h2>Remake expression set for export</h2>
+<pre class="r"><code># add cluster information to phenodata
+pheno_data_3 &lt;- pheno_data %&gt;%
+  rownames_to_column(var = &quot;rawID&quot;) %&gt;%
+  as_tibble() %&gt;%
+  left_join(pheno_tbl_clust)</code></pre>
+<pre><code>Joining, by = c(&quot;rawID&quot;, &quot;treatment&quot;)</code></pre>
+<pre><code>Warning: Column `treatment` joining factors with different levels, coercing
+to character vector</code></pre>
+<pre class="r"><code># add back rownames to phenodata
+mac_pData &lt;- pheno_data_3 %&gt;%
+  as.data.frame() %&gt;%
+  column_to_rownames(var = &quot;rawID&quot;)
+
+# create a frame for annotation of column names in metadata
+# will be empty for now
+varnames &lt;- colnames(mac_pData)
+vardata &lt;- data.frame(labelDescription = varnames, 
+                      row.names = varnames)
+
+# rebuild AnnotatedDataFrame
+mac_phenoData_3 &lt;- new(&quot;AnnotatedDataFrame&quot;,
+                       data = mac_pData, 
+                       varMetadata = vardata)
+
+# retreive expression data matrix
+mac_exprs_3 &lt;- exprs(mac_eset)
+
+# create expression set
+mac_eset_3 &lt;- ExpressionSet(assayData = mac_exprs_3,
+                            phenoData = mac_phenoData_3,
+                            annotation = &quot;Illumina Human HT-12 v3.0 beadchip&quot;)
+
+# check properties
+featureNames(mac_eset_3)[1:5]</code></pre>
+<pre><code>[1] &quot;Ku8QhfS0n_hIOABXuE&quot; &quot;fqPEquJRRlSVSfL.8A&quot; &quot;ckiehnugOno9d7vf1Q&quot;
+[4] &quot;x57Vw5B5Fbt5JUnQkI&quot; &quot;ritxUH.kuHlYqjozpE&quot;</code></pre>
+<pre class="r"><code>sampleNames(mac_eset_3)[1:5]</code></pre>
+<pre><code>[1] &quot;4487653414_E&quot; &quot;4487653415_E&quot; &quot;4487653415_G&quot; &quot;4487653415_H&quot;
+[5] &quot;4676163025_B&quot;</code></pre>
+<pre class="r"><code>varLabels(mac_eset_3)</code></pre>
+<pre><code> [1] &quot;geo_id&quot;                      &quot;treatment&quot;                  
+ [3] &quot;clusternum&quot;                  &quot;cell_type&quot;                  
+ [5] &quot;geo_accession&quot;               &quot;status&quot;                     
+ [7] &quot;submission_date&quot;             &quot;last_update_date&quot;           
+ [9] &quot;type&quot;                        &quot;channel_count&quot;              
+[11] &quot;source_name_ch1&quot;             &quot;organism_ch1&quot;               
+[13] &quot;characteristics_ch1&quot;         &quot;characteristics_ch1.1&quot;      
+[15] &quot;characteristics_ch1.2&quot;       &quot;characteristics_ch1.3&quot;      
+[17] &quot;molecule_ch1&quot;                &quot;extract_protocol_ch1&quot;       
+[19] &quot;label_ch1&quot;                   &quot;label_protocol_ch1&quot;         
+[21] &quot;taxid_ch1&quot;                   &quot;hyb_protocol&quot;               
+[23] &quot;scan_protocol&quot;               &quot;description&quot;                
+[25] &quot;data_processing&quot;             &quot;platform_id&quot;                
+[27] &quot;contact_name&quot;                &quot;contact_email&quot;              
+[29] &quot;contact_department&quot;          &quot;contact_institute&quot;          
+[31] &quot;contact_address&quot;             &quot;contact_city&quot;               
+[33] &quot;contact_state&quot;               &quot;contact_zip/postal_code&quot;    
+[35] &quot;contact_country&quot;             &quot;supplementary_file&quot;         
+[37] &quot;data_row_count&quot;              &quot;activation stimuli:ch1&quot;     
+[39] &quot;donor:ch1&quot;                   &quot;initial differentiation:ch1&quot;
+[41] &quot;time:ch1&quot;                    &quot;sample_cluster&quot;             
+[43] &quot;orig_cluster&quot;                &quot;treatment_cluster&quot;          
+[45] &quot;adj_cluster&quot;                </code></pre>
+<pre class="r"><code>mat &lt;- exprs(mac_eset_3)
+dim(mat)</code></pre>
+<pre><code>[1] 47462   111</code></pre>
+<pre class="r"><code>mat[1:5, 1:5]</code></pre>
+<pre><code>                   4487653414_E 4487653415_E 4487653415_G 4487653415_H
+Ku8QhfS0n_hIOABXuE     5.927150     5.811502     6.056031     6.234910
+fqPEquJRRlSVSfL.8A     6.329524     6.141837     6.119038     6.390689
+ckiehnugOno9d7vf1Q     6.314675     6.100132     6.295151     6.000457
+x57Vw5B5Fbt5JUnQkI     5.855040     6.135511     5.902838     5.980478
+ritxUH.kuHlYqjozpE     6.312922     6.152733     5.910791     6.340384
+                   4676163025_B
+Ku8QhfS0n_hIOABXuE     6.080220
+fqPEquJRRlSVSfL.8A     6.017910
+ckiehnugOno9d7vf1Q     6.711265
+x57Vw5B5Fbt5JUnQkI     6.107331
+ritxUH.kuHlYqjozpE     5.980075</code></pre>
+<pre class="r"><code># save expression set
+saveRDS(mac_eset_3, &quot;~/tcga_macs/output/mac_eset_w_clusters.rds&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -2277,7 +2991,6 @@ loaded via a namespace (and not attached):
 [141] bit_1.1-14               stringi_1.4.3           
 [143] HDF5Array_1.10.1         blob_1.1.1              
 [145] latticeExtra_0.6-28      memoise_1.1.0           </code></pre>
-</div>
 </div>
 </div>
 
