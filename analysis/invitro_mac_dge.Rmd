@@ -25,15 +25,16 @@ library("factoextra")
 library("FactoMineR")
 library("ggsci")
 library("ggpubr")
+library("EnhancedVolcano")
 ```
 
 ## Read data
 ```{r read data}
-# Expression set created in PCA_MCA notebook 
+# Expression set created in clustering.rmd notebook 
 # Contains normalized expression matrix made from raw illumina beadchip data
-# Also contains metadata from GEO
+# Also contains metadata from GEO, treatment assignment, and cluster assignments
 # Probe ID is unique sequence ID from lumiHumanIDMapping
-mac_eset <- readRDS("~/tcga_macs/output/expression_set.rds")
+mac_eset <- readRDS("~/tcga_macs/output/mac_eset_w_clusters.rds")
 
 # Expression set created by lumi
 # Contains raw reads from illumina beadchip
@@ -48,9 +49,19 @@ lumi_46903 <- readRDS("~/tcga_macs/output/normalized_probe_intensities.Rds")
 # retreive normalized data
 dataMatrix <- exprs(mac_eset)
 
+# tidy data
+edata_tbl <- dataMatrix %>% 
+  as.data.frame() %>%
+  rownames_to_column(var = "probeID") %>%
+  as_tibble() %>%
+  gather(key = "sampleID", value = "intensity", -probeID) %>%
+  group_by(sampleID)
+
 # find "valley" in density plot for low value filtering
-density(mac_eset)
-abline(v = 5, col = "blue")
+dplot <- ggplot(edata_tbl, aes(intensity, color = sampleID)) +
+  geom_density() + 
+  theme(legend.position = "none") +
+  geom_vline(xintercept = 5)
 
 # remove the probes without at least expression value 5 in at least 3 samples 
 dataMatrix <- as.data.frame(dataMatrix)
@@ -73,66 +84,27 @@ probeList <- rownames(selDataMatrix)
 pheno_data <- pData(mac_eset)
 str(pheno_data)
 
-# OK if rownames are dropped, column is duplicated as "raw_id"
-pheno_data <- pheno_data %>%
-  as_tibble() %>%
-# clean up experimental group data
-  mutate(treatment = str_sub(cell_type, 9, 25),
-         treatment = str_replace(treatment, "_72h", ""),
-         treatment = ifelse(`activation stimuli:ch1` == "con", "control", treatment),
-         treatment = trimws(treatment)) %>%
-  dplyr::select(raw_id, geo_id, treatment, everything()) %>%
-  print()
-
-# assign treatments into clusters from Xue et al PMID: 24530056
-pheno_data <- pheno_data %>%
+# create table with groups as factors
+pheno_tbl <- pheno_data %>%
+  rownames_to_column(var = "rawID") %>%
+  dplyr::select(rawID, treatment, adj_cluster, treatment_cluster, sample_cluster, orig_cluster) %>%
   mutate(treatment = as.factor(treatment),
-         clusternum = fct_recode(treatment,
-                                 "0" = "control",
-                                 "1" = "IFNb",
-                                 "1" = "IL10",
-                                 "1" = "GC",
-                                 "2" = "IL4",
-                                 "2" = "L4",
-                                 "2" = "IL13",
-                                 "2" = "IL4_upLPS",
-                                 "2" = "L4_upLPS",
-                                 "3" = "upLPS_IC",
-                                 "3" = "upLPS",
-                                 "3" = "pLPS",
-                                 "4" = "P3C_PGE2",
-                                 "4" = "P3C",
-                                 "4" = "PGE2",
-                                 "6" = "IFNg",
-                                 "6" = "TNFa",
-                                 "6" = "IFNg_TNFa",
-                                 "7" = "sLPS",
-                                 "7" = "sLPS_IFNg",
-                                 "7" = "sLPS_IC",
-                                 "8" = "TNFa_PGE2",
-                                 "8" = "TNFa_P3C",
-                                 "9" = "TPP",
-                                 "9" = "TPP_IFNb",
-                                 "9" = "TPP_IFNb_IFNg"),
-         treatment = fct_recode(treatment, 
-                                "IL4_upLPS" = "L4_upLPS",
-                                "upLPS" = "pLPS",
-                                "IL4" = "L4")) %>%
-  dplyr::select(raw_id, geo_id, treatment, clusternum, everything()) %>%
+         adj_cluster = as.factor(adj_cluster)) %>%
   print()
 
-summary(pheno_data$treatment)
-summary(pheno_data$clusternum)
+# Review cluster and treatment assignments
+summary(pheno_tbl$treatment)
+summary(pheno_tbl$adj_cluster)
 ```
 
-## Limma
+## DGE by treatment 
 
 Design matrix and contrast matrix for individual treatments
 
 ```{r}
 # set up design matrix
-rnames <- pheno_data$raw_id
-groups <- as.factor(pheno_data$treatment)
+rnames <- pheno_tbl$rawID
+groups <- as.factor(pheno_tbl$treatment)
 design <- model.matrix(~ 0 + groups)
 colnames(design) <- gsub("groups", "", colnames(design))
 rownames(design) <- rnames
@@ -187,163 +159,162 @@ results <- decideTests(fit2)
 # collect results
 table_GC        <- topTable(fit2, coef = 1, 
                             adjust.method = "BH", 
-                            number = 500)
+                            sort.by = "none",
+                            number = Inf)
 table_IFNb      <- topTable(fit2, 
                             coef = 2, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_IFNg      <- topTable(fit2, 
                             coef = 3, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_IFNg_TNFa <- topTable(fit2, 
                             coef = 4, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_IL10      <- topTable(fit2, 
                             coef = 5, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_IL13      <- topTable(fit2, 
                             coef = 6, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_IL4       <- topTable(fit2, 
                             coef = 7, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_IL4_upLPS <- topTable(fit2, 
                             coef = 8, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_P3C       <- topTable(fit2, 
                             coef = 9, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_P3C_PGE2  <- topTable(fit2, 
                             coef = 10, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_PGE2      <- topTable(fit2, 
                             coef = 11, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_upLPS     <- topTable(fit2, 
                             coef = 12, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_sLPS      <- topTable(fit2, 
                             coef = 13, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_sLPS_IC   <- topTable(fit2, 
                             coef = 14, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_sLPS_IFNg <- topTable(fit2, 
                             coef = 15, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_TNFa      <- topTable(fit2, 
                             coef = 16, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_TNFa_P3C  <- topTable(fit2, 
                             coef = 17, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_TNFa_PGE2 <- topTable(fit2, 
                             coef = 18, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_TPP       <- topTable(fit2, 
                             coef = 19, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_TPP_IFNb  <- topTable(fit2, 
                             coef = 20, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_TPP_IFNb_IFNg <- topTable(fit2, 
                                 coef = 21, 
-                                adjust.method = "BH",
-                                number = 500)
+                                adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 table_upLPS_IC  <- topTable(fit2, 
                             coef = 22, 
-                            adjust.method = "BH",
-                            number = 500)
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
 ```
 
 Collecting results
 ```{r}
-# take only significantly differentially expressed genes
 # using FDR-corrected P-values
 # pull out t value and gene symbol
 subtable_GC <- table_GC %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, GC = t)
 subtable_IFNb <- table_IFNb %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IFNb = t)
 subtable_IFNg <- table_IFNg %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IFNg = t)
 subtable_IFNg_TNFa <- table_IFNg_TNFa %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IFNg_TNFa = t)
 subtable_IL10 <- table_IL10 %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IL10 = t)
 subtable_IL13 <- table_IL13 %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IL13 = t)
 subtable_IL4 <- table_IL4 %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IL4 = t)
 subtable_IL4_upLPS <- table_IL4_upLPS %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, IL4_upLPS = t)
 subtable_P3C <- table_P3C %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, P3C = t)
 subtable_P3C_PGE2 <- table_P3C_PGE2 %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, P3C_PGE2 = t)
 subtable_PGE2 <- table_PGE2 %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, PGE2 = t)
 subtable_upLPS <- table_upLPS %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, upLPS = t)
 subtable_sLPS <- table_sLPS %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, sLPS = t)
 subtable_sLPS_IC <- table_sLPS_IC %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, sLPS_IC = t)
 subtable_sLPS_IFNg <- table_sLPS_IFNg %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, sLPS_IFNg = t)
 subtable_TNFa <- table_TNFa %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, TNFa = t)
 subtable_TNFa_P3C <- table_TNFa_P3C %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, TNFa_P3C = t)
 subtable_TNFa_PGE2 <- table_TNFa_PGE2 %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, TNFa_PGE2 = t)
 subtable_TPP <- table_TPP %>% 
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, TPP = t)
 subtable_TPP_IFNb <- table_TPP_IFNb %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, TPP_IFNb = t)
 subtable_TPP_IFNb_IFNg <- table_TPP_IFNb_IFNg %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, TPP_IFNb_IFNg = t)
 subtable_upLPS_IC <- table_upLPS_IC %>%
-  filter(adj.P.Val < 0.05) %>%
   dplyr::select(ID, geneSymbol, upLPS = t)
 
 # get  of all the probe symbols in all the lists
@@ -406,3 +377,444 @@ dge_frame <- enframe(unique_ids) %>%
 
 ```
  
+Collecting results, averaged by gene name
+```{r}
+# using FDR-corrected P-values
+# pull out t value and gene symbol
+subtable_GC <- table_GC %>%
+  dplyr::select(ID, geneSymbol, GC = t)
+subtable_IFNb <- table_IFNb %>%
+  dplyr::select(ID, geneSymbol, IFNb = t)
+subtable_IFNg <- table_IFNg %>%
+  dplyr::select(ID, geneSymbol, IFNg = t)
+subtable_IFNg_TNFa <- table_IFNg_TNFa %>%
+  dplyr::select(ID, geneSymbol, IFNg_TNFa = t)
+subtable_IL10 <- table_IL10 %>%
+  dplyr::select(ID, geneSymbol, IL10 = t)
+subtable_IL13 <- table_IL13 %>%
+  dplyr::select(ID, geneSymbol, IL13 = t)
+subtable_IL4 <- table_IL4 %>%
+  dplyr::select(ID, geneSymbol, IL4 = t)
+subtable_IL4_upLPS <- table_IL4_upLPS %>%
+  dplyr::select(ID, geneSymbol, IL4_upLPS = t)
+subtable_P3C <- table_P3C %>%
+  dplyr::select(ID, geneSymbol, P3C = t)
+subtable_P3C_PGE2 <- table_P3C_PGE2 %>%
+  dplyr::select(ID, geneSymbol, P3C_PGE2 = t)
+subtable_PGE2 <- table_PGE2 %>%
+  dplyr::select(ID, geneSymbol, PGE2 = t)
+subtable_upLPS <- table_upLPS %>%
+  dplyr::select(ID, geneSymbol, upLPS = t)
+subtable_sLPS <- table_sLPS %>%
+  dplyr::select(ID, geneSymbol, sLPS = t)
+subtable_sLPS_IC <- table_sLPS_IC %>%
+  dplyr::select(ID, geneSymbol, sLPS_IC = t)
+subtable_sLPS_IFNg <- table_sLPS_IFNg %>%
+  dplyr::select(ID, geneSymbol, sLPS_IFNg = t)
+subtable_TNFa <- table_TNFa %>%
+  dplyr::select(ID, geneSymbol, TNFa = t)
+subtable_TNFa_P3C <- table_TNFa_P3C %>%
+  dplyr::select(ID, geneSymbol, TNFa_P3C = t)
+subtable_TNFa_PGE2 <- table_TNFa_PGE2 %>%
+  dplyr::select(ID, geneSymbol, TNFa_PGE2 = t)
+subtable_TPP <- table_TPP %>% 
+  dplyr::select(ID, geneSymbol, TPP = t)
+subtable_TPP_IFNb <- table_TPP_IFNb %>%
+  dplyr::select(ID, geneSymbol, TPP_IFNb = t)
+subtable_TPP_IFNb_IFNg <- table_TPP_IFNb_IFNg %>%
+  dplyr::select(ID, geneSymbol, TPP_IFNb_IFNg = t)
+subtable_upLPS_IC <- table_upLPS_IC %>%
+  dplyr::select(ID, geneSymbol, upLPS = t)
+
+# get  of all the probe symbols in all the lists
+GC        <- pull(subtable_GC, ID) 
+IFNb      <- pull(subtable_IFNb, ID)
+IFNg      <- pull(subtable_IFNg, ID)
+IFNg_TNFa <- pull(subtable_IFNg_TNFa, ID)
+IL10      <- pull(subtable_IL10, ID)
+IL13      <- pull(subtable_IL13, ID)
+IL4       <- pull(subtable_IL4, ID)
+IL4_upLPS <- pull(subtable_IL4_upLPS, ID)
+P3C       <- pull(subtable_P3C, ID)
+P3C_PGE2  <- pull(subtable_P3C_PGE2, ID)
+PGE2      <- pull(subtable_PGE2, ID)
+upLPS     <- pull(subtable_upLPS, ID)
+sLPS      <- pull(subtable_sLPS, ID)
+sLPS_IC   <- pull(subtable_sLPS_IC, ID)
+sLPS_IFNg <- pull(subtable_sLPS_IFNg, ID)
+TNFa      <- pull(subtable_TNFa, ID)
+TNFa_P3C  <- pull(subtable_TNFa_P3C, ID)
+TNFa_PGE2 <- pull(subtable_TNFa_PGE2, ID)
+TPP       <- pull(subtable_TPP, ID)
+TPP_IFNb  <- pull(subtable_TPP_IFNb, ID)
+TPP_IFNbg <- pull(subtable_TPP_IFNb_IFNg, ID)
+upLPS_IC  <- pull(subtable_upLPS_IC, ID)
+
+unique_ids <- unique(c(GC, IFNb, IFNg, IFNg_TNFa, IL10, IL13, IL4, IL4_upLPS, P3C, P3C_PGE2, PGE2, upLPS, sLPS, sLPS_IC, sLPS_IFNg, TNFa, TNFa_P3C, TNFa_PGE2, TPP, TPP_IFNb, TPP_IFNbg, upLPS_IC))
+
+# get gene symbols for each of the unique probe IDs
+unique_ids_geneSymbol <- getSYMBOL(unique_ids, 'lumiHumanAll.db') %>%
+  enframe() %>%
+  dplyr::rename(ID = name, geneSymbol = value)
+
+# make table of differential gene expression t values
+dge_frame <- enframe(unique_ids) %>%
+  dplyr::rename(ID = value) %>%
+  left_join(unique_ids_geneSymbol, by = "ID") %>%
+  left_join(subtable_GC, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IFNb, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IFNg, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IFNg_TNFa, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL10, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL13, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL4, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_IL4_upLPS, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_P3C, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_P3C_PGE2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_PGE2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_upLPS, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_sLPS, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_sLPS_IC, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_sLPS_IFNg, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TNFa, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TNFa_P3C, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TNFa_PGE2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TPP, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TPP_IFNb, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_TPP_IFNb_IFNg, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_upLPS_IC, by = c("ID", "geneSymbol"))
+
+```
+
+## DGE by cluster
+
+#### DGE by probe
+
+Design matrix and contrast matrix for KM clusters
+
+```{r}
+# rename factors to be syntactically valid names
+pheno_table <- pheno_tbl %>%
+  mutate(adj_cluster = paste0("cluster_", adj_cluster))
+
+# set up design matrix
+rnames <- pheno_table$rawID
+groups <- as.factor(pheno_table$adj_cluster)
+design <- model.matrix(~ 0 + groups)
+colnames(design) <- gsub("groups", "", colnames(design))
+rownames(design) <- rnames
+design[1:5, 1:5]
+
+# define contrasts
+contr.matrix <- makeContrasts(cluster_1 - cluster_0,
+                              cluster_2 - cluster_0,
+                              cluster_3 - cluster_0,
+                              cluster_4 - cluster_0,
+                              cluster_5 - cluster_0,
+                              cluster_6 - cluster_0,
+                              cluster_7 - cluster_0,
+                              levels = design)
+contr.matrix[1:5, 1:5]
+```
+
+Fit linear models with limma
+```{r}
+# fit linear models
+fit <- lmFit(selDataMatrix, design)
+fit2 <- contrasts.fit(fit, contr.matrix)
+fit2 <- eBayes(fit2)
+
+# add gene names
+geneSymbol <- getSYMBOL(probeList, 'lumiHumanAll.db')
+geneName <- sapply(lookUp(probeList, 'lumiHumanAll.db', 'GENENAME'),
+                   function(x) x[1])
+fit2$genes <- data.frame(ID = probeList, 
+                         geneSymbol = geneSymbol, 
+                         geneName = geneName, 
+                         stringsAsFactors = FALSE)
+
+# store matrix of significant results
+results <- decideTests(fit2)
+
+# collect results
+table_c1       <- topTable(fit2, coef = 1, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c2      <- topTable(fit2, 
+                            coef = 2, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c3      <- topTable(fit2, 
+                            coef = 3, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c4 <- topTable(fit2, 
+                            coef = 4, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c5      <- topTable(fit2, 
+                            coef = 5, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c6      <- topTable(fit2, 
+                            coef = 6, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c7       <- topTable(fit2, 
+                            coef = 7, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+```
+
+Collecting results
+```{r}
+# using FDR-corrected P-values
+# pull out t value and gene symbol
+subtable_c1 <- table_c1 %>%
+  dplyr::select(ID, geneSymbol, c1 = t)
+subtable_c2 <- table_c2 %>%
+  dplyr::select(ID, geneSymbol, c2 = t)
+subtable_c3 <- table_c3 %>%
+  dplyr::select(ID, geneSymbol, c3 = t)
+subtable_c4 <- table_c4 %>%
+  dplyr::select(ID, geneSymbol, c4 = t)
+subtable_c5 <- table_c5 %>%
+  dplyr::select(ID, geneSymbol, c5 = t)
+subtable_c6 <- table_c6 %>%
+  dplyr::select(ID, geneSymbol, c6 = t)
+subtable_c7 <- table_c7 %>%
+  dplyr::select(ID, geneSymbol, c7 = t)
+
+# get  of all the probe symbols in all the lists
+c1        <- pull(subtable_c1, ID) 
+c2        <- pull(subtable_c2, ID)
+c3        <- pull(subtable_c3, ID)
+c4        <- pull(subtable_c4, ID)
+c5        <- pull(subtable_c5, ID)
+c6        <- pull(subtable_c6, ID)
+c7        <- pull(subtable_c7, ID)
+
+unique_ids <- unique(c(c1, c2, c3, c4, c5, c6, c7))
+
+# get gene symbols for each of the unique probe IDs
+unique_ids_geneSymbol <- getSYMBOL(unique_ids, 'lumiHumanAll.db') %>%
+  enframe() %>%
+  dplyr::rename(ID = name, geneSymbol = value)
+
+# make table of differential gene expression t values
+dge_frame <- enframe(unique_ids) %>%
+  dplyr::rename(ID = value) %>%
+  left_join(unique_ids_geneSymbol, by = "ID") %>%
+  left_join(subtable_c1, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_c2, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_c3, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_c4, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_c5, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_c6, by = c("ID", "geneSymbol")) %>%
+  left_join(subtable_c7, by = c("ID", "geneSymbol"))
+
+```
+
+
+
+#### DGE by gene
+
+Design matrix and contrast matrix for KM clusters
+
+```{r}
+# rename factors to be syntactically valid names
+pheno_table <- pheno_tbl %>%
+  mutate(adj_cluster = paste0("cluster_", adj_cluster))
+
+# set up design matrix
+rnames <- pheno_table$rawID
+groups <- as.factor(pheno_table$adj_cluster)
+design <- model.matrix(~ 0 + groups)
+colnames(design) <- gsub("groups", "", colnames(design))
+rownames(design) <- rnames
+design[1:5, 1:5]
+
+# define contrasts
+contr.matrix <- makeContrasts(cluster_1 - cluster_0,
+                              cluster_2 - cluster_0,
+                              cluster_3 - cluster_0,
+                              cluster_4 - cluster_0,
+                              cluster_5 - cluster_0,
+                              cluster_6 - cluster_0,
+                              cluster_7 - cluster_0,
+                              levels = design)
+contr.matrix[1:5, 1:5]
+```
+
+Convert probe names to gene symbols and collapse by gene
+```{r}
+# get gene names
+geneSymbol <- getSYMBOL(probeList, 'lumiHumanAll.db')
+genes <- data.frame(probeID = probeList, 
+                         geneSymbol = geneSymbol, 
+                         geneName = geneName, 
+                         stringsAsFactors = FALSE)
+
+# replace probeIDs with gene symbols
+geneDataMatrix <- selDataMatrix %>%
+  rownames_to_column(var = "probeID") %>%
+  left_join(genes, by = "probeID") %>%
+  dplyr::select(geneSymbol, everything()) %>%
+  dplyr::select(-probeID, -geneName) %>%
+  drop_na(geneSymbol)
+
+# convert to matrix with gene symbols as rownames
+rnames <- geneDataMatrix %>% pull(geneSymbol)
+geneDataMat <- geneDataMatrix %>%
+  dplyr::select(-geneSymbol) %>%
+  as.matrix()
+rownames(geneDataMat) <- rnames
+geneDataMat[1:5, 1:5]
+
+# average the expression data among gene symbol replicates
+aveDataMatrix <- avereps(geneDataMat, ID = rownames(geneDataMat))
+aveDataMatrix[1:5, 1:5]
+```
+
+Fit linear models with limma (by gene symbol)
+```{r}
+# fit linear models
+fit <- lmFit(aveDataMatrix, design)
+fit2 <- contrasts.fit(fit, contr.matrix)
+fit2 <- eBayes(fit2)
+
+# store matrix of significant results
+results <- decideTests(fit2)
+
+# collect results
+table_c1       <- topTable(fit2, coef = 1, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c2      <- topTable(fit2, 
+                            coef = 2, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c3      <- topTable(fit2, 
+                            coef = 3, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c4 <- topTable(fit2, 
+                            coef = 4, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c5      <- topTable(fit2, 
+                            coef = 5, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c6      <- topTable(fit2, 
+                            coef = 6, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+table_c7       <- topTable(fit2, 
+                            coef = 7, 
+                            adjust.method = "BH", 
+                            sort.by = "none",
+                            number = Inf)
+```
+
+ 
+Collecting results, averaged by gene name
+```{r}
+# pull out t value and gene symbol
+subtable_c1 <- table_c1 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c1 = t)
+subtable_c2 <- table_c2 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c2 = t)
+subtable_c3 <- table_c3 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c3 = t)
+subtable_c4 <- table_c4 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c4 = t)
+subtable_c5 <- table_c5 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c5 = t)
+subtable_c6 <- table_c6 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c6 = t)
+subtable_c7 <- table_c7 %>%
+  rownames_to_column(var = "gene") %>%
+  dplyr::select(gene, c7 = t)
+
+# get  of all the probe symbols in all the lists
+c1      <- pull(subtable_c1, gene) 
+c2      <- pull(subtable_c2, gene)
+c3      <- pull(subtable_c3, gene)
+c4      <- pull(subtable_c4, gene)
+c5      <- pull(subtable_c5, gene)
+c6      <- pull(subtable_c6, gene)
+c7      <- pull(subtable_c7, gene)
+
+unique_ids <- unique(c(c1, c2, c3, c4, c5, c6, c7))
+
+##--------------------------------
+# collect T-values
+
+# initialize table with unique ids
+dge_gene_frame <- enframe(unique_ids) %>% 
+  dplyr::rename(gene = value) %>%
+  dplyr::select(-name)
+  
+# gather additional relevant tables into a list for iteration
+subt_list = mget(ls(pattern = "subtable_c[1-7]"))
+
+# define function
+subleftjoin <- function(df){
+  left_join(dge_gene_frame, df, by = "gene")
+}
+
+# apply function to each table in list
+dge_tval_by_gene <- map(subt_list, subleftjoin)
+```
+
+```{r}
+# gather relevant tables into a list for iteration
+df_list = mget(ls(pattern = "^table_c[1-7]"))
+
+# define function
+# top 50 greatest differentially expressed genes for each cluster
+top50dge <- function(df){
+  df %>%
+  rownames_to_column(var = "gene") %>%
+  top_n(50, logFC) %>%
+  arrange(desc(logFC)) %>%
+  return()
+}
+
+# apply top 50 function to each table in list
+top50_list <- map(df_list, top50dge)
+
+# write each table in the list to a csv
+filenames <- paste0("~/tcga_macs/output/", 
+                    names(top50_list),
+                    ".csv")
+
+map2(top50_list, filenames, write_csv)
+```
+
+#### Volcano plots
+```{r}
+
+
+
+```
