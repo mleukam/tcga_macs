@@ -13,7 +13,7 @@
 
 <meta name="date" content="2019-04-09" />
 
-<title>Differential gene expression: _in vitro_ macrophage model</title>
+<title>Differential gene expression: in vitro macrophage model</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -341,8 +341,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -438,7 +436,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#report"> Report <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -447,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-04-16
+<strong>Last updated:</strong> 2019-06-07
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -457,11 +455,11 @@ div.section {
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.2.0). The <em>Report</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.3.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
-<div id="report" class="tab-pane fade">
+<div id="checks" class="tab-pane fade">
 <div id="workflowr-checks" class="panel-group">
 <div class="panel panel-default">
 <div class="panel-heading">
@@ -526,10 +524,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree907c8c6432543158aa4e20ef73c605ff3003c31btargetblank907c8c6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/907c8c6432543158aa4e20ef73c605ff3003c31b" target="_blank">907c8c6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree7effb485d0c38c7d99ff512ccf0c621d811e5b6dtargetblank7effb48a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/7effb485d0c38c7d99ff512ccf0c621d811e5b6d" target="_blank">7effb48</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree907c8c6432543158aa4e20ef73c605ff3003c31btargetblank907c8c6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree7effb485d0c38c7d99ff512ccf0c621d811e5b6dtargetblank7effb48a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -547,11 +545,29 @@ Ignored files:
     Ignored:    data/GSE46903_non-normalized.txt
     Ignored:    data/GSE46903_nonnormalized copy.tsv
     Ignored:    data/gse_46903.rds
+    Ignored:    output/dge_frame.csv
     Ignored:    output/expression_set.rds
+    Ignored:    output/mac_eset.rds
+    Ignored:    output/mac_eset_w_clusters.rds
     Ignored:    output/normalized_probe_intensities.Rds
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+
+Untracked files:
+    Untracked:  output/PCA_with_km7cluster_labels.pdf
+    Untracked:  output/i
+    Untracked:  output/km_cluster_assignments.csv
+    Untracked:  output/table_c1.csv
+    Untracked:  output/table_c2.csv
+    Untracked:  output/table_c3.csv
+    Untracked:  output/table_c4.csv
+    Untracked:  output/table_c5.csv
+    Untracked:  output/table_c6.csv
+    Untracked:  output/table_c7.csv
+
+Unstaged changes:
+    Modified:   analysis/preprocessing.Rmd
 
 </code></pre>
 <p>
@@ -590,6 +606,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/7effb485d0c38c7d99ff512ccf0c621d811e5b6d/analysis/invitro_mac_dge.Rmd" target="_blank">7effb48</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-07
+</td>
+<td>
+dge by gene and toptable
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e9d2801d6c2c2d168fb1f9e644f3d1afbe1fe1b1/analysis/invitro_mac_dge.Rmd" target="_blank">e9d2801</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-17
+</td>
+<td>
+gitignore update for data files
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/aa889ed012d7e4d2928f4a56ca099ba01b30c26d/docs/invitro_mac_dge.html" target="_blank">aa889ed</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1005,15 +1072,16 @@ library(&quot;annotate&quot;)
 library(&quot;factoextra&quot;)
 library(&quot;FactoMineR&quot;)
 library(&quot;ggsci&quot;)
-library(&quot;ggpubr&quot;)</code></pre>
+library(&quot;ggpubr&quot;)
+library(&quot;EnhancedVolcano&quot;)</code></pre>
 </div>
 <div id="read-data" class="section level2">
 <h2>Read data</h2>
-<pre class="r"><code># Expression set created in PCA_MCA notebook 
+<pre class="r"><code># Expression set created in clustering.rmd notebook 
 # Contains normalized expression matrix made from raw illumina beadchip data
-# Also contains metadata from GEO
+# Also contains metadata from GEO, treatment assignment, and cluster assignments
 # Probe ID is unique sequence ID from lumiHumanIDMapping
-mac_eset &lt;- readRDS(&quot;~/tcga_macs/output/expression_set.rds&quot;)
+mac_eset &lt;- readRDS(&quot;~/tcga_macs/output/mac_eset_w_clusters.rds&quot;)
 
 # Expression set created by lumi
 # Contains raw reads from illumina beadchip
@@ -1026,9 +1094,32 @@ lumi_46903 &lt;- readRDS(&quot;~/tcga_macs/output/normalized_probe_intensities.R
 <pre class="r"><code># retreive normalized data
 dataMatrix &lt;- exprs(mac_eset)
 
-# remove the probes that are not detected in raw data
-presentCount &lt;- detectionCall(lumi_46903)
-selDataMatrix &lt;- dataMatrix[presentCount &gt; 0,]
+# tidy data
+edata_tbl &lt;- dataMatrix %&gt;% 
+  as.data.frame() %&gt;%
+  rownames_to_column(var = &quot;probeID&quot;) %&gt;%
+  as_tibble() %&gt;%
+  gather(key = &quot;sampleID&quot;, value = &quot;intensity&quot;, -probeID) %&gt;%
+  group_by(sampleID)
+
+# find &quot;valley&quot; in density plot for low value filtering
+dplot &lt;- ggplot(edata_tbl, aes(intensity, color = sampleID)) +
+  geom_density() + 
+  theme(legend.position = &quot;none&quot;) +
+  geom_vline(xintercept = 5)
+
+# remove the probes without at least expression value 5 in at least 3 samples 
+dataMatrix &lt;- as.data.frame(dataMatrix)
+mat_stats &lt;- data.frame(total = apply(dataMatrix, 1, function(x) sum(
+      x &gt; 5, na.rm = TRUE)))
+keep = which(mat_stats$total &gt;= 3) 
+
+dim(dataMatrix)</code></pre>
+<pre><code>[1] 47462   111</code></pre>
+<pre class="r"><code>selDataMatrix = dataMatrix[keep,]
+dim(selDataMatrix)</code></pre>
+<pre><code>[1] 47462   111</code></pre>
+<pre class="r"><code># gather list of selected probes
 probeList &lt;- rownames(selDataMatrix)</code></pre>
 </div>
 <div id="define-groups" class="section level2">
@@ -1036,10 +1127,11 @@ probeList &lt;- rownames(selDataMatrix)</code></pre>
 <pre class="r"><code># Get phenotype data from expressionset
 pheno_data &lt;- pData(mac_eset)
 str(pheno_data)</code></pre>
-<pre><code>&#39;data.frame&#39;:   111 obs. of  40 variables:
+<pre><code>&#39;data.frame&#39;:   111 obs. of  45 variables:
  $ geo_id                     : chr  &quot;GSM1140443&quot; &quot;GSM1140444&quot; &quot;GSM1140445&quot; &quot;GSM1140446&quot; ...
+ $ treatment                  : chr  &quot;control&quot; &quot;IL4&quot; &quot;TPP&quot; &quot;IFNg&quot; ...
+ $ clusternum                 : Factor w/ 9 levels &quot;0&quot;,&quot;1&quot;,&quot;6&quot;,&quot;2&quot;,..: 1 4 9 3 7 4 2 7 3 4 ...
  $ cell_type                  : chr  &quot;M0_GMCSF_72h &quot; &quot;M_GMCSF_IL4_72h &quot; &quot;M_GMCSF_TPP_72h &quot; &quot;M_GMCSF_IFNg_72h &quot; ...
- $ raw_id                     : chr  &quot;4487653414_E&quot; &quot;4487653415_E&quot; &quot;4487653415_G&quot; &quot;4487653415_H&quot; ...
  $ geo_accession              : chr  &quot;GSM1140443&quot; &quot;GSM1140444&quot; &quot;GSM1140445&quot; &quot;GSM1140446&quot; ...
  $ status                     : Factor w/ 1 level &quot;Public on Feb 13 2014&quot;: 1 1 1 1 1 1 1 1 1 1 ...
  $ submission_date            : Factor w/ 1 level &quot;May 14 2013&quot;: 1 1 1 1 1 1 1 1 1 1 ...
@@ -1076,128 +1168,264 @@ str(pheno_data)</code></pre>
  $ activation stimuli:ch1     : chr  &quot;con&quot; &quot;IL4&quot; &quot;TNFa+PGE2+P3C&quot; &quot;IFNg&quot; ...
  $ donor:ch1                  : chr  &quot;BC9&quot; &quot;BC9&quot; &quot;BC9&quot; &quot;BC9&quot; ...
  $ initial differentiation:ch1: chr  &quot;GM-CSF&quot; &quot;GM-CSF&quot; &quot;GM-CSF&quot; &quot;GM-CSF&quot; ...
- $ time:ch1                   : chr  &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; ...</code></pre>
-<pre class="r"><code># OK if rownames are dropped, column is duplicated as &quot;raw_id&quot;
-pheno_data &lt;- pheno_data %&gt;%
-  as_tibble() %&gt;%
-# clean up experimental group data
-  mutate(treatment = str_sub(cell_type, 9, 25),
-         treatment = str_replace(treatment, &quot;_72h&quot;, &quot;&quot;),
-         treatment = ifelse(`activation stimuli:ch1` == &quot;con&quot;, &quot;control&quot;, treatment),
-         treatment = trimws(treatment)) %&gt;%
-  dplyr::select(raw_id, geo_id, treatment, everything()) %&gt;%
-  print()</code></pre>
-<pre><code># A tibble: 111 x 41
-   raw_id geo_id treatment cell_type geo_accession status submission_date
-   &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;         &lt;fct&gt;  &lt;fct&gt;          
- 1 44876… GSM11… control   &quot;M0_GMCS… GSM1140443    Publi… May 14 2013    
- 2 44876… GSM11… IL4       &quot;M_GMCSF… GSM1140444    Publi… May 14 2013    
- 3 44876… GSM11… TPP       &quot;M_GMCSF… GSM1140445    Publi… May 14 2013    
- 4 44876… GSM11… IFNg      &quot;M_GMCSF… GSM1140446    Publi… May 14 2013    
- 5 46761… GSM11… sLPS_IC   &quot;M_GMCSF… GSM1140484    Publi… May 14 2013    
- 6 46761… GSM11… IL13      &quot;M_GMCSF… GSM1140485    Publi… May 14 2013    
- 7 46761… GSM11… IL10      &quot;M_GMCSF… GSM1140486    Publi… May 14 2013    
- 8 46761… GSM11… sLPS      &quot;M_GMCSF… GSM1140489    Publi… May 14 2013    
- 9 46761… GSM11… IFNg      &quot;M_GMCSF… GSM1140490    Publi… May 14 2013    
-10 46761… GSM11… IL4       &quot;M_GMCSF… GSM1140492    Publi… May 14 2013    
-# … with 101 more rows, and 34 more variables: last_update_date &lt;fct&gt;,
-#   type &lt;fct&gt;, channel_count &lt;fct&gt;, source_name_ch1 &lt;fct&gt;,
-#   organism_ch1 &lt;fct&gt;, characteristics_ch1 &lt;fct&gt;,
-#   characteristics_ch1.1 &lt;fct&gt;, characteristics_ch1.2 &lt;fct&gt;,
-#   characteristics_ch1.3 &lt;fct&gt;, molecule_ch1 &lt;fct&gt;,
-#   extract_protocol_ch1 &lt;fct&gt;, label_ch1 &lt;fct&gt;, label_protocol_ch1 &lt;fct&gt;,
-#   taxid_ch1 &lt;fct&gt;, hyb_protocol &lt;fct&gt;, scan_protocol &lt;fct&gt;,
-#   description &lt;fct&gt;, data_processing &lt;fct&gt;, platform_id &lt;fct&gt;,
-#   contact_name &lt;fct&gt;, contact_email &lt;fct&gt;, contact_department &lt;fct&gt;,
-#   contact_institute &lt;fct&gt;, contact_address &lt;fct&gt;, contact_city &lt;fct&gt;,
-#   contact_state &lt;fct&gt;, `contact_zip/postal_code` &lt;fct&gt;,
-#   contact_country &lt;fct&gt;, supplementary_file &lt;fct&gt;, data_row_count &lt;fct&gt;,
-#   `activation stimuli:ch1` &lt;chr&gt;, `donor:ch1` &lt;chr&gt;, `initial
-#   differentiation:ch1` &lt;chr&gt;, `time:ch1` &lt;chr&gt;</code></pre>
-<pre class="r"><code># assign treatments into clusters from Xue et al PMID: 24530056
-pheno_data &lt;- pheno_data %&gt;%
+ $ time:ch1                   : chr  &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; ...
+ $ sample_cluster             : Factor w/ 10 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 6 1 8 9 5 7 10 5 9 7 ...
+ $ orig_cluster               : Factor w/ 9 levels &quot;0&quot;,&quot;1&quot;,&quot;6&quot;,&quot;2&quot;,..: 1 4 9 3 7 4 2 7 3 4 ...
+ $ treatment_cluster          : Factor w/ 7 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 6 1 5 2 7 1 6 5 2 1 ...
+ $ adj_cluster                : Factor w/ 8 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 1 2 6 3 8 2 7 6 3 2 ...</code></pre>
+<pre class="r"><code># create table with groups as factors
+pheno_tbl &lt;- pheno_data %&gt;%
+  rownames_to_column(var = &quot;rawID&quot;) %&gt;%
+  dplyr::select(rawID, treatment, adj_cluster, treatment_cluster, sample_cluster, orig_cluster) %&gt;%
   mutate(treatment = as.factor(treatment),
-         clusternum = fct_recode(treatment,
-                                 &quot;0&quot; = &quot;control&quot;,
-                                 &quot;1&quot; = &quot;IFNb&quot;,
-                                 &quot;1&quot; = &quot;IL10&quot;,
-                                 &quot;1&quot; = &quot;GC&quot;,
-                                 &quot;2&quot; = &quot;IL4&quot;,
-                                 &quot;2&quot; = &quot;L4&quot;,
-                                 &quot;2&quot; = &quot;IL13&quot;,
-                                 &quot;2&quot; = &quot;IL4_upLPS&quot;,
-                                 &quot;2&quot; = &quot;L4_upLPS&quot;,
-                                 &quot;3&quot; = &quot;upLPS_IC&quot;,
-                                 &quot;3&quot; = &quot;upLPS&quot;,
-                                 &quot;3&quot; = &quot;pLPS&quot;,
-                                 &quot;4&quot; = &quot;P3C_PGE2&quot;,
-                                 &quot;4&quot; = &quot;P3C&quot;,
-                                 &quot;4&quot; = &quot;PGE2&quot;,
-                                 &quot;6&quot; = &quot;IFNg&quot;,
-                                 &quot;6&quot; = &quot;TNFa&quot;,
-                                 &quot;6&quot; = &quot;IFNg_TNFa&quot;,
-                                 &quot;7&quot; = &quot;sLPS&quot;,
-                                 &quot;7&quot; = &quot;sLPS_IFNg&quot;,
-                                 &quot;7&quot; = &quot;sLPS_IC&quot;,
-                                 &quot;8&quot; = &quot;TNFa_PGE2&quot;,
-                                 &quot;8&quot; = &quot;TNFa_P3C&quot;,
-                                 &quot;9&quot; = &quot;TPP&quot;,
-                                 &quot;9&quot; = &quot;TPP_IFNb&quot;,
-                                 &quot;9&quot; = &quot;TPP_IFNb_IFNg&quot;),
-         treatment = fct_recode(treatment, 
-                                &quot;IL4_upLPS&quot; = &quot;L4_upLPS&quot;,
-                                &quot;upLPS&quot; = &quot;pLPS&quot;,
-                                &quot;IL4&quot; = &quot;L4&quot;)) %&gt;%
-  dplyr::select(raw_id, geo_id, treatment, clusternum, everything()) %&gt;%
+         adj_cluster = as.factor(adj_cluster)) %&gt;%
   print()</code></pre>
-<pre><code># A tibble: 111 x 42
-   raw_id geo_id treatment clusternum cell_type geo_accession status
-   &lt;chr&gt;  &lt;chr&gt;  &lt;fct&gt;     &lt;fct&gt;      &lt;chr&gt;     &lt;chr&gt;         &lt;fct&gt; 
- 1 44876… GSM11… control   0          &quot;M0_GMCS… GSM1140443    Publi…
- 2 44876… GSM11… IL4       2          &quot;M_GMCSF… GSM1140444    Publi…
- 3 44876… GSM11… TPP       9          &quot;M_GMCSF… GSM1140445    Publi…
- 4 44876… GSM11… IFNg      6          &quot;M_GMCSF… GSM1140446    Publi…
- 5 46761… GSM11… sLPS_IC   7          &quot;M_GMCSF… GSM1140484    Publi…
- 6 46761… GSM11… IL13      2          &quot;M_GMCSF… GSM1140485    Publi…
- 7 46761… GSM11… IL10      1          &quot;M_GMCSF… GSM1140486    Publi…
- 8 46761… GSM11… sLPS      7          &quot;M_GMCSF… GSM1140489    Publi…
- 9 46761… GSM11… IFNg      6          &quot;M_GMCSF… GSM1140490    Publi…
-10 46761… GSM11… IL4       2          &quot;M_GMCSF… GSM1140492    Publi…
-# … with 101 more rows, and 35 more variables: submission_date &lt;fct&gt;,
-#   last_update_date &lt;fct&gt;, type &lt;fct&gt;, channel_count &lt;fct&gt;,
-#   source_name_ch1 &lt;fct&gt;, organism_ch1 &lt;fct&gt;, characteristics_ch1 &lt;fct&gt;,
-#   characteristics_ch1.1 &lt;fct&gt;, characteristics_ch1.2 &lt;fct&gt;,
-#   characteristics_ch1.3 &lt;fct&gt;, molecule_ch1 &lt;fct&gt;,
-#   extract_protocol_ch1 &lt;fct&gt;, label_ch1 &lt;fct&gt;, label_protocol_ch1 &lt;fct&gt;,
-#   taxid_ch1 &lt;fct&gt;, hyb_protocol &lt;fct&gt;, scan_protocol &lt;fct&gt;,
-#   description &lt;fct&gt;, data_processing &lt;fct&gt;, platform_id &lt;fct&gt;,
-#   contact_name &lt;fct&gt;, contact_email &lt;fct&gt;, contact_department &lt;fct&gt;,
-#   contact_institute &lt;fct&gt;, contact_address &lt;fct&gt;, contact_city &lt;fct&gt;,
-#   contact_state &lt;fct&gt;, `contact_zip/postal_code` &lt;fct&gt;,
-#   contact_country &lt;fct&gt;, supplementary_file &lt;fct&gt;, data_row_count &lt;fct&gt;,
-#   `activation stimuli:ch1` &lt;chr&gt;, `donor:ch1` &lt;chr&gt;, `initial
-#   differentiation:ch1` &lt;chr&gt;, `time:ch1` &lt;chr&gt;</code></pre>
-<pre class="r"><code>summary(pheno_data$treatment)</code></pre>
+<pre><code>           rawID     treatment adj_cluster treatment_cluster
+1   4487653414_E       control           0                 6
+2   4487653415_E           IL4           1                 1
+3   4487653415_G           TPP           5                 5
+4   4487653415_H          IFNg           2                 2
+5   4676163025_B       sLPS_IC           7                 7
+6   4676163025_C          IL13           1                 1
+7   4676163025_D          IL10           6                 6
+8   4676163025_G          sLPS           5                 5
+9   4676163025_H          IFNg           2                 2
+10  4676163025_J           IL4           1                 1
+11  4676163025_K       sLPS_IC           7                 7
+12  4676163025_L            GC           6                 6
+13  4676163030_A       control           0                 6
+14  4676163030_B           TPP           5                 5
+15  4676163030_C           IL4           1                 1
+16  4676163030_D          IFNg           2                 2
+17  4676163030_E       control           0                 6
+18  4676163030_F           TPP           5                 5
+19  4676163030_G           IL4           1                 1
+20  4676163030_H          IFNg           2                 2
+21  4676163030_I       control           0                 6
+22  4676163030_J           TPP           5                 5
+23  4676163030_K           IL4           1                 1
+24  4676163030_L          IFNg           2                 2
+25  4676163034_B          IFNg           2                 2
+26  4676163034_G           TPP           5                 5
+27  4676163034_H       control           0                 6
+28  4676163034_K           TPP           5                 5
+29  4950679013_A          IL13           1                 1
+30  4950679013_C           IL4           1                 1
+31  4950679013_D          sLPS           5                 5
+32  4950679013_E       control           0                 6
+33  4950679013_F          IL13           1                 1
+34  4950679013_G          IL10           6                 6
+35  4950679013_J            GC           6                 6
+36  4950679045_A          IL10           6                 6
+37  4950679045_B            GC           6                 6
+38  4950679045_C       control           0                 6
+39  4950679045_F       sLPS_IC           7                 7
+40  4950679045_G           IL4           1                 1
+41  4950679045_I           TPP           5                 5
+42  4950679045_K          IFNg           2                 2
+43  4958478013_A         upLPS           4                 4
+44  4958478013_C      upLPS_IC           3                 3
+45  4958478013_D      upLPS_IC           3                 3
+46  4958478013_F      upLPS_IC           3                 3
+47  4958478013_J         upLPS           4                 4
+48  4958478013_L         upLPS           4                 4
+49  4958478033_C          sLPS           5                 5
+50  4958478033_E          sLPS           5                 5
+51  4958478044_B          sLPS           5                 5
+52  4958478044_E          sLPS           5                 5
+53  4958478044_I          sLPS           5                 5
+54  4958478044_L          sLPS           5                 5
+55  4958478053_A          TNFa           2                 2
+56  4958478053_B          TNFa           2                 2
+57  4958478053_F          TNFa           2                 2
+58  5342595001_A     sLPS_IFNg           7                 7
+59  5342595001_C     IFNg_TNFa           2                 2
+60  5342595001_F     IFNg_TNFa           2                 2
+61  5342595020_G     sLPS_IFNg           7                 7
+62  5342595020_I     sLPS_IFNg           7                 7
+63  5342595020_J     IFNg_TNFa           2                 2
+64  5376074023_A           IL4           1                 1
+65  5376074023_C         upLPS           4                 4
+66  5376074023_D     IL4_upLPS           3                 3
+67  5376074023_E     IL4_upLPS           3                 3
+68  5376074023_F           IL4           1                 1
+69  5376074023_G           IL4           1                 1
+70  5376074023_I         upLPS           4                 4
+71  5376074023_K     IL4_upLPS           3                 3
+72  5376074032_A           P3C           4                 4
+73  5376074032_B           TPP           5                 5
+74  5376074032_C      P3C_PGE2           4                 4
+75  5376074032_E      TNFa_P3C           5                 5
+76  5376074032_F      P3C_PGE2           4                 4
+77  5376074032_G      TNFa_P3C           5                 5
+78  5376074032_H          TNFa           2                 2
+79  5376074032_I          TNFa           2                 2
+80  5376074032_J           P3C           4                 4
+81  5376074032_K      TNFa_P3C           5                 5
+82  5376074032_L      P3C_PGE2           4                 4
+83  5376074033_A          PGE2           4                 4
+84  5376074033_B           P3C           4                 4
+85  5376074033_C     TNFa_PGE2           5                 5
+86  5376074033_D          PGE2           4                 4
+87  5376074033_G           TPP           5                 5
+88  5376074033_H     TNFa_PGE2           5                 5
+89  5376074033_I          PGE2           4                 4
+90  5376074033_J           TPP           5                 5
+91  5376074033_K     TNFa_PGE2           5                 5
+92  5376074033_L          TNFa           2                 2
+93  5376074038_C TPP_IFNb_IFNg           7                 7
+94  5376074038_D TPP_IFNb_IFNg           7                 7
+95  5376074038_E          IFNb           3                 3
+96  5376074038_G          IFNb           3                 3
+97  5376074038_H      TPP_IFNb           5                 5
+98  5376074038_I          IFNb           3                 3
+99  5376074038_J      TPP_IFNb           5                 5
+100 5376074038_K TPP_IFNb_IFNg           7                 7
+101 5376074038_L      TPP_IFNb           5                 5
+102 5376074056_A         upLPS           4                 4
+103 5376074056_D         upLPS           4                 4
+104 5376074056_E     IL4_upLPS           3                 3
+105 5376074056_F         upLPS           4                 4
+106 5376074056_G         upLPS           4                 4
+107 5376074056_H     IL4_upLPS           3                 3
+108 5376074056_I           IL4           1                 1
+109 5376074056_J           IL4           1                 1
+110 5376074056_K           IL4           1                 1
+111 5376074056_L     IL4_upLPS           3                 3
+    sample_cluster orig_cluster
+1                6            0
+2                1            2
+3                8            9
+4                9            6
+5                5            7
+6                7            2
+7               10            1
+8                5            7
+9                9            6
+10               7            2
+11               5            7
+12               6            1
+13              10            0
+14               5            9
+15               7            2
+16               9            6
+17               6            0
+18               5            9
+19               7            2
+20               9            6
+21               6            0
+22               5            9
+23               7            2
+24               9            6
+25               9            6
+26               5            9
+27              10            0
+28               8            9
+29               7            2
+30               7            2
+31               5            7
+32              10            0
+33               7            2
+34               6            1
+35               6            1
+36              10            1
+37               6            1
+38              10            0
+39               5            7
+40               7            2
+41               5            9
+42               9            6
+43              10            3
+44               3            3
+45               3            3
+46               3            3
+47               3            3
+48              10            3
+49               8            7
+50               8            7
+51               8            7
+52               8            7
+53               2            7
+54               8            7
+55               9            6
+56               9            6
+57               9            6
+58               5            7
+59               9            6
+60               9            6
+61               8            7
+62               8            7
+63               9            6
+64               1            2
+65               2            3
+66               3            2
+67               4            2
+68               1            2
+69               4            2
+70               2            3
+71               4            2
+72               2            4
+73               8            9
+74               2            4
+75               8            8
+76               3            4
+77               2            8
+78               8            6
+79               8            6
+80               3            4
+81               8            8
+82               2            4
+83               3            4
+84               3            4
+85               8            8
+86               3            4
+87               8            9
+88               8            8
+89               3            4
+90               8            9
+91               8            8
+92               9            6
+93               8            9
+94               8            9
+95               3            1
+96               3            1
+97               8            9
+98               3            1
+99               8            9
+100              8            9
+101              8            9
+102              2            3
+103              2            3
+104              3            2
+105              2            3
+106              2            3
+107              3            2
+108              1            2
+109              4            2
+110              4            2
+111              4            2</code></pre>
+<pre class="r"><code># Review cluster and treatment assignments
+summary(pheno_tbl$treatment)</code></pre>
 <pre><code>      control            GC          IFNb          IFNg     IFNg_TNFa 
             7             3             3             7             3 
          IL10          IL13           IL4     IL4_upLPS           P3C 
             3             3            13             6             3 
-     P3C_PGE2          PGE2         upLPS          sLPS       sLPS_IC 
-            3             3             9             8             3 
-    sLPS_IFNg          TNFa      TNFa_P3C     TNFa_PGE2           TPP 
-            3             6             3             3            10 
-     TPP_IFNb TPP_IFNb_IFNg      upLPS_IC 
-            3             3             3 </code></pre>
-<pre class="r"><code>summary(pheno_data$clusternum)</code></pre>
-<pre><code> 0  1  6  2  4  3  7  8  9 
- 7  9 16 22  9 12 14  6 16 </code></pre>
+     P3C_PGE2          PGE2          sLPS       sLPS_IC     sLPS_IFNg 
+            3             3             8             3             3 
+         TNFa      TNFa_P3C     TNFa_PGE2           TPP      TPP_IFNb 
+            6             3             3            10             3 
+TPP_IFNb_IFNg         upLPS      upLPS_IC 
+            3             9             3 </code></pre>
+<pre class="r"><code>summary(pheno_tbl$adj_cluster)</code></pre>
+<pre><code> 0  1  2  3  4  5  6  7 
+ 7 16 16 12 18 27  6  9 </code></pre>
 </div>
-<div id="limma" class="section level2">
-<h2>Limma</h2>
+<div id="dge-by-treatment" class="section level2">
+<h2>DGE by treatment</h2>
 <p>Design matrix and contrast matrix for individual treatments</p>
 <pre class="r"><code># set up design matrix
-rnames &lt;- pheno_data$raw_id
-groups &lt;- as.factor(pheno_data$treatment)
+rnames &lt;- pheno_tbl$rawID
+groups &lt;- as.factor(pheno_tbl$treatment)
 design &lt;- model.matrix(~ 0 + groups)
 colnames(design) &lt;- gsub(&quot;groups&quot;, &quot;&quot;, colnames(design))
 rownames(design) &lt;- rnames
@@ -1268,160 +1496,159 @@ results &lt;- decideTests(fit2)
 # collect results
 table_GC        &lt;- topTable(fit2, coef = 1, 
                             adjust.method = &quot;BH&quot;, 
-                            number = 500)
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IFNb      &lt;- topTable(fit2, 
                             coef = 2, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IFNg      &lt;- topTable(fit2, 
                             coef = 3, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IFNg_TNFa &lt;- topTable(fit2, 
                             coef = 4, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IL10      &lt;- topTable(fit2, 
                             coef = 5, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IL13      &lt;- topTable(fit2, 
                             coef = 6, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IL4       &lt;- topTable(fit2, 
                             coef = 7, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_IL4_upLPS &lt;- topTable(fit2, 
                             coef = 8, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_P3C       &lt;- topTable(fit2, 
                             coef = 9, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_P3C_PGE2  &lt;- topTable(fit2, 
                             coef = 10, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_PGE2      &lt;- topTable(fit2, 
                             coef = 11, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_upLPS     &lt;- topTable(fit2, 
                             coef = 12, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_sLPS      &lt;- topTable(fit2, 
                             coef = 13, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_sLPS_IC   &lt;- topTable(fit2, 
                             coef = 14, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_sLPS_IFNg &lt;- topTable(fit2, 
                             coef = 15, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_TNFa      &lt;- topTable(fit2, 
                             coef = 16, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_TNFa_P3C  &lt;- topTable(fit2, 
                             coef = 17, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_TNFa_PGE2 &lt;- topTable(fit2, 
                             coef = 18, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_TPP       &lt;- topTable(fit2, 
                             coef = 19, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_TPP_IFNb  &lt;- topTable(fit2, 
                             coef = 20, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_TPP_IFNb_IFNg &lt;- topTable(fit2, 
                                 coef = 21, 
-                                adjust.method = &quot;BH&quot;,
-                                number = 500)
+                                adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
 table_upLPS_IC  &lt;- topTable(fit2, 
                             coef = 22, 
-                            adjust.method = &quot;BH&quot;,
-                            number = 500)</code></pre>
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)</code></pre>
 <p>Collecting results</p>
-<pre class="r"><code># take only significantly differentially expressed genes
-# using FDR-corrected P-values
+<pre class="r"><code># using FDR-corrected P-values
 # pull out t value and gene symbol
 subtable_GC &lt;- table_GC %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, GC = t)
 subtable_IFNb &lt;- table_IFNb %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IFNb = t)
 subtable_IFNg &lt;- table_IFNg %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IFNg = t)
 subtable_IFNg_TNFa &lt;- table_IFNg_TNFa %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IFNg_TNFa = t)
 subtable_IL10 &lt;- table_IL10 %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IL10 = t)
 subtable_IL13 &lt;- table_IL13 %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IL13 = t)
 subtable_IL4 &lt;- table_IL4 %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IL4 = t)
 subtable_IL4_upLPS &lt;- table_IL4_upLPS %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, IL4_upLPS = t)
 subtable_P3C &lt;- table_P3C %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, P3C = t)
 subtable_P3C_PGE2 &lt;- table_P3C_PGE2 %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, P3C_PGE2 = t)
 subtable_PGE2 &lt;- table_PGE2 %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, PGE2 = t)
 subtable_upLPS &lt;- table_upLPS %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, upLPS = t)
 subtable_sLPS &lt;- table_sLPS %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, sLPS = t)
 subtable_sLPS_IC &lt;- table_sLPS_IC %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, sLPS_IC = t)
 subtable_sLPS_IFNg &lt;- table_sLPS_IFNg %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, sLPS_IFNg = t)
 subtable_TNFa &lt;- table_TNFa %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, TNFa = t)
 subtable_TNFa_P3C &lt;- table_TNFa_P3C %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, TNFa_P3C = t)
 subtable_TNFa_PGE2 &lt;- table_TNFa_PGE2 %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, TNFa_PGE2 = t)
 subtable_TPP &lt;- table_TPP %&gt;% 
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, TPP = t)
 subtable_TPP_IFNb &lt;- table_TPP_IFNb %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, TPP_IFNb = t)
 subtable_TPP_IFNb_IFNg &lt;- table_TPP_IFNb_IFNg %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, TPP_IFNb_IFNg = t)
 subtable_upLPS_IC &lt;- table_upLPS_IC %&gt;%
-  filter(adj.P.Val &lt; 0.05) %&gt;%
   dplyr::select(ID, geneSymbol, upLPS = t)
 
 # get  of all the probe symbols in all the lists
@@ -1481,7 +1708,1203 @@ dge_frame &lt;- enframe(unique_ids) %&gt;%
   left_join(subtable_TPP_IFNb, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
   left_join(subtable_TPP_IFNb_IFNg, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
   left_join(subtable_upLPS_IC, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;))</code></pre>
-<br> <br>
+<p>Collecting results, averaged by gene name</p>
+<pre class="r"><code># using FDR-corrected P-values
+# pull out t value and gene symbol
+subtable_GC &lt;- table_GC %&gt;%
+  dplyr::select(ID, geneSymbol, GC = t)
+subtable_IFNb &lt;- table_IFNb %&gt;%
+  dplyr::select(ID, geneSymbol, IFNb = t)
+subtable_IFNg &lt;- table_IFNg %&gt;%
+  dplyr::select(ID, geneSymbol, IFNg = t)
+subtable_IFNg_TNFa &lt;- table_IFNg_TNFa %&gt;%
+  dplyr::select(ID, geneSymbol, IFNg_TNFa = t)
+subtable_IL10 &lt;- table_IL10 %&gt;%
+  dplyr::select(ID, geneSymbol, IL10 = t)
+subtable_IL13 &lt;- table_IL13 %&gt;%
+  dplyr::select(ID, geneSymbol, IL13 = t)
+subtable_IL4 &lt;- table_IL4 %&gt;%
+  dplyr::select(ID, geneSymbol, IL4 = t)
+subtable_IL4_upLPS &lt;- table_IL4_upLPS %&gt;%
+  dplyr::select(ID, geneSymbol, IL4_upLPS = t)
+subtable_P3C &lt;- table_P3C %&gt;%
+  dplyr::select(ID, geneSymbol, P3C = t)
+subtable_P3C_PGE2 &lt;- table_P3C_PGE2 %&gt;%
+  dplyr::select(ID, geneSymbol, P3C_PGE2 = t)
+subtable_PGE2 &lt;- table_PGE2 %&gt;%
+  dplyr::select(ID, geneSymbol, PGE2 = t)
+subtable_upLPS &lt;- table_upLPS %&gt;%
+  dplyr::select(ID, geneSymbol, upLPS = t)
+subtable_sLPS &lt;- table_sLPS %&gt;%
+  dplyr::select(ID, geneSymbol, sLPS = t)
+subtable_sLPS_IC &lt;- table_sLPS_IC %&gt;%
+  dplyr::select(ID, geneSymbol, sLPS_IC = t)
+subtable_sLPS_IFNg &lt;- table_sLPS_IFNg %&gt;%
+  dplyr::select(ID, geneSymbol, sLPS_IFNg = t)
+subtable_TNFa &lt;- table_TNFa %&gt;%
+  dplyr::select(ID, geneSymbol, TNFa = t)
+subtable_TNFa_P3C &lt;- table_TNFa_P3C %&gt;%
+  dplyr::select(ID, geneSymbol, TNFa_P3C = t)
+subtable_TNFa_PGE2 &lt;- table_TNFa_PGE2 %&gt;%
+  dplyr::select(ID, geneSymbol, TNFa_PGE2 = t)
+subtable_TPP &lt;- table_TPP %&gt;% 
+  dplyr::select(ID, geneSymbol, TPP = t)
+subtable_TPP_IFNb &lt;- table_TPP_IFNb %&gt;%
+  dplyr::select(ID, geneSymbol, TPP_IFNb = t)
+subtable_TPP_IFNb_IFNg &lt;- table_TPP_IFNb_IFNg %&gt;%
+  dplyr::select(ID, geneSymbol, TPP_IFNb_IFNg = t)
+subtable_upLPS_IC &lt;- table_upLPS_IC %&gt;%
+  dplyr::select(ID, geneSymbol, upLPS = t)
+
+# get  of all the probe symbols in all the lists
+GC        &lt;- pull(subtable_GC, ID) 
+IFNb      &lt;- pull(subtable_IFNb, ID)
+IFNg      &lt;- pull(subtable_IFNg, ID)
+IFNg_TNFa &lt;- pull(subtable_IFNg_TNFa, ID)
+IL10      &lt;- pull(subtable_IL10, ID)
+IL13      &lt;- pull(subtable_IL13, ID)
+IL4       &lt;- pull(subtable_IL4, ID)
+IL4_upLPS &lt;- pull(subtable_IL4_upLPS, ID)
+P3C       &lt;- pull(subtable_P3C, ID)
+P3C_PGE2  &lt;- pull(subtable_P3C_PGE2, ID)
+PGE2      &lt;- pull(subtable_PGE2, ID)
+upLPS     &lt;- pull(subtable_upLPS, ID)
+sLPS      &lt;- pull(subtable_sLPS, ID)
+sLPS_IC   &lt;- pull(subtable_sLPS_IC, ID)
+sLPS_IFNg &lt;- pull(subtable_sLPS_IFNg, ID)
+TNFa      &lt;- pull(subtable_TNFa, ID)
+TNFa_P3C  &lt;- pull(subtable_TNFa_P3C, ID)
+TNFa_PGE2 &lt;- pull(subtable_TNFa_PGE2, ID)
+TPP       &lt;- pull(subtable_TPP, ID)
+TPP_IFNb  &lt;- pull(subtable_TPP_IFNb, ID)
+TPP_IFNbg &lt;- pull(subtable_TPP_IFNb_IFNg, ID)
+upLPS_IC  &lt;- pull(subtable_upLPS_IC, ID)
+
+unique_ids &lt;- unique(c(GC, IFNb, IFNg, IFNg_TNFa, IL10, IL13, IL4, IL4_upLPS, P3C, P3C_PGE2, PGE2, upLPS, sLPS, sLPS_IC, sLPS_IFNg, TNFa, TNFa_P3C, TNFa_PGE2, TPP, TPP_IFNb, TPP_IFNbg, upLPS_IC))
+
+# get gene symbols for each of the unique probe IDs
+unique_ids_geneSymbol &lt;- getSYMBOL(unique_ids, &#39;lumiHumanAll.db&#39;) %&gt;%
+  enframe() %&gt;%
+  dplyr::rename(ID = name, geneSymbol = value)
+
+# make table of differential gene expression t values
+dge_frame &lt;- enframe(unique_ids) %&gt;%
+  dplyr::rename(ID = value) %&gt;%
+  left_join(unique_ids_geneSymbol, by = &quot;ID&quot;) %&gt;%
+  left_join(subtable_GC, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IFNb, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IFNg, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IFNg_TNFa, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IL10, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IL13, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IL4, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_IL4_upLPS, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_P3C, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_P3C_PGE2, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_PGE2, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_upLPS, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_sLPS, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_sLPS_IC, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_sLPS_IFNg, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_TNFa, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_TNFa_P3C, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_TNFa_PGE2, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_TPP, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_TPP_IFNb, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_TPP_IFNb_IFNg, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_upLPS_IC, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;))</code></pre>
+</div>
+<div id="dge-by-cluster" class="section level2">
+<h2>DGE by cluster</h2>
+<div id="dge-by-probe" class="section level4">
+<h4>DGE by probe</h4>
+<p>Design matrix and contrast matrix for KM clusters</p>
+<pre class="r"><code># rename factors to be syntactically valid names
+pheno_table &lt;- pheno_tbl %&gt;%
+  mutate(adj_cluster = paste0(&quot;cluster_&quot;, adj_cluster))
+
+# set up design matrix
+rnames &lt;- pheno_table$rawID
+groups &lt;- as.factor(pheno_table$adj_cluster)
+design &lt;- model.matrix(~ 0 + groups)
+colnames(design) &lt;- gsub(&quot;groups&quot;, &quot;&quot;, colnames(design))
+rownames(design) &lt;- rnames
+design[1:5, 1:5]</code></pre>
+<pre><code>             cluster_0 cluster_1 cluster_2 cluster_3 cluster_4
+4487653414_E         1         0         0         0         0
+4487653415_E         0         1         0         0         0
+4487653415_G         0         0         0         0         0
+4487653415_H         0         0         1         0         0
+4676163025_B         0         0         0         0         0</code></pre>
+<pre class="r"><code># define contrasts
+contr.matrix &lt;- makeContrasts(cluster_1 - cluster_0,
+                              cluster_2 - cluster_0,
+                              cluster_3 - cluster_0,
+                              cluster_4 - cluster_0,
+                              cluster_5 - cluster_0,
+                              cluster_6 - cluster_0,
+                              cluster_7 - cluster_0,
+                              levels = design)
+contr.matrix[1:5, 1:5]</code></pre>
+<pre><code>           Contrasts
+Levels      cluster_1 - cluster_0 cluster_2 - cluster_0
+  cluster_0                    -1                    -1
+  cluster_1                     1                     0
+  cluster_2                     0                     1
+  cluster_3                     0                     0
+  cluster_4                     0                     0
+           Contrasts
+Levels      cluster_3 - cluster_0 cluster_4 - cluster_0
+  cluster_0                    -1                    -1
+  cluster_1                     0                     0
+  cluster_2                     0                     0
+  cluster_3                     1                     0
+  cluster_4                     0                     1
+           Contrasts
+Levels      cluster_5 - cluster_0
+  cluster_0                    -1
+  cluster_1                     0
+  cluster_2                     0
+  cluster_3                     0
+  cluster_4                     0</code></pre>
+<p>Fit linear models with limma</p>
+<pre class="r"><code># fit linear models
+fit &lt;- lmFit(selDataMatrix, design)
+fit2 &lt;- contrasts.fit(fit, contr.matrix)
+fit2 &lt;- eBayes(fit2)
+
+# add gene names
+geneSymbol &lt;- getSYMBOL(probeList, &#39;lumiHumanAll.db&#39;)
+geneName &lt;- sapply(lookUp(probeList, &#39;lumiHumanAll.db&#39;, &#39;GENENAME&#39;),
+                   function(x) x[1])
+fit2$genes &lt;- data.frame(ID = probeList, 
+                         geneSymbol = geneSymbol, 
+                         geneName = geneName, 
+                         stringsAsFactors = FALSE)
+
+# store matrix of significant results
+results &lt;- decideTests(fit2)
+
+# collect results
+table_c1       &lt;- topTable(fit2, coef = 1, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c2      &lt;- topTable(fit2, 
+                            coef = 2, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c3      &lt;- topTable(fit2, 
+                            coef = 3, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c4 &lt;- topTable(fit2, 
+                            coef = 4, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c5      &lt;- topTable(fit2, 
+                            coef = 5, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c6      &lt;- topTable(fit2, 
+                            coef = 6, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c7       &lt;- topTable(fit2, 
+                            coef = 7, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)</code></pre>
+<p>Collecting results</p>
+<pre class="r"><code># using FDR-corrected P-values
+# pull out t value and gene symbol
+subtable_c1 &lt;- table_c1 %&gt;%
+  dplyr::select(ID, geneSymbol, c1 = t)
+subtable_c2 &lt;- table_c2 %&gt;%
+  dplyr::select(ID, geneSymbol, c2 = t)
+subtable_c3 &lt;- table_c3 %&gt;%
+  dplyr::select(ID, geneSymbol, c3 = t)
+subtable_c4 &lt;- table_c4 %&gt;%
+  dplyr::select(ID, geneSymbol, c4 = t)
+subtable_c5 &lt;- table_c5 %&gt;%
+  dplyr::select(ID, geneSymbol, c5 = t)
+subtable_c6 &lt;- table_c6 %&gt;%
+  dplyr::select(ID, geneSymbol, c6 = t)
+subtable_c7 &lt;- table_c7 %&gt;%
+  dplyr::select(ID, geneSymbol, c7 = t)
+
+# get  of all the probe symbols in all the lists
+c1        &lt;- pull(subtable_c1, ID) 
+c2        &lt;- pull(subtable_c2, ID)
+c3        &lt;- pull(subtable_c3, ID)
+c4        &lt;- pull(subtable_c4, ID)
+c5        &lt;- pull(subtable_c5, ID)
+c6        &lt;- pull(subtable_c6, ID)
+c7        &lt;- pull(subtable_c7, ID)
+
+unique_ids &lt;- unique(c(c1, c2, c3, c4, c5, c6, c7))
+
+# get gene symbols for each of the unique probe IDs
+unique_ids_geneSymbol &lt;- getSYMBOL(unique_ids, &#39;lumiHumanAll.db&#39;) %&gt;%
+  enframe() %&gt;%
+  dplyr::rename(ID = name, geneSymbol = value)
+
+# make table of differential gene expression t values
+dge_frame &lt;- enframe(unique_ids) %&gt;%
+  dplyr::rename(ID = value) %&gt;%
+  left_join(unique_ids_geneSymbol, by = &quot;ID&quot;) %&gt;%
+  left_join(subtable_c1, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_c2, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_c3, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_c4, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_c5, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_c6, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;)) %&gt;%
+  left_join(subtable_c7, by = c(&quot;ID&quot;, &quot;geneSymbol&quot;))</code></pre>
+</div>
+<div id="dge-by-gene" class="section level4">
+<h4>DGE by gene</h4>
+<p>Design matrix and contrast matrix for KM clusters</p>
+<pre class="r"><code># rename factors to be syntactically valid names
+pheno_table &lt;- pheno_tbl %&gt;%
+  mutate(adj_cluster = paste0(&quot;cluster_&quot;, adj_cluster))
+
+# set up design matrix
+rnames &lt;- pheno_table$rawID
+groups &lt;- as.factor(pheno_table$adj_cluster)
+design &lt;- model.matrix(~ 0 + groups)
+colnames(design) &lt;- gsub(&quot;groups&quot;, &quot;&quot;, colnames(design))
+rownames(design) &lt;- rnames
+design[1:5, 1:5]</code></pre>
+<pre><code>             cluster_0 cluster_1 cluster_2 cluster_3 cluster_4
+4487653414_E         1         0         0         0         0
+4487653415_E         0         1         0         0         0
+4487653415_G         0         0         0         0         0
+4487653415_H         0         0         1         0         0
+4676163025_B         0         0         0         0         0</code></pre>
+<pre class="r"><code># define contrasts
+contr.matrix &lt;- makeContrasts(cluster_1 - cluster_0,
+                              cluster_2 - cluster_0,
+                              cluster_3 - cluster_0,
+                              cluster_4 - cluster_0,
+                              cluster_5 - cluster_0,
+                              cluster_6 - cluster_0,
+                              cluster_7 - cluster_0,
+                              levels = design)
+contr.matrix[1:5, 1:5]</code></pre>
+<pre><code>           Contrasts
+Levels      cluster_1 - cluster_0 cluster_2 - cluster_0
+  cluster_0                    -1                    -1
+  cluster_1                     1                     0
+  cluster_2                     0                     1
+  cluster_3                     0                     0
+  cluster_4                     0                     0
+           Contrasts
+Levels      cluster_3 - cluster_0 cluster_4 - cluster_0
+  cluster_0                    -1                    -1
+  cluster_1                     0                     0
+  cluster_2                     0                     0
+  cluster_3                     1                     0
+  cluster_4                     0                     1
+           Contrasts
+Levels      cluster_5 - cluster_0
+  cluster_0                    -1
+  cluster_1                     0
+  cluster_2                     0
+  cluster_3                     0
+  cluster_4                     0</code></pre>
+<p>Convert probe names to gene symbols and collapse by gene</p>
+<pre class="r"><code># get gene names
+geneSymbol &lt;- getSYMBOL(probeList, &#39;lumiHumanAll.db&#39;)
+genes &lt;- data.frame(probeID = probeList, 
+                         geneSymbol = geneSymbol, 
+                         geneName = geneName, 
+                         stringsAsFactors = FALSE)
+
+# replace probeIDs with gene symbols
+geneDataMatrix &lt;- selDataMatrix %&gt;%
+  rownames_to_column(var = &quot;probeID&quot;) %&gt;%
+  left_join(genes, by = &quot;probeID&quot;) %&gt;%
+  dplyr::select(geneSymbol, everything()) %&gt;%
+  dplyr::select(-probeID, -geneName) %&gt;%
+  drop_na(geneSymbol)
+
+# convert to matrix with gene symbols as rownames
+rnames &lt;- geneDataMatrix %&gt;% pull(geneSymbol)
+geneDataMat &lt;- geneDataMatrix %&gt;%
+  dplyr::select(-geneSymbol) %&gt;%
+  as.matrix()
+rownames(geneDataMat) &lt;- rnames
+geneDataMat[1:5, 1:5]</code></pre>
+<pre><code>      4487653414_E 4487653415_E 4487653415_G 4487653415_H 4676163025_B
+MACC1     5.927150     5.811502     6.056031     6.234910     6.080220
+A1BG      6.329524     6.141837     6.119038     6.390689     6.017910
+A1BG      6.314675     6.100132     6.295151     6.000457     6.711265
+A1CF      5.855040     6.135511     5.902838     5.980478     6.107331
+A1CF      6.312922     6.152733     5.910791     6.340384     5.980075</code></pre>
+<pre class="r"><code># average the expression data among gene symbol replicates
+aveDataMatrix &lt;- avereps(geneDataMat, ID = rownames(geneDataMat))
+aveDataMatrix[1:5, 1:5]</code></pre>
+<pre><code>       4487653414_E 4487653415_E 4487653415_G 4487653415_H 4676163025_B
+MACC1      6.023605     5.882313     6.104069     6.153906     6.189163
+A1BG       6.322100     6.120984     6.207095     6.195573     6.364587
+A1CF       6.184874     6.118702     6.035052     6.171183     6.099077
+POTEH      6.076949     6.156781     6.151065     6.236475     6.106448
+RBFOX1     6.106064     6.185220     6.030923     6.210317     6.125152</code></pre>
+<p>Fit linear models with limma (by gene symbol)</p>
+<pre class="r"><code># fit linear models
+fit &lt;- lmFit(aveDataMatrix, design)
+fit2 &lt;- contrasts.fit(fit, contr.matrix)
+fit2 &lt;- eBayes(fit2)
+
+# store matrix of significant results
+results &lt;- decideTests(fit2)
+
+# collect results
+table_c1       &lt;- topTable(fit2, coef = 1, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c2      &lt;- topTable(fit2, 
+                            coef = 2, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c3      &lt;- topTable(fit2, 
+                            coef = 3, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c4 &lt;- topTable(fit2, 
+                            coef = 4, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c5      &lt;- topTable(fit2, 
+                            coef = 5, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c6      &lt;- topTable(fit2, 
+                            coef = 6, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)
+table_c7       &lt;- topTable(fit2, 
+                            coef = 7, 
+                            adjust.method = &quot;BH&quot;, 
+                            sort.by = &quot;none&quot;,
+                            number = Inf)</code></pre>
+<p>Collecting results, averaged by gene name</p>
+<pre class="r"><code># pull out t value and gene symbol
+subtable_c1 &lt;- table_c1 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c1 = t)
+subtable_c2 &lt;- table_c2 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c2 = t)
+subtable_c3 &lt;- table_c3 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c3 = t)
+subtable_c4 &lt;- table_c4 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c4 = t)
+subtable_c5 &lt;- table_c5 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c5 = t)
+subtable_c6 &lt;- table_c6 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c6 = t)
+subtable_c7 &lt;- table_c7 %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  dplyr::select(gene, c7 = t)
+
+# get  of all the probe symbols in all the lists
+c1      &lt;- pull(subtable_c1, gene) 
+c2      &lt;- pull(subtable_c2, gene)
+c3      &lt;- pull(subtable_c3, gene)
+c4      &lt;- pull(subtable_c4, gene)
+c5      &lt;- pull(subtable_c5, gene)
+c6      &lt;- pull(subtable_c6, gene)
+c7      &lt;- pull(subtable_c7, gene)
+
+unique_ids &lt;- unique(c(c1, c2, c3, c4, c5, c6, c7))
+
+##--------------------------------
+# collect T-values
+
+# initialize table with unique ids
+dge_gene_frame &lt;- enframe(unique_ids) %&gt;% 
+  dplyr::rename(gene = value) %&gt;%
+  dplyr::select(-name)
+  
+# gather additional relevant tables into a list for iteration
+subt_list = mget(ls(pattern = &quot;subtable_c[1-7]&quot;))
+
+# define function
+subleftjoin &lt;- function(df){
+  left_join(dge_gene_frame, df, by = &quot;gene&quot;)
+}
+
+# apply function to each table in list
+dge_tval_by_gene &lt;- map(subt_list, subleftjoin)</code></pre>
+<pre class="r"><code># gather relevant tables into a list for iteration
+df_list = mget(ls(pattern = &quot;^table_c[1-7]&quot;))
+
+# define function
+# top 50 greatest differentially expressed genes for each cluster
+top50dge &lt;- function(df){
+  df %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  top_n(50, logFC) %&gt;%
+  arrange(desc(logFC)) %&gt;%
+  return()
+}
+
+# apply top 50 function to each table in list
+top50_list &lt;- map(df_list, top50dge)
+
+# write each table in the list to a csv
+filenames &lt;- paste0(&quot;~/tcga_macs/output/&quot;, 
+                    names(top50_list),
+                    &quot;.csv&quot;)
+
+map2(top50_list, filenames, write_csv)</code></pre>
+<pre><code>$table_c1
+       gene    logFC   AveExpr         t      P.Value    adj.P.Val
+1     FOXQ1 5.553645  7.708557 11.552663 1.565753e-20 2.953010e-16
+2     PALLD 3.823804  7.733252 10.339053 8.661041e-18 5.444908e-14
+3      MAOA 3.792217  9.576965  6.827561 5.416624e-10 2.761014e-07
+4     CCL22 3.471627  9.979516  4.118354 7.534892e-05 4.060231e-03
+5     BATF3 3.079544  7.972882  7.545445 1.567856e-11 1.182790e-08
+6      CD1A 3.050802  8.454642  3.326595 1.205361e-03 2.999091e-02
+7     CCL26 3.016832  7.046701  4.334750 3.308319e-05 2.244421e-03
+8     SOCS1 2.901280  7.721338  7.800889 4.337989e-12 3.895927e-09
+9   RAP1GAP 2.843571  7.426340  5.707534 1.033581e-07 1.989117e-05
+10    ESPNL 2.796442  6.632430  8.790551 2.743515e-14 5.174270e-11
+11   HOMER2 2.723679  7.053626  8.371270 2.376590e-13 3.447884e-10
+12   FCER1A 2.691161  7.519794  4.452714 2.089280e-05 1.595870e-03
+13 PPP1R14A 2.611318  7.334005  8.934079 1.305565e-14 3.077869e-11
+14    RAMP1 2.462984  6.932161  6.648989 1.283138e-09 5.627902e-07
+15     QPRT 2.387343  8.072242  6.424286 3.751487e-09 1.310242e-06
+16    MMP12 2.367486  9.076374  2.846593 5.297879e-03 8.044927e-02
+17     CD1C 2.346480  7.838472  4.171405 6.173137e-05 3.582319e-03
+18  GALNT18 2.308009  6.519683  7.921001 2.362157e-12 2.620604e-09
+19    CD209 2.300201 10.886056  4.572606 1.299605e-05 1.104079e-03
+20    CCL13 2.262961  9.183968  2.904529 4.468928e-03 7.208157e-02
+21    CCL17 2.257626  8.589476  2.532200 1.278630e-02 1.402112e-01
+22    PPM1F 2.158437 10.626420  7.451157 2.511971e-11 1.822145e-08
+23    CDR2L 2.144129  7.233002 11.391913 3.602300e-20 3.396969e-16
+24    FCER2 2.114578  7.729781  4.221651 5.103497e-05 3.069186e-03
+25    GPD1L 1.979888  8.277496  7.668145 8.469744e-12 6.945190e-09
+26 SIGLEC10 1.952290  9.487828  3.464701 7.647428e-04 2.191953e-02
+27   RAB33A 1.947596  6.687654  9.546788 5.406474e-16 1.699435e-12
+28     SOX8 1.943988  6.659311  7.781323 4.788464e-12 4.105019e-09
+29   TMEM71 1.941832 10.244675  3.711437 3.289292e-04 1.235778e-02
+30   DHRS11 1.918476  7.623153  7.827288 3.796213e-12 3.624511e-09
+31     FGL2 1.913410 11.280270  3.869783 1.875851e-04 8.132999e-03
+32    SCIMP 1.905016  8.400456  6.111065 1.632062e-08 4.439475e-06
+33   CLEC4G 1.896021  8.160875  3.515172 6.455714e-04 1.957472e-02
+34     GATM 1.892277  7.297948  5.949861 3.435275e-08 8.201176e-06
+35     FZD2 1.880076  8.154423  6.210303 1.027743e-08 2.936853e-06
+36  CLEC10A 1.804979  8.735288  4.220098 5.133720e-05 3.069186e-03
+37 HLA-DRB5 1.797182  9.228606  1.174729 2.427100e-01 7.051001e-01
+38  CTNNAL1 1.720875  8.531491  4.636612 1.005544e-05 9.030745e-04
+39   SEMA4A 1.686361  9.993280  2.880879 4.791763e-03 7.524329e-02
+40   NMNAT3 1.683698  7.434953  8.831286 2.222515e-14 4.657404e-11
+41    DHRS2 1.666750  6.348781  6.734648 8.493004e-10 4.107130e-07
+42    CMTM8 1.637791  7.354598  6.296192 6.869791e-09 2.056575e-06
+43   ALOX15 1.570262  6.422281  9.067186 6.548424e-15 1.764332e-11
+44      AUH 1.569455  8.041759  6.965744 2.763683e-10 1.628846e-07
+45     CD1E 1.553709  7.334127  3.602965 4.789251e-04 1.590234e-02
+46    WNT5A 1.548255  6.813794  4.704864 7.631300e-06 7.225789e-04
+47    MAT2A 1.520952 12.035683  4.742774 6.540530e-06 6.492337e-04
+48     CD1B 1.517236  9.434632  1.999015 4.814134e-02 3.097733e-01
+49    SYT17 1.508762  6.733820  7.215485 8.098166e-11 5.656719e-08
+50   SPINT2 1.482396 11.322155  6.049906 2.166783e-08 5.522368e-06
+             B
+1  35.51160348
+2  29.54739336
+3  12.49308223
+4   1.31997864
+5  15.86199403
+6  -1.22911106
+7   2.08565390
+8  17.08440464
+9   7.51077636
+10 21.89991116
+11 19.84716843
+12  2.51447251
+13 22.60564776
+14 11.67349979
+15 10.65450277
+16 -2.56048565
+17  1.50511908
+18 17.66268305
+19  2.95825283
+20 -2.40902587
+21 -3.33620350
+22 15.41357513
+23 34.72648582
+24  1.68202594
+25 16.44784202
+26 -0.81485395
+27 25.62934840
+28 16.99040894
+29 -0.04190508
+30 17.21132555
+31  0.47553068
+32  9.25933007
+33 -0.66012613
+34  8.55382412
+35  9.69799566
+36  1.67653387
+37 -5.71687969
+38  3.19837163
+39 -2.47116801
+40 22.10007471
+41 12.06560965
+42 10.08021823
+43 23.26121466
+44 13.13278583
+45 -0.38680728
+46  3.45681622
+47  3.60142365
+48 -4.46535270
+49 14.30010114
+50  8.99061995
+
+$table_c2
+       gene    logFC   AveExpr        t      P.Value    adj.P.Val
+1      GBP5 3.673006  8.929766 5.490181 2.724122e-07 4.110155e-05
+2      CCL5 3.528160 10.327853 5.589117 1.756489e-07 3.067351e-05
+3   CYP27B1 3.468098  9.062977 5.877008 4.794621e-08 1.189823e-05
+4    CXCL10 3.265192  7.224250 4.649865 9.532776e-06 6.810158e-04
+5      GBP4 3.070322  7.819076 6.927856 3.325209e-10 2.850611e-07
+6      IL1B 3.068287 12.060692 6.114665 1.604997e-08 5.065879e-06
+7      WARS 2.925233 10.565942 7.212700 8.210416e-11 1.032323e-07
+8      EDN1 2.913172  7.458282 5.314618 5.876803e-07 7.973849e-05
+9  CRISPLD2 2.891529  9.477360 6.052153 2.144385e-08 6.523081e-06
+10     GBP1 2.799248  8.264066 5.614392 1.569231e-07 2.873368e-05
+11     MT2A 2.756951 11.589645 4.819309 4.780072e-06 3.971461e-04
+12      CFB 2.736705  8.804540 5.576907 1.854629e-07 3.209019e-05
+13    CCND1 2.688152  7.988516 6.396816 4.272960e-09 1.857892e-06
+14     GPC4 2.593302  7.561877 6.036212 2.308343e-08 6.910372e-06
+15 ADAMDEC1 2.582037 11.270423 4.450882 2.104370e-05 1.181203e-03
+16    CXCL9 2.575797  6.541515 4.834780 4.484915e-06 3.787134e-04
+17    LAMP3 2.456376  9.893924 2.652389 9.207971e-03 9.828089e-02
+18     MT1G 2.397593 11.955890 3.696836 3.461412e-04 9.502509e-03
+19 SERPINE1 2.368916  7.832374 4.636062 1.007772e-05 7.118571e-04
+20   SLAMF1 2.361930  9.063546 5.510884 2.485912e-07 3.874736e-05
+21  BHLHE41 2.330006  8.981956 6.018143 2.509117e-08 7.169992e-06
+22     G0S2 2.291509  8.368604 4.746082 6.452864e-06 5.113488e-04
+23     MT1A 2.247343 12.421675 4.391165 2.658001e-05 1.392497e-03
+24    NCF1C 2.213646  8.492514 5.571742 1.897744e-07 3.224454e-05
+25     IRF1 2.109714  9.324842 5.696363 1.086853e-07 2.120719e-05
+26     SCG5 2.091225  6.968425 6.023768 2.444834e-08 7.093779e-06
+27     IL1A 2.085234  9.653189 4.348198 3.140640e-05 1.558749e-03
+28    DDIT4 2.065580 10.052271 4.574914 1.287685e-05 8.461930e-04
+29    CCL22 2.023753  9.979516 2.400756 1.808642e-02 1.533227e-01
+30     MT1H 2.008328  9.114553 3.477715 7.321723e-04 1.607540e-02
+31     CA12 2.002573  8.500795 4.401903 2.549042e-05 1.356112e-03
+32     NCF1 1.978356  8.059770 5.597908 1.689001e-07 2.977061e-05
+33  TNFAIP6 1.934387  8.165038 6.882533 4.146799e-10 3.128345e-07
+34     TAP1 1.932771 11.597717 6.389050 4.432934e-09 1.857892e-06
+35     CD38 1.931797  7.419132 5.770870 7.766292e-08 1.645756e-05
+36  RAP1GAP 1.927883  7.426340 3.869592 1.877138e-04 5.930121e-03
+37    PTGS2 1.918005  8.964224 3.690518 3.538506e-04 9.678293e-03
+38    CD274 1.887239  7.730445 6.104234 1.684648e-08 5.208600e-06
+39     MT1F 1.881441 11.721026 4.937077 2.934060e-06 2.699336e-04
+40    RIPK2 1.832737 11.586684 5.747962 8.613624e-08 1.765793e-05
+41     MYOF 1.827299  9.680624 4.203820 5.460912e-05 2.389624e-03
+42    STAT1 1.823558 10.380245 4.006509 1.140974e-04 4.202884e-03
+43    GPR84 1.818180  9.054634 6.026018 2.419584e-08 7.093779e-06
+44  SLCO4A1 1.816831  7.390781 7.016207 2.159065e-10 2.133415e-07
+45       F3 1.811612  7.103059 5.290954 6.512060e-07 8.649116e-05
+46      NDP 1.806101  9.272471 2.759484 6.811552e-03 7.959472e-02
+47   GBP1P1 1.801050  6.780711 5.013937 2.126119e-06 2.152221e-04
+48  ANKRD22 1.795270  7.626800 6.181255 1.177117e-08 4.111191e-06
+49     CAMP 1.724010  7.761731 3.405534 9.307658e-04 1.912227e-02
+50  TNFSF10 1.719392  9.437016 3.884556 1.778702e-04 5.685816e-03
+             B
+1   6.59960517
+2   7.01315098
+3   8.23827149
+4   3.26300855
+5  12.94238704
+6   9.27233546
+7  14.26804530
+8   5.87577403
+9   8.99845872
+10  7.11943283
+11  3.90847887
+12  6.96190050
+13 10.52417978
+14  8.92882566
+15  2.52441737
+16  3.96814617
+17 -3.01801972
+18 -0.06525886
+19  3.21108874
+20  6.68581556
+21  8.85000836
+22  3.62771791
+23  2.30700248
+24  6.94023840
+25  7.46583796
+26  8.87453498
+27  2.15181309
+28  2.98229148
+29 -3.60440575
+30 -0.74983385
+31  2.34595076
+32  7.05008749
+33 12.73316246
+34 10.48939541
+35  7.78295228
+36  0.49696588
+37 -0.08544963
+38  9.22654564
+39  4.36566341
+40  7.68522837
+41  1.63812702
+42  0.95612065
+43  8.88434581
+44 13.35163783
+45  5.77922077
+46 -2.75296994
+47  4.66769908
+48  9.56550290
+49 -0.96812779
+50  0.54657155
+
+$table_c3
+       gene    logFC   AveExpr        t      P.Value    adj.P.Val
+1     CCL26 3.610691  7.046701 4.943346 2.858288e-06 1.885523e-04
+2     PALLD 3.231193  7.733252 8.324645 3.018143e-13 2.846109e-09
+3      CCL8 3.230899  8.796706 3.427549 8.653834e-04 9.640360e-03
+4      TGM2 3.102919  8.531488 7.130299 1.232846e-10 2.583497e-07
+5     FOXQ1 2.507845  7.708557 4.970756 2.548731e-06 1.793622e-04
+6       MX1 2.496206 11.705223 4.174641 6.098215e-05 1.476410e-03
+7     IFI27 2.484918  7.290769 3.740209 2.973614e-04 4.511979e-03
+8       CFB 2.433920  8.804540 4.725955 7.004393e-06 3.413510e-04
+9      MAOA 2.379962  9.576965 4.082820 8.603420e-05 1.867092e-03
+10 HLA-DRB5 2.259541  9.228606 1.407290 1.622386e-01 3.864873e-01
+11     GALM 2.175756  9.358226 5.670912 1.218479e-07 2.188621e-05
+12    MAT2A 2.145065 12.035683 6.373461 4.772124e-09 2.368480e-06
+13  RASGRP3 2.077217  8.603501 6.249012 8.573646e-09 3.674976e-06
+14    CD209 2.065134 10.886056 3.911687 1.612648e-04 2.947145e-03
+15    CCL23 2.036202 10.793038 2.900934 4.516675e-03 3.198817e-02
+16    SOCS1 2.021727  7.721338 5.179581 1.052210e-06 9.824099e-05
+17  OLFML2B 2.001476 10.168971 2.903066 4.488299e-03 3.187055e-02
+18    STAT4 1.969765  9.076055 4.436244 2.228756e-05 7.361529e-04
+19    WNT5A 1.944270  6.813794 5.629615 1.466046e-07 2.490958e-05
+20  DCUN1D3 1.917709  9.752794 5.641164 1.392237e-07 2.431258e-05
+21     AHCY 1.878114  9.355806 5.766282 7.929163e-08 1.680270e-05
+22     CCL5 1.863197 10.327853 2.812364 5.851572e-03 3.857415e-02
+23     CTSL 1.862739 11.311681 4.902812 3.384075e-06 2.065490e-04
+24      MX2 1.847960  9.149739 4.259962 4.410061e-05 1.183126e-03
+25    CHST7 1.835931  8.579335 4.741604 6.571810e-06 3.261693e-04
+26    ATOX1 1.835279 11.733987 6.403066 4.148361e-09 2.333292e-06
+27    LAMP3 1.832072  9.893924 1.884962 6.214713e-02 2.084909e-01
+28   SEMA4A 1.825901  9.993280 2.972141 3.653034e-03 2.758055e-02
+29 SIGLEC10 1.806785  9.487828 3.055242 2.838802e-03 2.280231e-02
+30   EPSTI1 1.797465 10.477484 3.558636 5.572037e-04 6.987275e-03
+31    BATF3 1.785500  7.972882 4.168465 6.241971e-05 1.500747e-03
+32     RGL1 1.782611 11.408167 4.165577 6.310308e-05 1.508395e-03
+33    MERTK 1.765624  8.223702 3.303259 1.300059e-03 1.290026e-02
+34    THBS1 1.761348  8.674979 1.806863 7.359301e-02 2.336247e-01
+35     MAFB 1.755882 11.747120 3.562860 5.492542e-04 6.905956e-03
+36 C17orf58 1.719730  9.569934 4.929840 3.023971e-06 1.933291e-04
+37   CLEC4G 1.707336  8.160875 3.016061 3.199145e-03 2.493218e-02
+38     PPA1 1.702793 11.259945 4.013533 1.111867e-04 2.262115e-03
+39    SCIMP 1.669540  8.400456 5.103084 1.458320e-06 1.201044e-04
+40  UBASH3B 1.655920  8.697834 5.605105 1.635647e-07 2.698249e-05
+41  CLEC10A 1.643863  8.735288 3.662130 3.905455e-04 5.532625e-03
+42    IL2RA 1.633419  7.841929 4.721147 7.142729e-06 3.454151e-04
+43     TGFA 1.623427  7.845713 5.032059 1.969845e-06 1.498036e-04
+44   IFITM2 1.611987 10.203262 3.277918 1.410753e-03 1.367959e-02
+45  GALNT18 1.583332  6.519683 5.177646 1.060965e-06 9.857046e-05
+46   CHST15 1.575296 10.545291 3.800531 2.402670e-04 3.882979e-03
+47     CCR7 1.565748  8.627755 2.531300 1.281726e-02 6.849917e-02
+48     CDS2 1.565528  8.903484 6.478045 2.906043e-09 1.889930e-06
+49    CREG1 1.562455 12.428032 5.157913 1.154436e-06 1.041754e-04
+50     QPRT 1.559098  8.072242 3.997618 1.178863e-04 2.349407e-03
+             B
+1   4.39429756
+2  19.56476147
+3  -0.89167136
+4  13.87416731
+5   4.50163564
+6   1.54329464
+7   0.08323769
+8   3.55615127
+9   1.22496145
+10 -5.37520482
+11  7.35838875
+12 10.41594256
+13  9.86235669
+14  0.64540875
+15 -2.37719642
+16  5.33108289
+17 -2.37159868
+18  2.47735026
+19  7.18417507
+20  7.23282490
+21  7.76322406
+22 -2.60662588
+23  4.23623671
+24  1.84358750
+25  3.61568928
+26 10.54832830
+27 -4.62598487
+28 -2.18836845
+29 -1.96313520
+30 -0.49100236
+31  1.52172537
+32  1.51164665
+33 -1.26048346
+34 -4.76252205
+35 -0.47789662
+36  4.34154461
+37 -2.06997970
+38  0.98813434
+39  5.02487820
+40  7.08109053
+41 -0.16639295
+42  3.53788783
+43  4.74300576
+44 -1.33433021
+45  5.32330635
+46  0.27883396
+47 -3.29377311
+48 10.88475675
+49  5.24407627
+50  0.93415378
+
+$table_c4
+       gene    logFC   AveExpr         t      P.Value    adj.P.Val
+1      VMO1 3.132819  8.834327 5.2584030 7.496615e-07 7.104832e-05
+2   OLFML2B 2.890999 10.168971 4.4772054 1.897345e-05 5.930402e-04
+3     THBS1 2.753310  8.674979 3.0156974 3.202678e-03 2.545407e-02
+4  SLC16A10 2.593652 10.596859 5.1997396 9.650716e-07 8.485362e-05
+5  SERPINB2 2.219415  7.644095 2.9704656 3.671476e-03 2.811888e-02
+6      PDK4 2.049418  7.598230 3.5475576 5.785746e-04 7.155356e-03
+7    SEMA4A 2.040637  9.993280 3.5465850 5.804873e-04 7.169607e-03
+8   CD163L1 2.022378  8.305296 3.6219954 4.486173e-04 5.933177e-03
+9     STAT4 1.973508  9.076055 4.7456134 6.465220e-06 2.952398e-04
+10     CTSL 1.968589 11.311681 5.5322360 2.261637e-07 3.306549e-05
+11     ETS2 1.955567 10.310621 3.9024602 1.667387e-04 2.790321e-03
+12 CRISPLD2 1.912092  9.477360 4.0715642 8.971147e-05 1.797385e-03
+13    DDIT4 1.887799 10.052271 4.2537017 4.516815e-05 1.109207e-03
+14  SLC7A11 1.872336  8.476709 5.1553243 1.167276e-06 9.613461e-05
+15     IL7R 1.816595 10.932396 3.6129198 4.628376e-04 6.074542e-03
+16    MERTK 1.789160  8.223702 3.5739303 5.289227e-04 6.683591e-03
+17     RGL1 1.741637 11.408167 4.3453901 3.174961e-05 8.640659e-04
+18      MX1 1.738076 11.705223 3.1035589 2.446234e-03 2.072604e-02
+19     DLL1 1.722193  7.323742 3.8185355 2.253560e-04 3.535953e-03
+20     VMP1 1.718862 11.884370 5.8224752 6.146046e-08 1.649570e-05
+21 TNFRSF21 1.708905 10.297255 3.2508921 1.538480e-03 1.469895e-02
+22   ZNF746 1.706046  9.427616 7.0761755 1.608844e-10 4.202099e-07
+23     MAFB 1.683338 11.747120 3.6469277 4.116496e-04 5.565384e-03
+24  TBC1D14 1.672615 10.560263 5.1150446 1.386004e-06 1.045601e-04
+25    TACC1 1.634988 11.910994 7.6087252 1.141629e-11 1.076556e-07
+26     SGSH 1.618037 10.472821 3.9238336 1.543196e-04 2.636293e-03
+27    CD209 1.566175 10.886056 3.1674410 2.004298e-03 1.794070e-02
+28     CD93 1.557337 10.721353 3.0316317 3.051160e-03 2.449422e-02
+29   MAPK13 1.556705 10.960711 6.8684636 4.440560e-10 7.713183e-07
+30    ISG20 1.555597  8.520453 3.7094785 3.311900e-04 4.728421e-03
+31      MX2 1.553942  9.149739 3.8247258 2.204360e-04 3.476107e-03
+32   TMEM71 1.548798 10.244675 3.0115864 3.242882e-03 2.565468e-02
+33   ZBTB34 1.540080  8.761546 6.4939740 2.693833e-09 2.419319e-06
+34     VNN1 1.538172  8.280814 3.4541660 7.921013e-04 9.003293e-03
+35    FNBP4 1.531920 11.264572 5.6025103 1.654687e-07 2.690293e-05
+36   CEMIP2 1.531158  9.190029 5.1050274 1.446322e-06 1.069742e-04
+37  BCDIN3D 1.516575  8.022885 5.8088214 6.539185e-08 1.666608e-05
+38    BAZ2B 1.511018  9.406178 5.5681931 1.927934e-07 3.009049e-05
+39 KIAA1147 1.498782 11.745675 4.2975577 3.818191e-05 9.770838e-04
+40    MS4A7 1.497665 11.416600 3.7991285 2.414670e-04 3.738971e-03
+41 HLA-DRB5 1.490997  9.228606 0.9914995 3.236778e-01 5.938870e-01
+42    MKLN1 1.490153 10.564219 6.3653159 4.959385e-09 3.741360e-06
+43      ID3 1.475585  8.746966 3.6630808 3.892596e-04 5.316028e-03
+44     RBM5 1.474495 10.877398 5.8880122 4.559700e-08 1.409769e-05
+45  HLA-DOA 1.473548 10.081072 2.5195499 1.322763e-02 7.214142e-02
+46    EPAS1 1.472616 10.473209 4.3876491 2.694642e-05 7.616310e-04
+47    CREG1 1.467912 12.428032 5.1739115 1.078070e-06 9.117669e-05
+48     MXD1 1.436895 10.838748 5.9216309 3.909892e-08 1.340738e-05
+49   HS3ST1 1.432521  6.917438 4.2161973 5.210356e-05 1.221971e-03
+50     NKG7 1.418960  8.102249 2.6569776 9.091358e-03 5.490330e-02
+              B
+1   5.651982089
+2   2.634567838
+3  -2.056520635
+4   5.415223336
+5  -2.178238392
+6  -0.513110950
+7  -0.516115361
+8  -0.281261707
+9   3.636836883
+10  6.776783702
+11  0.625200756
+12  1.195948358
+13  1.830102407
+14  5.236994678
+15 -0.309729337
+16 -0.431397425
+17  2.156694296
+18 -1.815699025
+19  0.348606844
+20  8.002020701
+21 -1.399077011
+22 13.610728024
+23 -0.202772117
+24  5.076137587
+25 16.110126992
+26  0.696355920
+27 -1.637006277
+28 -2.013274507
+29 12.651807266
+30 -0.004034253
+31  0.368854662
+32 -2.067647132
+33 10.949889264
+34 -0.798650814
+35  7.070442378
+36  5.036249745
+37  7.943664825
+38  6.926792911
+39  1.985712710
+40  0.285288483
+41 -5.836523715
+42 10.374057492
+43 -0.151698780
+44  8.283067420
+45 -3.304910943
+46  2.308836372
+47  5.311472413
+48  8.427835715
+49  1.697916083
+50 -2.978552294
+
+$table_c5
+       gene    logFC   AveExpr         t      P.Value    adj.P.Val
+1      IL1B 4.826388 12.060692 10.276501 1.200531e-17 4.528404e-14
+2     ACKR3 4.745887  8.296150  8.807428 2.514320e-14 1.823849e-11
+3      IL1A 4.400503  9.653189  9.803998 1.414020e-16 2.666843e-13
+4  CRISPLD2 4.215157  9.477360  9.426324 1.012535e-15 1.364029e-12
+5     LAMP3 4.183603  9.893924  4.826576 4.639150e-06 1.239297e-04
+6   ABHD17C 4.119367  8.851067  9.036545 7.676495e-15 6.894223e-12
+7  ADAMDEC1 3.972625 11.270423  7.316568 4.908353e-11 1.028573e-08
+8   ADORA2A 3.819215  8.351900 10.594960 2.278468e-18 1.853300e-14
+9      G0S2 3.749453  8.368604  8.297133 3.474802e-13 1.598409e-10
+10     CCR7 3.600249  8.627755  6.526535 2.306522e-09 2.701925e-07
+11    STAT4 3.444517  9.076055  8.698773 4.407167e-14 2.968542e-11
+12     NKG7 3.269266  8.102249  6.429010 3.668356e-09 3.930977e-07
+13    DDIT4 3.187325 10.052271  7.542471 1.591379e-11 3.949133e-09
+14  GRAMD1A 3.184420  9.588906 10.124035 2.660946e-17 7.169349e-14
+15     CCL5 3.146795 10.327853  5.326106 5.590646e-07 2.224464e-05
+16    CEMIP 3.100234  7.330574  8.160574 6.983400e-13 2.863194e-10
+17     PID1 3.077211  8.879843  5.828283 5.985949e-08 3.572317e-06
+18     VNN1 3.070880  8.280814  7.242314 7.091915e-11 1.393266e-08
+19    PTGES 3.055075  7.471551  6.919343 3.466140e-10 5.108707e-08
+20     FPR2 3.037872  8.617020  9.138166 4.530423e-15 4.746876e-12
+21     ETS2 3.025837 10.310621  6.341434 5.551268e-09 5.510364e-07
+22     CA12 2.880815  8.500795  6.765717 7.308892e-10 9.776291e-08
+23     MT1F 2.852985 11.721026  7.998806 1.591512e-12 5.558502e-10
+24   SLAMF1 2.821936  9.063546  7.034737 1.971649e-10 3.098775e-08
+25    PTGS2 2.773760  8.964224  5.702337 1.058039e-07 5.605227e-06
+26  SLC7A11 2.709109  8.476709  7.833840 3.672520e-12 1.129234e-09
+27  TNFAIP6 2.678615  8.165038 10.182671 1.959279e-17 6.158667e-14
+28    GPR84 2.650668  9.054634  9.386318 1.246965e-15 1.567850e-12
+29    IL2RA 2.650645  7.841929  8.590733 7.692648e-14 4.680108e-11
+30      OSM 2.643280  8.946747  5.779210 7.478611e-08 4.222952e-06
+31    PTPRF 2.614172  7.333577  9.439287 9.464526e-16 1.364029e-12
+32     MT2A 2.587308 11.589645  4.832260 4.531766e-06 1.219245e-04
+33    IRAK2 2.566576  8.943938  8.357708 2.547732e-13 1.298654e-10
+34 SIGLEC10 2.522094  9.487828  4.782213 5.566669e-06 1.450102e-04
+35     EBI3 2.498678  7.673159  5.295103 6.396011e-07 2.489756e-05
+36   TMEM71 2.497468 10.244675  5.100077 1.477069e-06 4.861698e-05
+37     SOD2 2.496690  8.851946 10.318504 9.641652e-18 4.528404e-14
+38    MUCL1 2.493925  7.516561  4.545936 1.445311e-05 3.055893e-04
+39   MCOLN2 2.454242  8.196941  5.960054 3.278221e-08 2.218162e-06
+40     UPB1 2.450916  7.236238  7.452682 2.492922e-11 5.877063e-09
+41 SLC16A10 2.441398 10.596859  5.140257 1.244839e-06 4.249113e-05
+42    PRDM8 2.429185  7.991570  6.673861 1.138476e-09 1.421964e-07
+43   SLC1A3 2.421157  9.675715  5.975379 3.055300e-08 2.118491e-06
+44 SLC25A37 2.365667  9.202107  6.919280 3.467203e-10 5.108707e-08
+45       GK 2.363209 10.643546  7.889811 2.766609e-12 8.926445e-10
+46     GJB2 2.332374  8.372118  5.827607 6.004372e-08 3.572317e-06
+47     MT1H 2.330736  9.114553  4.312200 3.609028e-05 6.379219e-04
+48  C1QTNF1 2.307717  7.086532  9.882552 9.385272e-17 1.966736e-13
+49    PDE4D 2.292583  7.194826  7.210436 8.302812e-11 1.597868e-08
+50   ADGRE3 2.275686  7.781656  5.498643 2.624171e-07 1.204181e-05
+           B
+1  29.521469
+2  22.137393
+3  27.141325
+4  25.240396
+5   3.824936
+6  23.283637
+7  14.819428
+8  31.124241
+9  19.600096
+10 11.108395
+11 21.595144
+12 10.661840
+13 15.906540
+14 28.753529
+15  5.840742
+16 18.925764
+17  7.979307
+18 14.464337
+19 12.934151
+20 23.793087
+21 10.263301
+22 12.215165
+23 18.130036
+24 13.478084
+25  7.433325
+26 17.322389
+27 29.048897
+28 25.039256
+29 21.056943
+30  7.765843
+31 25.305579
+32  3.847181
+33 19.899923
+34  3.651865
+35  5.712221
+36  4.913827
+37 29.732984
+38  2.747652
+39  8.556972
+40 15.473261
+41  5.076865
+42 11.788238
+43  8.624567
+44 12.933856
+45 17.595959
+46  7.976360
+47  1.883591
+48 27.537007
+49 14.312253
+50  6.563694
+
+$table_c6
+       gene    logFC   AveExpr        t      P.Value   adj.P.Val
+1      GLDN 2.425369  6.563885 5.599146 1.679700e-07 0.001637959
+2  SIGLEC10 2.279126  9.487828 3.294561 1.337101e-03 0.198151231
+3      ETS2 2.132403 10.310621 3.407004 9.262588e-04 0.168557473
+4    ADORA3 1.904876  7.662227 3.892859 1.726227e-04 0.081391597
+5     THBS1 1.857266  8.674979 1.628713 1.063137e-01 0.999901708
+6     MFGE8 1.840083  7.806917 3.234625 1.620481e-03 0.214246477
+7  ADAMDEC1 1.826737 11.270423 2.564882 1.170663e-02 0.511080994
+8   OLFML2B 1.675248 10.168971 2.077188 4.017771e-02 0.797790226
+9     MERTK 1.669790  8.223702 2.670524 8.754882e-03 0.461994247
+10    F13A1 1.608823  9.264402 2.185142 3.105868e-02 0.735970707
+11    DDIT4 1.591196 10.052271 2.870599 4.938642e-03 0.359624672
+12    FOLR2 1.543025  8.349086 2.064734 4.136495e-02 0.806734306
+13     PDK4 1.521570  7.598230 2.108767 3.729768e-02 0.786839227
+14   SLC1A3 1.517328  9.675715 2.854852 5.171678e-03 0.372281888
+15    VSIG4 1.493094  9.032306 1.839238 6.865196e-02 0.952017903
+16   RNASE2 1.480705  6.922349 3.841665 2.074901e-04 0.086115438
+17     FPR2 1.450361  8.617020 3.326039 1.207539e-03 0.184125247
+18    TPST1 1.436253  7.252417 3.858188 1.955626e-04 0.085774649
+19  TBC1D16 1.425826  7.635695 5.172822 1.083112e-06 0.005106871
+20    ELANE 1.408622  6.822229 4.362906 2.966621e-05 0.050864065
+21   MS4A6E 1.396689  6.596095 3.510375 6.560966e-04 0.140613436
+22  PIK3IP1 1.382127  9.099343 2.267952 2.533968e-02 0.689619482
+23    STAB1 1.361253  8.435715 1.650997 1.016704e-01 0.999901708
+24     IRF1 1.305882  9.324842 2.872010 4.918246e-03 0.359527596
+25    CD163 1.300589 11.333890 1.662771 9.928394e-02 0.999901708
+26     SRPX 1.294825  6.334038 3.421135 8.839750e-04 0.163448703
+27 CRISPLD2 1.280729  9.477360 2.183471 3.118478e-02 0.735970707
+28     TCN2 1.265841  7.363475 2.712081 7.791853e-03 0.443220085
+29  SELENOP 1.264557  7.143166 2.551428 1.214073e-02 0.514487650
+30    GFRA2 1.258790  8.390456 3.071418 2.701309e-03 0.275332377
+31  METTL7A 1.235171  7.696167 3.018856 3.172098e-03 0.290963489
+32    SESN1 1.175457  8.504986 4.043121 9.968690e-05 0.073130736
+33     IDH1 1.152802 10.185595 2.412688 1.753525e-02 0.596000744
+34  SLC43A2 1.140143 10.381372 3.959517 1.355296e-04 0.076658868
+35 SH3PXD2B 1.131964  7.859345 3.600803 4.824892e-04 0.128109572
+36    TPCN2 1.122515  8.411342 3.903942 1.658477e-04 0.081391597
+37  GADD45B 1.120184  8.094804 3.178020 1.938714e-03 0.233190022
+38    NAPRT 1.114489 10.007237 3.190862 1.861790e-03 0.228728433
+39  SLC18B1 1.084006  8.280463 1.919731 5.755403e-02 0.895487618
+40     BATF 1.076111  7.555714 3.541581 5.904229e-04 0.138651923
+41  SLC40A1 1.073201  7.142376 2.495013 1.412278e-02 0.553753805
+42  TNFAIP3 1.070037 10.317946 2.597243 1.071907e-02 0.491877354
+43  HLA-DOA 1.069943 10.081072 1.464728 1.459261e-01 0.999901708
+44     TFPI 1.057968  7.862830 2.562751 1.177444e-02 0.511672545
+45    FUCA1 1.049013 10.972770 1.654403 1.009753e-01 0.999901708
+46    EPDR1 1.039292  8.049357 2.664654 8.899257e-03 0.461994247
+47  DCUN1D3 1.038525  9.752794 2.611519 1.030781e-02 0.481023955
+48     RETN 1.036415  6.439757 3.343717 1.140030e-03 0.181701008
+49     RGL1 1.034912 11.408167 2.067341 4.111398e-02 0.805202179
+50     TLN1 1.033347 10.039485 4.815732 4.850941e-06 0.011436094
+            B
+1   6.5930231
+2  -1.0731432
+3  -0.7657864
+4   0.6523555
+5  -4.5657923
+6  -1.2336193
+7  -2.8592105
+8  -3.8352413
+9  -2.6240229
+10 -3.6351043
+11 -2.1563533
+12 -3.8577328
+13 -3.7776527
+14 -2.1942016
+15 -4.2433829
+16  0.4963091
+17 -0.9879234
+18  0.5465079
+19  4.9908703
+20  2.1525834
+21 -0.4761212
+22 -3.4753636
+23 -4.5334117
+24 -2.1529547
+25 -4.5161346
+26 -0.7265893
+27 -3.6382717
+28 -2.5292609
+29 -2.8885688
+30 -1.6585055
+31 -1.7915064
+32  1.1189349
+33 -3.1834062
+34  0.8577758
+35 -0.2172636
+36  0.6863357
+37 -1.3830015
+38 -1.3492979
+39 -4.1104544
+40 -0.3873620
+41 -3.0102052
+42 -2.7880405
+43 -4.7911994
+44 -2.8638693
+45 -4.5284255
+46 -2.6373045
+47 -2.7563988
+48 -0.9397811
+49 -3.8530354
+50  3.7034238
+
+$table_c7
+       gene    logFC   AveExpr         t      P.Value    adj.P.Val
+1     PTGES 5.386563  7.471551 10.267710 1.256906e-17 5.926310e-14
+2      GBP5 5.184128  8.929766  6.967965 2.733854e-10 5.553132e-08
+3      IL1B 5.002590 12.060692  8.964721 1.113934e-14 1.750734e-11
+4  CRISPLD2 4.683554  9.477360  8.815015 2.417601e-14 3.039731e-11
+5     ACKR3 4.514542  8.296150  7.051220 1.818533e-10 3.897447e-08
+6      IL1A 4.432267  9.653189  8.310855 3.239036e-13 2.349547e-10
+7      MT1H 4.119041  9.114553  6.413879 3.941201e-09 4.704497e-07
+8  ADAMDEC1 4.087186 11.270423  6.335388 5.711858e-09 6.236781e-07
+9      MT2A 4.068453 11.589645  6.395142 4.306957e-09 5.014149e-07
+10     MT1G 4.056308 11.955890  5.624072 1.502826e-07 8.311815e-06
+11      IL6 3.978532  8.453156  4.649150 9.560269e-06 2.308664e-04
+12     MT1F 3.765445 11.721026  8.885067 1.682689e-14 2.266823e-11
+13  ADORA2A 3.736049  8.351900  8.722815 3.892827e-14 3.864143e-11
+14      CFB 3.679570  8.804540  6.742605 8.172792e-10 1.340338e-07
+15     CCL5 3.647927 10.327853  5.196445 9.788154e-07 3.714378e-05
+16    STAT4 3.627273  9.076055  7.709546 6.876658e-12 2.646812e-09
+17     MT1A 3.518369 12.421675  6.181828 1.173971e-08 1.080053e-06
+18     GBP4 3.511384  7.819076  7.124566 1.268141e-10 2.989642e-08
+19  TNFAIP6 3.492783  8.165038 11.174854 1.111926e-19 1.048547e-15
+20     CA12 3.475005  8.500795  6.868672 4.436061e-10 8.195978e-08
+21     CCL8 3.450272  8.796706  3.454309 7.917246e-04 7.875489e-03
+22    DDIT4 3.420722 10.052271  6.812774 5.819435e-10 9.793345e-08
+23  ABHD17C 3.292725  8.851067  6.079197 1.892067e-08 1.531519e-06
+24     FPR2 3.239022  8.617020  8.200162 5.705468e-13 3.710522e-10
+25     G0S2 3.225979  8.368604  6.008145 2.627502e-08 2.014418e-06
+26  GRAMD1A 3.221222  9.588906  8.619118 6.646058e-14 6.267233e-11
+27     CCR7 3.179083  8.627755  4.850325 4.206224e-06 1.189346e-04
+28 SIGLEC10 3.139768  9.487828  5.010535 2.156772e-06 6.953287e-05
+29     GBP1 3.137504  8.264066  5.658625 1.287503e-07 7.336043e-06
+30    IRAK2 3.135451  8.943938  8.593140 7.597851e-14 6.823594e-11
+31    ISG20 3.049167  8.520453  6.426757 3.707776e-09 4.454054e-07
+32     EXOG 3.019417  8.423345  6.133932 1.467498e-08 1.278565e-06
+33   SLAMF1 3.019326  9.063546  6.334751 5.729018e-09 6.236781e-07
+34    GPR84 3.000095  9.054634  8.941159 1.258554e-14 1.825872e-11
+35    MUCL1 2.981053  7.516561  4.573287 1.296078e-05 2.999267e-04
+36    PTGS2 2.937688  8.964224  5.082863 1.589022e-06 5.462294e-05
+37    LAMP3 2.911668  9.893924  2.827154 5.606140e-03 3.680188e-02
+38     SOD2 2.871484  8.851946  9.987974 5.413679e-17 2.042040e-13
+39     IRF1 2.865918  9.324842  6.958300 2.866043e-10 5.689850e-08
+40     UPB1 2.859884  7.236238  7.318994 4.849594e-11 1.365124e-08
+41     NKG7 2.796975  8.102249  4.629150 1.036185e-05 2.476863e-04
+42    BATF3 2.766601  7.972882  6.095512 1.754234e-08 1.448928e-06
+43   SLC1A3 2.755394  9.675715  5.723281 9.628176e-08 5.746437e-06
+44   SLC7A5 2.732961  8.661028  6.926134 3.353252e-10 6.453300e-08
+45     MT1X 2.723355  9.798291  5.371761 4.582148e-07 2.014147e-05
+46     CD38 2.711131  7.419132  7.282753 5.804721e-11 1.586624e-08
+47    MT1IP 2.711034  8.237722  5.070806 1.672320e-06 5.637018e-05
+48   TMEM71 2.692608 10.244675  4.627738 1.042084e-05 2.484649e-04
+49    MT1P3 2.685607  7.484927  5.443702 3.343235e-07 1.549053e-05
+50   SLC2A6 2.660221  9.661753  6.548425 2.077602e-09 2.778977e-07
+            B
+1  29.4282683
+2  13.1664874
+3  22.8979984
+4  22.1518075
+5  13.5584944
+6  19.6524695
+7  10.6032752
+8  10.2472703
+9  10.5181183
+10  7.1165490
+11  3.1677165
+12 22.5007831
+13 21.6930510
+14 12.1139550
+15  5.3298371
+16 16.7100675
+17  9.5564392
+18 13.9051807
+19 33.9676181
+20 12.7011603
+21 -0.9611586
+22 12.4402848
+23  9.0990685
+24 19.1071993
+25  8.7845505
+26 21.1779071
+27  3.9449713
+28  4.5787548
+29  7.2642823
+30 21.0490033
+31 10.6618633
+32  9.3425491
+33 10.2443927
+34 22.7804570
+35  2.8801998
+36  4.8690119
+37 -2.7403717
+38 28.0243436
+39 13.1210885
+40 14.8299229
+41  3.0916138
+42  9.1715346
+43  7.5419960
+44 12.9701540
+45  6.0527443
+46 14.6569444
+47  4.8204509
+48  3.0862490
+49  6.3533206
+50 11.2178490</code></pre>
+</div>
+<div id="volcano-plots" class="section level4">
+<h4>Volcano plots</h4>
+<br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
 <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
@@ -1491,7 +2914,7 @@ dge_frame &lt;- enframe(unique_ids) %&gt;%
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.5.3 (2019-03-11)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Mojave 10.14
+Running under: macOS Mojave 10.14.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -1505,84 +2928,84 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] ggpubr_0.2                magrittr_1.5             
- [3] ggsci_2.9                 FactoMineR_1.41          
- [5] factoextra_1.0.5          annotate_1.60.1          
- [7] XML_3.98-1.19             limma_3.38.3             
- [9] lumiHumanAll.db_1.22.0    org.Hs.eg.db_3.7.0       
-[11] lumiHumanIDMapping_1.10.1 AnnotationDbi_1.44.0     
-[13] IRanges_2.16.0            S4Vectors_0.20.1         
-[15] lumi_2.34.0               GEOquery_2.50.5          
-[17] Biobase_2.42.0            BiocGenerics_0.28.0      
-[19] forcats_0.4.0             stringr_1.4.0            
-[21] dplyr_0.8.0.1             purrr_0.3.2              
-[23] readr_1.3.1               tidyr_0.8.3              
-[25] tibble_2.1.1              ggplot2_3.1.1            
-[27] tidyverse_1.2.1          
+ [1] EnhancedVolcano_1.0.1     ggrepel_0.8.1            
+ [3] ggpubr_0.2                magrittr_1.5             
+ [5] ggsci_2.9                 FactoMineR_1.41          
+ [7] factoextra_1.0.5          annotate_1.60.1          
+ [9] XML_3.98-1.19             limma_3.38.3             
+[11] lumiHumanAll.db_1.22.0    org.Hs.eg.db_3.7.0       
+[13] lumiHumanIDMapping_1.10.1 AnnotationDbi_1.44.0     
+[15] IRanges_2.16.0            S4Vectors_0.20.1         
+[17] lumi_2.34.0               GEOquery_2.50.5          
+[19] Biobase_2.42.0            BiocGenerics_0.28.0      
+[21] forcats_0.4.0             stringr_1.4.0            
+[23] dplyr_0.8.1               purrr_0.3.2              
+[25] readr_1.3.1               tidyr_0.8.3              
+[27] tibble_2.1.1              ggplot2_3.1.1            
+[29] tidyverse_1.2.1          
 
 loaded via a namespace (and not attached):
   [1] readxl_1.3.1                backports_1.1.4            
-  [3] workflowr_1.2.0             plyr_1.8.4                 
+  [3] workflowr_1.3.0             plyr_1.8.4                 
   [5] lazyeval_0.2.2              splines_3.5.3              
   [7] BiocParallel_1.16.6         GenomeInfoDb_1.18.2        
-  [9] digest_0.6.18               foreach_1.4.4              
- [11] htmltools_0.3.6             fansi_0.4.0                
- [13] memoise_1.1.0               cluster_2.0.8              
- [15] Biostrings_2.50.2           modelr_0.1.4               
- [17] matrixStats_0.54.0          askpass_1.1                
- [19] siggenes_1.56.0             prettyunits_1.0.2          
- [21] colorspace_1.4-1            ggrepel_0.8.0              
- [23] blob_1.1.1                  rvest_0.3.3                
- [25] haven_2.1.0                 xfun_0.6                   
- [27] crayon_1.3.4                RCurl_1.95-4.12            
- [29] jsonlite_1.6                genefilter_1.64.0          
- [31] survival_2.44-1.1           iterators_1.0.10           
- [33] glue_1.3.1                  registry_0.5-1             
- [35] gtable_0.3.0                zlibbioc_1.28.0            
- [37] XVector_0.22.0              DelayedArray_0.8.0         
- [39] Rhdf5lib_1.4.3              HDF5Array_1.10.1           
- [41] scales_1.0.0                DBI_1.0.0                  
- [43] rngtools_1.3.1              bibtex_0.4.2               
- [45] Rcpp_1.0.1                  xtable_1.8-3               
- [47] progress_1.2.0              bumphunter_1.24.5          
- [49] flashClust_1.01-2           bit_1.1-14                 
- [51] mclust_5.4.3                preprocessCore_1.44.0      
- [53] httr_1.4.0                  RColorBrewer_1.1-2         
- [55] pkgconfig_2.0.2             reshape_0.8.8              
- [57] utf8_1.1.4                  locfit_1.5-9.1             
- [59] tidyselect_0.2.5            rlang_0.3.4                
- [61] munsell_0.5.0               cellranger_1.1.0           
- [63] tools_3.5.3                 cli_1.1.0                  
- [65] generics_0.0.2              RSQLite_2.1.1              
- [67] broom_0.5.2                 evaluate_0.13              
- [69] yaml_2.2.0                  knitr_1.22                 
- [71] bit64_0.9-7                 fs_1.2.7                   
- [73] beanplot_1.2                methylumi_2.28.0           
- [75] nlme_3.1-139                doRNG_1.7.1                
- [77] whisker_0.3-2               nor1mix_1.2-3              
- [79] leaps_3.0                   xml2_1.2.0                 
- [81] biomaRt_2.38.0              compiler_3.5.3             
- [83] rstudioapi_0.10             affyio_1.52.0              
- [85] stringi_1.4.3               GenomicFeatures_1.34.8     
- [87] minfi_1.28.4                lattice_0.20-38            
- [89] Matrix_1.2-17               multtest_2.38.0            
- [91] pillar_1.3.1                BiocManager_1.30.4         
- [93] data.table_1.12.2           bitops_1.0-6               
- [95] rtracklayer_1.42.2          GenomicRanges_1.34.0       
- [97] R6_2.4.0                    affy_1.60.0                
- [99] KernSmooth_2.23-15          nleqslv_3.3.2              
-[101] codetools_0.2-16            MASS_7.3-51.4              
-[103] assertthat_0.2.1            rhdf5_2.26.2               
-[105] SummarizedExperiment_1.12.0 openssl_1.3                
-[107] pkgmaker_0.27               rprojroot_1.3-2            
-[109] withr_2.1.2                 GenomicAlignments_1.18.1   
-[111] Rsamtools_1.34.1            GenomeInfoDbData_1.2.0     
-[113] mgcv_1.8-28                 hms_0.4.2                  
-[115] quadprog_1.5-5              grid_3.5.3                 
-[117] base64_2.0                  rmarkdown_1.12             
-[119] DelayedMatrixStats_1.4.0    illuminaio_0.24.0          
-[121] git2r_0.25.2                scatterplot3d_0.3-41       
-[123] lubridate_1.7.4            </code></pre>
+  [9] digest_0.6.19               foreach_1.4.4              
+ [11] htmltools_0.3.6             memoise_1.1.0              
+ [13] cluster_2.0.9               Biostrings_2.50.2          
+ [15] modelr_0.1.4                matrixStats_0.54.0         
+ [17] askpass_1.1                 siggenes_1.56.0            
+ [19] prettyunits_1.0.2           colorspace_1.4-1           
+ [21] blob_1.1.1                  rvest_0.3.4                
+ [23] haven_2.1.0                 xfun_0.7                   
+ [25] crayon_1.3.4                RCurl_1.95-4.12            
+ [27] jsonlite_1.6                genefilter_1.64.0          
+ [29] survival_2.44-1.1           iterators_1.0.10           
+ [31] glue_1.3.1                  registry_0.5-1             
+ [33] gtable_0.3.0                zlibbioc_1.28.0            
+ [35] XVector_0.22.0              DelayedArray_0.8.0         
+ [37] Rhdf5lib_1.4.3              HDF5Array_1.10.1           
+ [39] scales_1.0.0                DBI_1.0.0                  
+ [41] rngtools_1.3.1              bibtex_0.4.2               
+ [43] Rcpp_1.0.1                  xtable_1.8-4               
+ [45] progress_1.2.2              bumphunter_1.24.5          
+ [47] flashClust_1.01-2           bit_1.1-14                 
+ [49] mclust_5.4.3                preprocessCore_1.44.0      
+ [51] httr_1.4.0                  RColorBrewer_1.1-2         
+ [53] pkgconfig_2.0.2             reshape_0.8.8              
+ [55] locfit_1.5-9.1              tidyselect_0.2.5           
+ [57] rlang_0.3.4                 munsell_0.5.0              
+ [59] cellranger_1.1.0            tools_3.5.3                
+ [61] cli_1.1.0                   generics_0.0.2             
+ [63] RSQLite_2.1.1               broom_0.5.2                
+ [65] evaluate_0.14               yaml_2.2.0                 
+ [67] knitr_1.23                  bit64_0.9-7                
+ [69] fs_1.3.1                    beanplot_1.2               
+ [71] methylumi_2.28.0            nlme_3.1-140               
+ [73] doRNG_1.7.1                 whisker_0.3-2              
+ [75] nor1mix_1.2-3               leaps_3.0                  
+ [77] xml2_1.2.0                  biomaRt_2.38.0             
+ [79] compiler_3.5.3              rstudioapi_0.10            
+ [81] affyio_1.52.0               stringi_1.4.3              
+ [83] GenomicFeatures_1.34.8      minfi_1.28.4               
+ [85] lattice_0.20-38             Matrix_1.2-17              
+ [87] multtest_2.38.0             pillar_1.4.1               
+ [89] BiocManager_1.30.4          data.table_1.12.2          
+ [91] bitops_1.0-6                rtracklayer_1.42.2         
+ [93] GenomicRanges_1.34.0        R6_2.4.0                   
+ [95] affy_1.60.0                 KernSmooth_2.23-15         
+ [97] nleqslv_3.3.2               codetools_0.2-16           
+ [99] MASS_7.3-51.4               assertthat_0.2.1           
+[101] rhdf5_2.26.2                SummarizedExperiment_1.12.0
+[103] openssl_1.4                 pkgmaker_0.27              
+[105] rprojroot_1.3-2             withr_2.1.2                
+[107] GenomicAlignments_1.18.1    Rsamtools_1.34.1           
+[109] GenomeInfoDbData_1.2.0      mgcv_1.8-28                
+[111] hms_0.4.2                   quadprog_1.5-7             
+[113] grid_3.5.3                  base64_2.0                 
+[115] rmarkdown_1.13              DelayedMatrixStats_1.4.0   
+[117] illuminaio_0.24.0           git2r_0.25.2               
+[119] scatterplot3d_0.3-41        lubridate_1.7.4            </code></pre>
+</div>
 </div>
 </div>
 
