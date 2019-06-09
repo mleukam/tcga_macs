@@ -1,0 +1,192 @@
+---
+title: "tcga_download"
+author: "mleukam"
+date: "2019-06-08"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+```{r}
+library("GenomicDataCommons")
+library("tidyverse")
+```
+
+#### Test connection
+
+```{r}
+GenomicDataCommons::status()
+
+# how many cases available in TCGA
+cases() %>% 
+  GenomicDataCommons::filter(~ project.program.name=='TCGA') %>%
+  facet('samples.sample_type') %>% 
+  aggregations()
+```
+
+## Download files
+
+#### Get manifest
+
+```{r}
+# function to get manifest id's for HTSeq raw counts
+getrawcounts <- function(i){
+  manifest <- files() %>%
+    GenomicDataCommons::select(available_fields('files')) %>%
+    GenomicDataCommons::filter(~ cases.project.project_id == i &
+             data_type=='Gene Expression Quantification' &
+             analysis.workflow_type == 'HTSeq - Counts') %>%
+    GenomicDataCommons::select('file_id') %>%
+    manifest()
+  manifest
+}
+
+# list of TGCA projects
+tcgalist <- list("BRCA" = "TCGA-BRCA",
+                 "GBM" = "TCGA-GBM",
+                 "OV" = "TCGA-OV",
+                 "LUAD" = "TCGA-LUAD",
+                 "UCEC" = "TCGA-UCEC",
+                 "KIRC" = "TCGA-KIRC",
+                 "HNSC" = "TCGA-HNSC",
+                 "LGG" = "TCGA-LGG",
+                 "THCA" = "TCGA-THCA",
+                 "LUSC" = "TCGA-LUSC",
+                 "PRAD" = "TCGA-PRAD",
+                 "SKCM" = "TCGA-SKCM",
+                 "COAD" = "TCGA-COAD",
+                 "STAD" = "TCGA-STAD",
+                 "BLCA" = "TCGA-BLCA",
+                 "LIHC" = "TCGA-LIHC",
+                 "CESC" = "TCGA-CESC",
+                 "KIRP" = "TCGA-KIRP",
+                 "SARC" = "TCGA-SARC",
+                 "LAML" = "TCGA-LAML",
+                 "ESCA" = "TCGA-ESCA",
+                 "PAAD" = "TCGA-PAAD",
+                 "PCPG" = "TCGA-PCPG",
+                 "READ" = "TCGA-READ",
+                 "TGCT" = "TCGA-TGCT",
+                 "THYM" = "TCGA-THYM",
+                 "KICH" = "TCGA-KICH",
+                 "ACC" = "TCGA-ACC",
+                 "MESO" = "TCGA-MESO",
+                 "UVM" = "TCGA-UVM",
+                 "DLBC" = "TCGA-DLBC",
+                 "UCS" =  "TCGA-UCS",
+                 "CHOL" = "TCGA-CHOL")
+
+# apply function to list elements
+tcga_countfile_manifest <- map(tcgalist, getrawcounts)
+str(tcga_countfile_manifest)
+
+# combined into a single table
+combined_manifest <- bind_rows(tcga_countfile_manifest, .id = "column_label")
+
+#----------------------------
+# select filenames
+sel_fnames <- function(df){
+  df %>% dplyr::select(filename)
+}
+# apply to list
+all_fnames <- map(tcga_countfile_manifest, sel_fnames)
+# create vector
+all_fnames_vector <- unlist(all_fnames)
+attributes(all_fnames_vector) <- NULL
+#----------------------------
+# select ids
+sel_ids <- function(df){
+  df %>% dplyr::select(id)
+}
+# apply to list
+all_ids <- map(tcga_countfile_manifest, sel_ids)
+# create vector
+all_id_vector <- unlist(all_ids)
+attributes(all_id_vector) <- NULL
+
+```
+
+#### Download data
+
+```{r eval=FALSE}
+# provide IDs for download
+library(BiocParallel)
+register(MulticoreParam())
+destdir = tempdir()
+fnames = lapply(all_id_vector, gdcdata)
+```
+
+```{bash}
+## done in command line, stored here for documentation only - not part of notebook
+## get files out of subfolders and move to parent
+# find . -mindepth 2 -type f -print -exec mv {} . \;
+
+## create a folder for counts
+# mkdir htseq_counts
+
+## move all sequence files into a folder
+# find . -name '*.htseq.counts.gz' -exec mv {} ~/Library/Caches/GenomicDataCommons/htseq_counts \;
+
+## unzip
+# find . -name '*.htseq.counts.gz' -exec gunzip {} \;
+
+## move to local repo data folder
+# find . -name '*.htseq.counts' -exec mv {} ~/tcga_macs/data/htseq_counts \;
+
+```
+
+Check for missing files
+```{r}
+# get filenames that were downloaded
+downloaded_fnames <- list.files("~/tcga_macs/data/htseq_counts/", all.files = FALSE) 
+
+all_fnames_v <- all_fnames_vector %>% str_replace(".gz", "")
+
+# find the difference
+missing <- setdiff(all_fnames_v, downloaded_fnames)
+
+# get ids for missing filenames
+combined_man_tbl <- combined_manifest %>%
+  mutate(filename = str_replace(filename, ".gz",""))
+
+missing_ids <- combined_man_tbl %>%
+  filter(filename %in% missing) %>%
+  pull(id)
+```
+
+About 1000 files were missing
+
+#### Download missing files
+
+```{r eval=FALSE}
+# provide IDs for download
+library(BiocParallel)
+register(MulticoreParam())
+destdir = tempdir()
+fnames = lapply(missing_ids, gdcdata)
+```
+
+Unzipped and moved in command line similar to above
+
+Check for missing files again
+```{r}
+# get filenames that were downloaded
+downloaded_fnames <- list.files("~/tcga_macs/data/htseq_counts/", all.files = FALSE) 
+
+all_fnames_v <- all_fnames_vector %>% str_replace(".gz", "")
+
+# find the difference
+missing <- setdiff(all_fnames_v, downloaded_fnames)
+
+# get ids for missing filenames
+combined_man_tbl <- combined_manifest %>%
+  mutate(filename = str_replace(filename, ".gz",""))
+
+missing_ids <- combined_man_tbl %>%
+  filter(filename %in% missing) %>%
+  pull(id)
+```
+
+No further missing files
