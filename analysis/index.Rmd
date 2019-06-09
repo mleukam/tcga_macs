@@ -19,4 +19,13 @@ Find ranked differential gene expression sets for each of a number of experiment
  * [Download data from GEO](data_download.html).
  * [Data cleaning](preprocessing.html).
  * [Clustering and correlation analyses](clustering.html)
- * [Get differential gene expression of each cluster compared to control M0](invitro_mac_dge.html).
+ * [Differential gene expression to derive gene lists](invitro_mac_dge.html).
+ 
+## Investigating patterns in TGCA data
+
+Apply gene lists from above to TCGA pancancer bulk RNAseq counts data 
+
+* [Download counts data from Genomic Data Commons](tcga_download.html)
+* [ssGSEA](ss_gsea.html)
+
+
