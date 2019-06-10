@@ -9,271 +9,35 @@ editor_options:
 
 ## Setup
 
+Clear environment
 ```{r}
-
+# clear environment
+rm(list = ls())
 ```
 
-Load data
+Load packages
 ```{r}
-tcga_manifest <- readRDS("output/tcga_gdc_manifest.rds")
-
+library(tidyverse)
 ```
 
-Combine files into dataframes
-
+Read in data
 ```{r}
-filepaths <- map(tcga_manifest, function(df){
-  df %>% dplyr::select(filename) %>% 
-    mutate(filename = (str_replace(filename, ".gz", ""))) %>%
-    mutate(filepath = (str_c("data/htseq_counts/", filename)))
-           })
+counts_df_list <- readRDS("output/tcga_counts_dataframe_list.rds")
 ```
 
 ```{r}
-# read in BRCA files
-BRCA_paths <- filepaths$BRCA %>% pull(filepath)
-
-BRCA_df <- map(BRCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$BRCA %>% pull(id)
-cols <- c("gene", cols)
-colnames(BRCA_df) <- cols
-BRCA_df
-```
-
-```{r}
-# read in GBM files
-GBM_paths <- filepaths$GBM %>% pull(filepath)
-
-GBM_df <- map(GBM_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$GBM %>% pull(id)
-cols <- c("gene", cols)
-colnames(GBM_df) <- cols
-GBM_df
+up_files <- list.files("output/", "^upreg_c")
+down_files <- list.files("output/", "downreg_c")
+file_list <- c(up_files, down_files)
+path_list <- paste0("output/", file_list)
+dge_list <- map(path_list, read_csv)
+names(dge_list) <- str_replace_all(file_list, ".csv", "")
 ```
 
 
-```{r}
-# read in OV files
-OV_paths <- filepaths$OV %>% pull(filepath)
-
-OV_df <- map(OV_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$OV %>% pull(id)
-cols <- c("gene", cols)
-colnames(OV_df) <- cols
-OV_df
-```
-
+## GSVA
 
 ```{r}
-# read in LUAD files
-LUAD_paths <- filepaths$LUAD %>% pull(filepath)
-
-LUAD_df <- map(LUAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$LUAD %>% pull(id)
-cols <- c("gene", cols)
-colnames(LUAD_df) <- cols
-LUAD_df
-```
-
-```{r}
-# read in UCEC files
-UCEC_paths <- filepaths$UCEC %>% pull(filepath)
-
-UCEC_df <- map(UCEC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$UCEC %>% pull(id)
-cols <- c("gene", cols)
-colnames(UCEC_df) <- cols
-UCEC_df
-```
 
 
-```{r}
-# read in KIRC files
-KIRC_paths <- filepaths$KIRC %>% pull(filepath)
-
-KIRC_df <- map(KIRC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$KIRC %>% pull(id)
-cols <- c("gene", cols)
-colnames(KIRC_df) <- cols
-KIRC_df
-```
-
-
-```{r}
-# read in HNSC files
-HNSC_paths <- filepaths$HNSC %>% pull(filepath)
-
-HNSC_df <- map(HNSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$HNSC %>% pull(id)
-cols <- c("gene", cols)
-colnames(HNSC_df) <- cols
-HNSC_df
-```
-
-
-```{r}
-# read in LGG files
-LGG_paths <- filepaths$LGG %>% pull(filepath)
-
-LGG_df <- map(LGG_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$LGG %>% pull(id)
-cols <- c("gene", cols)
-colnames(LGG_df) <- cols
-LGG_df
-```
-
-
-```{r}
-# read in THCA files
-THCA_paths <- filepaths$THCA %>% pull(filepath)
-
-THCA_df <- map(THCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$THCA %>% pull(id)
-cols <- c("gene", cols)
-colnames(THCA_df) <- cols
-THCA_df
-```
-
-```{r}
-# read in LUSC files
-LUSC_paths <- filepaths$LUSC %>% pull(filepath)
-
-LUSC_df <- map(LUSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$LUSC %>% pull(id)
-cols <- c("gene", cols)
-colnames(LUSC_df) <- cols
-LUSC_df
-```
-
-
-```{r}
-# read in PRAD files
-PRAD_paths <- filepaths$PRAD %>% pull(filepath)
-
-PRAD_df <- map(PRAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$PRAD %>% pull(id)
-cols <- c("gene", cols)
-colnames(PRAD_df) <- cols
-PRAD_df
-```
-
-
-```{r}
-# read in SKCM files
-SKCM_paths <- filepaths$SKCM %>% pull(filepath)
-
-SKCM_df <- map(SKCM_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$SKCM %>% pull(id)
-cols <- c("gene", cols)
-colnames(SKCM_df) <- cols
-SKCM_df
-```
-
-
-```{r}
-# read in STAD files
-STAD_paths <- filepaths$STAD %>% pull(filepath)
-
-STAD_df <- map(STAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$STAD %>% pull(id)
-cols <- c("gene", cols)
-colnames(STAD_df) <- cols
-STAD_df
-```
-
-
-```{r}
-# read in BLCA files
-BLCA_paths <- filepaths$BLCA %>% pull(filepath)
-
-BLCA_df <- map(BLCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$BLCA %>% pull(id)
-cols <- c("gene", cols)
-colnames(BLCA_df) <- cols
-BLCA_df
-```
-
-
-```{r}
-# read in LIHC files
-LIHC_paths <- filepaths$LIHC %>% pull(filepath)
-
-LIHC_df <- map(LIHC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$LIHC %>% pull(id)
-cols <- c("gene", cols)
-colnames(LIHC_df) <- cols
-LIHC_df
-```
-
-```{r}
-# read in CESC files
-CESC_paths <- filepaths$CESC %>% pull(filepath)
-
-CESC_df <- map(CESC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$CESC %>% pull(id)
-cols <- c("gene", cols)
-colnames(CESC_df) <- cols
-CESC_df
-```
-
-```{r}
-# read in KIRP files
-KIRP_paths <- filepaths$KIRP %>% pull(filepath)
-
-KIRP_df <- map(KIRP_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
-  reduce(left_join, by = "X1")
-
-# get column names
-cols <- tcga_manifest$KIRP %>% pull(id)
-cols <- c("gene", cols)
-colnames(KIRP_df) <- cols
-KIRP_df
 ```
