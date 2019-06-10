@@ -1,5 +1,5 @@
 ---
-title: "tcga_download"
+title: "Download and Format TCGA Data"
 author: "mleukam"
 date: "2019-06-08"
 output: workflowr::wflow_html
@@ -8,6 +8,9 @@ editor_options:
 ---
 
 ## Setup
+
+All of this is recorded for completeness - this notebook is not intended to be run more than once and the global options for evaluation are set to FALSE. Once this notebook was completed, results were stored in a list of dataframes saved with the saveRDS function. 
+
 ```{r}
 knitr::opts_chunk$set(eval=FALSE)
 ```
