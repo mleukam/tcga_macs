@@ -792,8 +792,8 @@ dge_tval_by_gene <- map(subt_list, subleftjoin)
 df_list = mget(ls(pattern = "^table_c[1-7]"))
 
 # define function
-# top 50 greatest differentially expressed genes for each cluster
-top50dge <- function(df){
+# top 50 highest positive fold change
+top50dge_up <- function(df){
   df %>%
   rownames_to_column(var = "gene") %>%
   top_n(50, logFC) %>%
@@ -801,8 +801,30 @@ top50dge <- function(df){
   return()
 }
 
-# apply top 50 function to each table in list
-top50_list <- map(df_list, top50dge)
+# top 50 highest negative fold change
+top50dge_down <- function(df){
+  df %>%
+  rownames_to_column(var = "gene") %>%
+  top_n(-50, logFC) %>%
+  arrange(logFC) %>%
+  return()
+}
+
+# apply top 50 functions to each table in list
+top50_up_list <- map(df_list, top50dge_up)
+top50_down_list <- map(df_list, top50dge_down)
+
+# rename list elements
+uplist_names <- sub("^table_", "upreg_", names(top50_up_list))
+top50_up_list <- top50_up_list %>% 
+  set_names(uplist_names)
+
+downlist_names <- sub("^table_", "downreg_", names(top50_down_list))
+top50_down_list <- top50_down_list %>% 
+  set_names(downlist_names)
+
+# combine lists
+top50_list <- c(top50_up_list, top50_down_list)
 
 # write each table in the list to a csv
 filenames <- paste0("~/tcga_macs/output/", 
@@ -813,8 +835,44 @@ map2(top50_list, filenames, write_csv)
 ```
 
 #### Volcano plots
-```{r}
+```{r fig.height=3, fig.width=3}
+# gather relevant tables into a list for iteration
+df_list = mget(ls(pattern = "^table_c[1-7]"))
 
+# create vector of plot titles
+df_titles <- sub("^table_c", "Cluster ", names(df_list)) %>%
+  paste0(., " gene expression vs control")
 
+# create vector of treatment conditions
+numberlist <- seq(1:7)
 
+gettreat <- function(num){
+  pheno_data %>% 
+    dplyr::filter(adj_cluster == num) %>%
+    dplyr::select(treatment) %>% 
+    pull() %>% 
+    unique()
+}
+
+clust_treat <- map(numberlist, gettreat)
+clust_treat
+
+# define plot function
+volcanoplot <- function(df, titles){
+  EnhancedVolcano(df,
+                  lab = rownames(df),
+                  x = 'logFC',
+                  y = 'P.Value',
+                  title = titles,
+                  FCcutoff = 1.5,
+                  transcriptPointSize = 2,
+                  transcriptLabSize = 3.0)
+}
+
+# apply plot function to each table in list
+map2(df_list, df_titles, volcanoplot)
 ```
+
+
+
+

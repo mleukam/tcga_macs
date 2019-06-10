@@ -290,7 +290,7 @@ edata_tbl <- edata %>%
   gather(key = "sampleID", value = "intensity", -probeID) %>%
   group_by(sampleID)
 
-# find "valley" in density plot for low value filtering
+# density plot
 dplot <- ggplot(edata_tbl, aes(intensity, color = sampleID)) +
   geom_density() + 
   theme(legend.position = "none")
