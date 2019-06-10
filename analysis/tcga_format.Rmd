@@ -1,0 +1,858 @@
+---
+title: "Formatting TCGA data"
+author: "mleukam"
+date: "2019-06-10"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+All of this is recorded for completeness - this notebook is not intended to be run more than once and the global options for evaluation are set to FALSE. Once this notebook was completed, results were stored in RDS objects for further. 
+
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+Load packages
+```{r}
+library(tidyverse)
+```
+
+## Combine reads into single dataframes by cancer type
+
+Load data
+```{r}
+tcga_manifest <- readRDS("output/tcga_gdc_manifest.rds")
+```
+
+Combine files into dataframes
+
+```{r}
+filepaths <- map(tcga_manifest, function(df){
+  df %>% dplyr::select(filename) %>% 
+    mutate(filename = (str_replace(filename, ".gz", ""))) %>%
+    mutate(filepath = (str_c("data/htseq_counts/", filename)))
+           })
+```
+
+```{r}
+# read in BRCA files
+BRCA_paths <- filepaths$BRCA %>% pull(filepath)
+
+BRCA_df <- map(BRCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("BRCA", seq(1, (ncol(BRCA_df) - 1)))
+allcols <- c("gene", cols)
+colnames(BRCA_df) <- allcols
+
+# get metadata
+BRCA_pheno <- tcga_manifest$BRCA
+enframe(cols) 
+BRCA_pheno <- add_column(BRCA_pheno, cols, .before = 1)
+BRCA_pheno <- dplyr::rename(BRCA_pheno, sample = cols)
+
+# review results
+BRCA_pheno
+BRCA_df
+```
+
+```{r}
+# read in GBM files
+GBM_paths <- filepaths$GBM %>% pull(filepath)
+
+GBM_df <- map(GBM_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("GBM", seq(1, (ncol(GBM_df) - 1)))
+allcols <- c("gene", cols)
+colnames(GBM_df) <- allcols
+
+# get metadata
+GBM_pheno <- tcga_manifest$GBM
+enframe(cols) 
+GBM_pheno <- add_column(GBM_pheno, cols, .before = 1)
+GBM_pheno <- dplyr::rename(GBM_pheno, sample = cols)
+
+# review results
+GBM_pheno
+GBM_df
+```
+
+
+```{r}
+# read in OV files
+OV_paths <- filepaths$OV %>% pull(filepath)
+
+OV_df <- map(OV_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("OV", seq(1, (ncol(OV_df) - 1)))
+allcols <- c("gene", cols)
+colnames(OV_df) <- allcols
+
+# get metadata
+OV_pheno <- tcga_manifest$OV
+enframe(cols) 
+OV_pheno <- add_column(OV_pheno, cols, .before = 1)
+OV_pheno <- dplyr::rename(OV_pheno, sample = cols)
+
+# review results
+OV_pheno
+OV_df
+```
+
+
+```{r}
+# read in LUAD files
+LUAD_paths <- filepaths$LUAD %>% pull(filepath)
+
+LUAD_df <- map(LUAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("LUAD", seq(1, (ncol(LUAD_df) - 1)))
+allcols <- c("gene", cols)
+colnames(LUAD_df) <- allcols
+
+# get metadata
+LUAD_pheno <- tcga_manifest$LUAD
+enframe(cols) 
+LUAD_pheno <- add_column(LUAD_pheno, cols, .before = 1)
+LUAD_pheno <- dplyr::rename(LUAD_pheno, sample = cols)
+
+# review results
+LUAD_pheno
+LUAD_df
+```
+
+```{r}
+# read in UCEC files
+UCEC_paths <- filepaths$UCEC %>% pull(filepath)
+
+UCEC_df <- map(UCEC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("UCEC", seq(1, (ncol(UCEC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(UCEC_df) <- allcols
+
+# get metadata
+UCEC_pheno <- tcga_manifest$UCEC
+enframe(cols) 
+UCEC_pheno <- add_column(UCEC_pheno, cols, .before = 1)
+UCEC_pheno <- dplyr::rename(UCEC_pheno, sample = cols)
+
+# review results
+UCEC_pheno
+UCEC_df
+```
+
+
+```{r}
+# read in KIRC files
+KIRC_paths <- filepaths$KIRC %>% pull(filepath)
+
+KIRC_df <- map(KIRC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("KIRC", seq(1, (ncol(KIRC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(KIRC_df) <- allcols
+
+# get metadata
+KIRC_pheno <- tcga_manifest$KIRC
+enframe(cols) 
+KIRC_pheno <- add_column(KIRC_pheno, cols, .before = 1)
+KIRC_pheno <- dplyr::rename(KIRC_pheno, sample = cols)
+
+# review results
+KIRC_pheno
+KIRC_df
+```
+
+
+```{r}
+# read in HNSC files
+HNSC_paths <- filepaths$HNSC %>% pull(filepath)
+
+HNSC_df <- map(HNSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("HNSC", seq(1, (ncol(HNSC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(HNSC_df) <- allcols
+
+# get metadata
+HNSC_pheno <- tcga_manifest$HNSC
+enframe(cols) 
+HNSC_pheno <- add_column(HNSC_pheno, cols, .before = 1)
+HNSC_pheno <- dplyr::rename(HNSC_pheno, sample = cols)
+
+# review results
+HNSC_pheno
+HNSC_df
+```
+
+
+```{r}
+# read in LGG files
+LGG_paths <- filepaths$LGG %>% pull(filepath)
+
+LGG_df <- map(LGG_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("LGG", seq(1, (ncol(LGG_df) - 1)))
+allcols <- c("gene", cols)
+colnames(LGG_df) <- allcols
+
+# get metadata
+LGG_pheno <- tcga_manifest$LGG
+enframe(cols) 
+LGG_pheno <- add_column(LGG_pheno, cols, .before = 1)
+LGG_pheno <- dplyr::rename(LGG_pheno, sample = cols)
+
+# review results
+LGG_pheno
+LGG_df
+```
+
+
+```{r}
+# read in THCA files
+THCA_paths <- filepaths$THCA %>% pull(filepath)
+
+THCA_df <- map(THCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("THCA", seq(1, (ncol(THCA_df) - 1)))
+allcols <- c("gene", cols)
+colnames(THCA_df) <- allcols
+
+# get metadata
+THCA_pheno <- tcga_manifest$THCA
+enframe(cols) 
+THCA_pheno <- add_column(THCA_pheno, cols, .before = 1)
+THCA_pheno <- dplyr::rename(THCA_pheno, sample = cols)
+
+# review results
+THCA_pheno
+THCA_df
+```
+
+```{r}
+# read in LUSC files
+LUSC_paths <- filepaths$LUSC %>% pull(filepath)
+
+LUSC_df <- map(LUSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("LUSC", seq(1, (ncol(LUSC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(LUSC_df) <- allcols
+
+# get metadata
+LUSC_pheno <- tcga_manifest$LUSC
+enframe(cols) 
+LUSC_pheno <- add_column(LUSC_pheno, cols, .before = 1)
+LUSC_pheno <- dplyr::rename(LUSC_pheno, sample = cols)
+
+# review results
+LUSC_pheno
+LUSC_df
+```
+
+
+```{r}
+# read in PRAD files
+PRAD_paths <- filepaths$PRAD %>% pull(filepath)
+
+PRAD_df <- map(PRAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("PRAD", seq(1, (ncol(PRAD_df) - 1)))
+allcols <- c("gene", cols)
+colnames(PRAD_df) <- allcols
+
+# get metadata
+PRAD_pheno <- tcga_manifest$PRAD
+enframe(cols) 
+PRAD_pheno <- add_column(PRAD_pheno, cols, .before = 1)
+PRAD_pheno <- dplyr::rename(PRAD_pheno, sample = cols)
+
+# review results
+PRAD_pheno
+PRAD_df
+```
+
+
+```{r}
+# read in SKCM files
+SKCM_paths <- filepaths$SKCM %>% pull(filepath)
+
+SKCM_df <- map(SKCM_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("SKCM", seq(1, (ncol(SKCM_df) - 1)))
+allcols <- c("gene", cols)
+colnames(SKCM_df) <- allcols
+
+# get metadata
+SKCM_pheno <- tcga_manifest$SKCM
+enframe(cols) 
+SKCM_pheno <- add_column(SKCM_pheno, cols, .before = 1)
+SKCM_pheno <- dplyr::rename(SKCM_pheno, sample = cols)
+
+# review results
+SKCM_pheno
+SKCM_df
+```
+
+
+```{r}
+# read in COAD files
+COAD_paths <- filepaths$COAD %>% pull(filepath)
+
+COAD_df <- map(COAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("COAD", seq(1, (ncol(COAD_df) - 1)))
+allcols <- c("gene", cols)
+colnames(COAD_df) <- allcols
+
+# get metadata
+COAD_pheno <- tcga_manifest$COAD
+enframe(cols) 
+COAD_pheno <- add_column(COAD_pheno, cols, .before = 1)
+COAD_pheno <- dplyr::rename(COAD_pheno, sample = cols)
+
+# review results
+COAD_pheno
+COAD_df
+```
+
+
+```{r}
+# read in STAD files
+STAD_paths <- filepaths$STAD %>% pull(filepath)
+
+STAD_df <- map(STAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("STAD", seq(1, (ncol(STAD_df) - 1)))
+allcols <- c("gene", cols)
+colnames(STAD_df) <- allcols
+
+# get metadata
+STAD_pheno <- tcga_manifest$STAD
+enframe(cols) 
+STAD_pheno <- add_column(STAD_pheno, cols, .before = 1)
+STAD_pheno <- dplyr::rename(STAD_pheno, sample = cols)
+
+# review results
+STAD_pheno
+STAD_df
+```
+
+
+```{r}
+# read in BLCA files
+BLCA_paths <- filepaths$BLCA %>% pull(filepath)
+
+BLCA_df <- map(BLCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("BLCA", seq(1, (ncol(BLCA_df) - 1)))
+allcols <- c("gene", cols)
+colnames(BLCA_df) <- allcols
+
+# get metadata
+BLCA_pheno <- tcga_manifest$BLCA
+enframe(cols) 
+BLCA_pheno <- add_column(BLCA_pheno, cols, .before = 1)
+BLCA_pheno <- dplyr::rename(BLCA_pheno, sample = cols)
+
+# review results
+BLCA_pheno
+BLCA_df
+```
+
+
+```{r}
+# read in LIHC files
+LIHC_paths <- filepaths$LIHC %>% pull(filepath)
+
+LIHC_df <- map(LIHC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("LIHC", seq(1, (ncol(LIHC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(LIHC_df) <- allcols
+
+# get metadata
+LIHC_pheno <- tcga_manifest$LIHC
+enframe(cols) 
+LIHC_pheno <- add_column(LIHC_pheno, cols, .before = 1)
+LIHC_pheno <- dplyr::rename(LIHC_pheno, sample = cols)
+
+# review results
+LIHC_pheno
+LIHC_df
+```
+
+```{r}
+# read in CESC files
+CESC_paths <- filepaths$CESC %>% pull(filepath)
+
+CESC_df <- map(CESC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("CESC", seq(1, (ncol(CESC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(CESC_df) <- allcols
+
+# get metadata
+CESC_pheno <- tcga_manifest$CESC
+enframe(cols) 
+CESC_pheno <- add_column(CESC_pheno, cols, .before = 1)
+CESC_pheno <- dplyr::rename(CESC_pheno, sample = cols)
+
+# review results
+CESC_pheno
+CESC_df
+```
+
+```{r}
+# read in KIRP files
+KIRP_paths <- filepaths$KIRP %>% pull(filepath)
+
+KIRP_df <- map(KIRP_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("KIRP", seq(1, (ncol(KIRP_df) - 1)))
+allcols <- c("gene", cols)
+colnames(KIRP_df) <- allcols
+
+# get metadata
+KIRP_pheno <- tcga_manifest$KIRP
+enframe(cols) 
+KIRP_pheno <- add_column(KIRP_pheno, cols, .before = 1)
+KIRP_pheno <- dplyr::rename(KIRP_pheno, sample = cols)
+
+# review results
+KIRP_pheno
+KIRP_df
+```
+
+
+```{r}
+# read in SARC files
+SARC_paths <- filepaths$SARC %>% pull(filepath)
+
+SARC_df <- map(SARC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("SARC", seq(1, (ncol(SARC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(SARC_df) <- allcols
+
+# get metadata
+SARC_pheno <- tcga_manifest$SARC
+enframe(cols) 
+SARC_pheno <- add_column(SARC_pheno, cols, .before = 1)
+SARC_pheno <- dplyr::rename(SARC_pheno, sample = cols)
+
+# review results
+SARC_pheno
+SARC_df
+```
+
+
+```{r}
+# read in LAML files
+LAML_paths <- filepaths$LAML %>% pull(filepath)
+
+LAML_df <- map(LAML_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("LAML", seq(1, (ncol(LAML_df) - 1)))
+allcols <- c("gene", cols)
+colnames(LAML_df) <- allcols
+
+# get metadata
+LAML_pheno <- tcga_manifest$LAML
+enframe(cols) 
+LAML_pheno <- add_column(LAML_pheno, cols, .before = 1)
+LAML_pheno <- dplyr::rename(LAML_pheno, sample = cols)
+
+# review results
+LAML_pheno
+LAML_df
+```
+
+
+```{r}
+# read in ESCA files
+ESCA_paths <- filepaths$ESCA %>% pull(filepath)
+
+ESCA_df <- map(ESCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("ESCA", seq(1, (ncol(ESCA_df) - 1)))
+allcols <- c("gene", cols)
+colnames(ESCA_df) <- allcols
+
+# get metadata
+ESCA_pheno <- tcga_manifest$ESCA
+enframe(cols) 
+ESCA_pheno <- add_column(ESCA_pheno, cols, .before = 1)
+ESCA_pheno <- dplyr::rename(ESCA_pheno, sample = cols)
+
+# review results
+ESCA_pheno
+ESCA_df
+```
+
+
+```{r}
+# read in PAAD files
+PAAD_paths <- filepaths$PAAD %>% pull(filepath)
+
+PAAD_df <- map(PAAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("PAAD", seq(1, (ncol(PAAD_df) - 1)))
+allcols <- c("gene", cols)
+colnames(PAAD_df) <- allcols
+
+# get metadata
+PAAD_pheno <- tcga_manifest$PAAD
+enframe(cols) 
+PAAD_pheno <- add_column(PAAD_pheno, cols, .before = 1)
+PAAD_pheno <- dplyr::rename(PAAD_pheno, sample = cols)
+
+# review results
+PAAD_pheno
+PAAD_df
+```
+
+
+```{r}
+# read in PCPG files
+PCPG_paths <- filepaths$PCPG %>% pull(filepath)
+
+PCPG_df <- map(PCPG_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("PCPG", seq(1, (ncol(PCPG_df) - 1)))
+allcols <- c("gene", cols)
+colnames(PCPG_df) <- allcols
+
+# get metadata
+PCPG_pheno <- tcga_manifest$PCPG
+enframe(cols) 
+PCPG_pheno <- add_column(PCPG_pheno, cols, .before = 1)
+PCPG_pheno <- dplyr::rename(PCPG_pheno, sample = cols)
+
+# review results
+PCPG_pheno
+PCPG_df
+```
+
+
+```{r}
+# read in READ files
+READ_paths <- filepaths$READ %>% pull(filepath)
+
+READ_df <- map(READ_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("READ", seq(1, (ncol(READ_df) - 1)))
+allcols <- c("gene", cols)
+colnames(READ_df) <- allcols
+
+# get metadata
+READ_pheno <- tcga_manifest$READ
+enframe(cols) 
+READ_pheno <- add_column(READ_pheno, cols, .before = 1)
+READ_pheno <- dplyr::rename(READ_pheno, sample = cols)
+
+# review results
+READ_pheno
+READ_df
+```
+
+
+```{r}
+# read in TGCT files
+TGCT_paths <- filepaths$TGCT %>% pull(filepath)
+
+TGCT_df <- map(TGCT_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("TGCT", seq(1, (ncol(TGCT_df) - 1)))
+allcols <- c("gene", cols)
+colnames(TGCT_df) <- allcols
+
+# get metadata
+TGCT_pheno <- tcga_manifest$TGCT
+enframe(cols) 
+TGCT_pheno <- add_column(TGCT_pheno, cols, .before = 1)
+TGCT_pheno <- dplyr::rename(TGCT_pheno, sample = cols)
+
+# review results
+TGCT_pheno
+TGCT_df
+```
+
+
+```{r}
+# read in THYM files
+THYM_paths <- filepaths$THYM %>% pull(filepath)
+
+THYM_df <- map(THYM_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("THYM", seq(1, (ncol(THYM_df) - 1)))
+allcols <- c("gene", cols)
+colnames(THYM_df) <- allcols
+
+# get metadata
+THYM_pheno <- tcga_manifest$THYM
+enframe(cols) 
+THYM_pheno <- add_column(THYM_pheno, cols, .before = 1)
+THYM_pheno <- dplyr::rename(THYM_pheno, sample = cols)
+
+# review results
+THYM_pheno
+THYM_df
+```
+
+
+```{r}
+# read in KICH files
+KICH_paths <- filepaths$KICH %>% pull(filepath)
+
+KICH_df <- map(KICH_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("KICH", seq(1, (ncol(KICH_df) - 1)))
+allcols <- c("gene", cols)
+colnames(KICH_df) <- allcols
+
+# get metadata
+KICH_pheno <- tcga_manifest$KICH
+enframe(cols) 
+KICH_pheno <- add_column(KICH_pheno, cols, .before = 1)
+KICH_pheno <- dplyr::rename(KICH_pheno, sample = cols)
+
+# review results
+KICH_pheno
+KICH_df
+```
+
+
+```{r}
+# read in ACC files
+ACC_paths <- filepaths$ACC %>% pull(filepath)
+
+ACC_df <- map(ACC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("ACC", seq(1, (ncol(ACC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(ACC_df) <- allcols
+
+# get metadata
+ACC_pheno <- tcga_manifest$ACC
+enframe(cols) 
+ACC_pheno <- add_column(ACC_pheno, cols, .before = 1)
+ACC_pheno <- dplyr::rename(ACC_pheno, sample = cols)
+
+# review results
+ACC_pheno
+ACC_df
+```
+
+
+```{r}
+# read in MESO files
+MESO_paths <- filepaths$MESO %>% pull(filepath)
+
+MESO_df <- map(MESO_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("MESO", seq(1, (ncol(MESO_df) - 1)))
+allcols <- c("gene", cols)
+colnames(MESO_df) <- allcols
+
+# get metadata
+MESO_pheno <- tcga_manifest$MESO
+enframe(cols) 
+MESO_pheno <- add_column(MESO_pheno, cols, .before = 1)
+MESO_pheno <- dplyr::rename(MESO_pheno, sample = cols)
+
+# review results
+MESO_pheno
+MESO_df
+```
+
+
+```{r}
+# read in UVM files
+UVM_paths <- filepaths$UVM %>% pull(filepath)
+
+UVM_df <- map(UVM_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("UVM", seq(1, (ncol(UVM_df) - 1)))
+allcols <- c("gene", cols)
+colnames(UVM_df) <- allcols
+
+# get metadata
+UVM_pheno <- tcga_manifest$UVM
+enframe(cols) 
+UVM_pheno <- add_column(UVM_pheno, cols, .before = 1)
+UVM_pheno <- dplyr::rename(UVM_pheno, sample = cols)
+
+# review results
+UVM_pheno
+UVM_df
+```
+
+
+```{r}
+# read in DLBC files
+DLBC_paths <- filepaths$DLBC %>% pull(filepath)
+
+DLBC_df <- map(DLBC_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("DLBC", seq(1, (ncol(DLBC_df) - 1)))
+allcols <- c("gene", cols)
+colnames(DLBC_df) <- allcols
+
+# get metadata
+DLBC_pheno <- tcga_manifest$DLBC
+enframe(cols) 
+DLBC_pheno <- add_column(DLBC_pheno, cols, .before = 1)
+DLBC_pheno <- dplyr::rename(DLBC_pheno, sample = cols)
+
+# review results
+DLBC_pheno
+DLBC_df
+```
+
+
+```{r}
+# read in UCS files
+UCS_paths <- filepaths$UCS %>% pull(filepath)
+
+UCS_df <- map(UCS_paths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("UCS", seq(1, (ncol(UCS_df) - 1)))
+allcols <- c("gene", cols)
+colnames(UCS_df) <- allcols
+
+# get metadata
+UCS_pheno <- tcga_manifest$UCS
+enframe(cols) 
+UCS_pheno <- add_column(UCS_pheno, cols, .before = 1)
+UCS_pheno <- dplyr::rename(UCS_pheno, sample = cols)
+
+# review results
+UCS_pheno
+UCS_df
+```
+
+
+```{r}
+# read in CHOL files
+CHOL_paths <- filepaths$CHOL %>% pull(filepath)
+
+CHOL_df <- map(CHOL_paths, function(x){read_tsv(x, col_names = FALSE)}) %>%
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("CHOL", seq(1, (ncol(CHOL_df) - 1)))
+allcols <- c("gene", cols)
+colnames(CHOL_df) <- allcols
+
+# get metadata
+CHOL_pheno <- tcga_manifest$CHOL
+enframe(cols) 
+CHOL_pheno <- add_column(CHOL_pheno, cols, .before = 1)
+CHOL_pheno <- dplyr::rename(CHOL_pheno, sample = cols)
+
+# review results
+CHOL_pheno
+CHOL_df
+
+```
+
+
+## Gather up the dataframes
+```{r}
+count_df_list <- list(BRCA_df, GBM_df, OV_df, LUAD_df, UCEC_df, KIRC_df, HNSC_df, LGG_df, THCA_df, LUSC_df, PRAD_df, SKCM_df, COAD_df, STAD_df, BLCA_df, LIHC_df, CESC_df, KIRP_df, SARC_df, LAML_df, ESCA_df, PAAD_df, PCPG_df, READ_df, TGCT_df, THYM_df, KICH_df, ACC_df, MESO_df, UVM_df, DLBC_df, UCS_df, CHOL_df)
+
+names(counts_df_list) <- list("BRCA", "GBM", "OV", "LUAD", "UCEC", "KIRC", "HNSC", "LGG", "THCA", "LUSC", "PRAD", "SKCM", "COAD", "STAD", "BLCA", "LIHC", "CESC", "KIRP", "SARC", "LAML", "ESCA", "PAAD", "PCPG", "READ", "TGCT", "THYM", "KICH", "ACC", "MESO", "UVM", "DLBC", "UCS", "CHOL")
+
+pheno_df_list <- list(BRCA_pheno, GBM_pheno, OV_pheno, LUAD_pheno, UCEC_pheno, KIRC_pheno, HNSC_pheno, LGG_pheno, THCA_pheno, LUSC_pheno, PRAD_pheno, SKCM_pheno, COAD_pheno, STAD_pheno, BLCA_pheno, LIHC_pheno, CESC_pheno, KIRP_pheno, SARC_pheno, LAML_pheno, ESCA_pheno, PAAD_pheno, PCPG_pheno, READ_pheno, TGCT_pheno, THYM_pheno, KICH_pheno, ACC_pheno, MESO_pheno, UVM_pheno, DLBC_pheno, UCS_pheno, CHOL_pheno)
+
+names(pheno_df_list) <- list("BRCA", "GBM", "OV", "LUAD", "UCEC", "KIRC", "HNSC", "LGG", "THCA", "LUSC", "PRAD", "SKCM", "COAD", "STAD", "BLCA", "LIHC", "CESC", "KIRP", "SARC", "LAML", "ESCA", "PAAD", "PCPG", "READ", "TGCT", "THYM", "KICH", "ACC", "MESO", "UVM", "DLBC", "UCS", "CHOL")
+
+# save list of count dataframes for later
+saveRDS(count_df_list, "output/tcga_counts_list.rds")
+saveRDS(pheno_df_list, "output/tcga_metadata_list.rds")
+
+```
+
+
+## Create single dataframe
+```{r}
+total_counts <- count_df_list %>% reduce(left_join, by = "gene")
+
+# save count dataframe for later
+write_csv(total_counts, "output/tcga_total_counts.csv")
+```
+
+
