@@ -445,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-09
+<strong>Last updated:</strong> 2019-06-10
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
@@ -560,10 +560,10 @@ data/htseq_counts
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree89b0b276c99fbae30bfbb355c6a3c7a1cf864c1etargetblank89b0b27a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/89b0b276c99fbae30bfbb355c6a3c7a1cf864c1e" target="_blank">89b0b27</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree8358b4e6dc2836ea571a525b148d04db9fda9acftargetblank8358b4ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/8358b4e6dc2836ea571a525b148d04db9fda9acf" target="_blank">8358b4e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree89b0b276c99fbae30bfbb355c6a3c7a1cf864c1etargetblank89b0b27a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree8358b4e6dc2836ea571a525b148d04db9fda9acftargetblank8358b4ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -589,6 +589,8 @@ Ignored files:
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/tcga_counts_dataframe_list.rds
+    Ignored:    output/tcga_gdc_manifest.rds
 
 Untracked files:
     Untracked:  analysis/ss_gsea.Rmd
@@ -601,7 +603,6 @@ Untracked files:
     Untracked:  output/downreg_c5.csv
     Untracked:  output/downreg_c6.csv
     Untracked:  output/downreg_c7.csv
-    Untracked:  output/i
     Untracked:  output/km_cluster_assignments.csv
     Untracked:  output/table_c1.csv
     Untracked:  output/table_c2.csv
@@ -664,6 +665,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/mleukam/tcga_macs/blob/8358b4e6dc2836ea571a525b148d04db9fda9acf/analysis/tcga_download.Rmd" target="_blank">8358b4e</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+completed tcga download notebook - ending with list of dataframes of
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/784e9c649e573a7c26df64f6d11454efce2d64ed/docs/tcga_download.html" target="_blank">784e9c6</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/mleukam/tcga_macs/blob/89b0b276c99fbae30bfbb355c6a3c7a1cf864c1e/analysis/tcga_download.Rmd" target="_blank">89b0b27</a>
 </td>
 <td>
@@ -685,62 +720,18 @@ working download with all files
 </div>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<pre class="r"><code>library(&quot;GenomicDataCommons&quot;)</code></pre>
-<pre><code>Loading required package: magrittr</code></pre>
-<pre><code>
-Attaching package: &#39;GenomicDataCommons&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:stats&#39;:
-
-    filter</code></pre>
-<pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
-<pre><code>── Attaching packages ──────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
-<pre><code>✔ ggplot2 3.1.1     ✔ purrr   0.3.2
-✔ tibble  2.1.3     ✔ dplyr   0.8.1
-✔ tidyr   0.8.3     ✔ stringr 1.4.0
-✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>── Conflicts ─────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::count()     masks GenomicDataCommons::count()
-✖ tidyr::expand()    masks GenomicDataCommons::expand()
-✖ tidyr::extract()   masks magrittr::extract()
-✖ dplyr::filter()    masks GenomicDataCommons::filter(), stats::filter()
-✖ dplyr::lag()       masks stats::lag()
-✖ dplyr::select()    masks GenomicDataCommons::select()
-✖ purrr::set_names() masks magrittr::set_names()</code></pre>
+<pre class="r"><code>knitr::opts_chunk$set(eval=FALSE)</code></pre>
+<pre class="r"><code>library(&quot;GenomicDataCommons&quot;)
+library(&quot;tidyverse&quot;)</code></pre>
 <div id="test-connection" class="section level4">
 <h4>Test connection</h4>
-<pre class="r"><code>GenomicDataCommons::status()</code></pre>
-<pre><code>$commit
-[1] &quot;3e22a4257d5079ae9f7193950b51ed9dfc561ed1&quot;
+<pre class="r"><code>GenomicDataCommons::status()
 
-$data_release
-[1] &quot;Data Release 17.0 - June 05, 2019&quot;
-
-$status
-[1] &quot;OK&quot;
-
-$tag
-[1] &quot;1.21.0&quot;
-
-$version
-[1] 1</code></pre>
-<pre class="r"><code># how many cases available in TCGA
+# how many cases available in TCGA
 cases() %&gt;% 
   GenomicDataCommons::filter(~ project.program.name==&#39;TCGA&#39;) %&gt;%
   facet(&#39;samples.sample_type&#39;) %&gt;% 
   aggregations()</code></pre>
-<pre><code>$samples.sample_type
-                                               key doc_count
-1                                    Primary Tumor     10901
-2                             Blood Derived Normal      9374
-3                              Solid Tissue Normal      2549
-4                                       Metastatic       398
-5  Primary Blood Derived Cancer - Peripheral Blood       200
-6                                  Recurrent Tumor        58
-7                         Additional - New Primary        11
-8                                     FFPE Scrolls         5
-9                               Buccal Cell Normal         5
-10                              Bone Marrow Normal         4
-11                           Additional Metastatic         2</code></pre>
 </div>
 </div>
 <div id="download-files" class="section level2">
@@ -796,471 +787,12 @@ tcgalist &lt;- list(&quot;BRCA&quot; = &quot;TCGA-BRCA&quot;,
 
 # apply function to list elements
 tcga_countfile_manifest &lt;- map(tcgalist, getrawcounts)
-str(tcga_countfile_manifest)</code></pre>
-<pre><code>List of 33
- $ BRCA:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 1222 obs. of  5 variables:
-  ..$ id      : chr [1:1222] &quot;f36a2bbc-ecf7-42ea-9fe2-f9da0d79b9b8&quot; &quot;d8b83d06-a8cf-411f-80f7-cd6847a1f5c7&quot; &quot;e8016e2b-8523-4faf-a967-d66cb09e3697&quot; &quot;0436168e-36ed-42e9-9ee9-d9aaf661547b&quot; ...
-  ..$ filename: chr [1:1222] &quot;2b5c518f-8327-478a-a282-01bfe59aca4c.htseq.counts.gz&quot; &quot;64262505-9f17-4989-94c9-fc6db56ca676.htseq.counts.gz&quot; &quot;f5d3e683-9177-45fc-93e3-357bf7366ac4.htseq.counts.gz&quot; &quot;6999d309-8502-49ee-8d80-9d0bde00081f.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:1222] &quot;af13d0ed779a76ea1025fd7e92fa2e97&quot; &quot;84e3124d9ea34fd4962f4143efa25617&quot; &quot;e2cb7cde00d8634fae748d082254158f&quot; &quot;16d4e23927588388086b2a8a1743490c&quot; ...
-  ..$ size    : num [1:1222] 257725 256496 252976 250749 259222 ...
-  ..$ state   : chr [1:1222] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ GBM :Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 174 obs. of  5 variables:
-  ..$ id      : chr [1:174] &quot;b3cc18d4-473d-4303-a8de-1a631b46d0d4&quot; &quot;558c4654-1be9-4eb2-9322-af29c48035ad&quot; &quot;fb671f53-6399-438c-9b90-9aac72084b09&quot; &quot;d232a064-8d33-48cc-ad14-c49842d35ce8&quot; ...
-  ..$ filename: chr [1:174] &quot;1ede5c59-96ae-486b-ae1f-5f7c7909cf6a.htseq.counts.gz&quot; &quot;026527d4-007c-4c4e-9bd5-855c44bbe7b0.htseq.counts.gz&quot; &quot;c8460566-8199-4a4d-93fd-67692611992d.htseq.counts.gz&quot; &quot;2afdb646-75ca-4bc9-9c12-30a27f994ecd.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:174] &quot;cd558fcce62cb66589ed63bcdd4ed8b3&quot; &quot;6789132c488c3c4f5882c78936f58f54&quot; &quot;11063bc62b4b9d7383cc537a2fc944c2&quot; &quot;3a10ff4b78cdc3977dde7b80507930f7&quot; ...
-  ..$ size    : num [1:174] 259234 255947 254622 257801 252368 ...
-  ..$ state   : chr [1:174] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ OV  :Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 379 obs. of  5 variables:
-  ..$ id      : chr [1:379] &quot;e09d9ae2-b5b5-47ac-8d22-f10d7c3066d1&quot; &quot;b02459dd-1f1d-4a66-a5d0-e8fd2d0dbc68&quot; &quot;329ae6b7-3f35-4fb8-bf04-25b179fdfc5c&quot; &quot;ff7edff0-bfb5-4520-b729-cc8faa3390ab&quot; ...
-  ..$ filename: chr [1:379] &quot;56427511-2167-465f-bdde-689b895b3d4b.htseq.counts.gz&quot; &quot;5327762f-5add-4008-ac5f-beca30ee5b4d.htseq.counts.gz&quot; &quot;9ac17699-409b-4750-9317-aacc8c04da46.htseq.counts.gz&quot; &quot;25d6dd26-51c7-40dd-962a-c00abb70c5cb.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:379] &quot;1be3c2be2cff4cddcdf4d6aea77a98dc&quot; &quot;b22976ca2e31bdf1f0ccd7a72df0efe0&quot; &quot;8ce298486ba9abb070d1a401ac3cd1cf&quot; &quot;fd0b10ceb8566ff99a62f1c04bad5226&quot; ...
-  ..$ size    : num [1:379] 250109 256176 261299 253578 249929 ...
-  ..$ state   : chr [1:379] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ LUAD:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 594 obs. of  5 variables:
-  ..$ id      : chr [1:594] &quot;82b7b19d-162c-417e-b38b-d1ac77a4969d&quot; &quot;04ddcbe3-f123-45ac-a1a9-c8509cf5d3a6&quot; &quot;f876894e-36f9-4ff9-ac34-59fc5de8fdeb&quot; &quot;66cb1ab2-787a-436e-9826-90211a052dee&quot; ...
-  ..$ filename: chr [1:594] &quot;10d037c2-a3bf-46cf-9e27-0584733f6794.htseq.counts.gz&quot; &quot;3799992f-2a2b-4a7b-8c21-f493764f4ce8.htseq.counts.gz&quot; &quot;98b20d7c-8d7e-4d6f-bdf1-67fc8d05a26c.htseq.counts.gz&quot; &quot;2391658d-7cf2-4a09-8dd5-19ea7a37dadf.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:594] &quot;ad6bed1715f76e5f718aad02d36499fb&quot; &quot;f8f03df32ae6ca1b991197e5180477b0&quot; &quot;5bb50260ea207d522042ad277098ea29&quot; &quot;049dfa10158e30f1ae145fce36573f7f&quot; ...
-  ..$ size    : num [1:594] 251151 252472 258414 249975 258367 ...
-  ..$ state   : chr [1:594] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ UCEC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 587 obs. of  5 variables:
-  ..$ id      : chr [1:587] &quot;edb4cee6-b9eb-4bc0-9f9d-caf2fe16116b&quot; &quot;472bdac0-5f51-4b54-a232-b750cc9a8c7b&quot; &quot;838139a6-b0a9-402a-a755-8a88a11abfea&quot; &quot;9c0b8a27-5f29-4580-a14c-01078b1524e7&quot; ...
-  ..$ filename: chr [1:587] &quot;d09dc15d-98ac-44c1-a474-a9710f87b8ae.htseq.counts.gz&quot; &quot;8cd31f85-1d2e-4d90-bd8b-7ca7ebd9241b.htseq.counts.gz&quot; &quot;c09a5ffc-56b4-481b-a2a6-f8b08e31d60e.htseq.counts.gz&quot; &quot;eead04fd-8f20-43f7-adc1-7da37fccd2e4.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:587] &quot;54f6801aa764b69a2a783d600ecfad93&quot; &quot;d9ecae518ee7647fdb0b23720102d297&quot; &quot;c7f66138d713f70c351fe652f38b9883&quot; &quot;d908c60b090029d7c8ce05cb36fe1362&quot; ...
-  ..$ size    : num [1:587] 241667 249615 254107 245656 250102 ...
-  ..$ state   : chr [1:587] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ KIRC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 611 obs. of  5 variables:
-  ..$ id      : chr [1:611] &quot;9fc0b1ed-f3f9-4cb1-be32-e10c3c9ccfd9&quot; &quot;3b97e2c7-5c28-45ae-91c2-902dfd3a7c9a&quot; &quot;793e01d0-1963-426d-8ad1-7b35396b919b&quot; &quot;51cf6da0-aa2e-43cd-b72e-5b5901a93348&quot; ...
-  ..$ filename: chr [1:611] &quot;4020fb48-41a6-40be-bf52-0e45fa2c1799.htseq.counts.gz&quot; &quot;e69a2070-7766-4e4a-89f5-5728e2c9590f.htseq.counts.gz&quot; &quot;8e8191bf-78b4-4d5d-ac02-153528aee2f5.htseq.counts.gz&quot; &quot;543d90e4-9064-47c2-a68d-fb123f627977.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:611] &quot;6e78f0114b247c7adf8693d1c1e87141&quot; &quot;c9286240a967b4794ec025324ee00c54&quot; &quot;3895420aac59b048d1b8d93ce49f2cf4&quot; &quot;988aadb3d2ab5717a0c947eb96a8f72c&quot; ...
-  ..$ size    : num [1:611] 256438 260220 258084 259435 257748 ...
-  ..$ state   : chr [1:611] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ HNSC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 546 obs. of  5 variables:
-  ..$ id      : chr [1:546] &quot;4dcbd438-8c68-4b00-b81b-989577ceda0d&quot; &quot;6267695a-6e35-4bef-9d24-39dbc783ed75&quot; &quot;04303348-e957-474f-9667-0f36ee8cbbf6&quot; &quot;9aab5cae-1c0e-4249-bb84-c5e6a484ee60&quot; ...
-  ..$ filename: chr [1:546] &quot;fb3bc987-c15c-4c73-a9cb-5312f548805b.htseq.counts.gz&quot; &quot;3dd81c51-f34d-43d2-b65e-997eab153d4d.htseq.counts.gz&quot; &quot;c8cb8ef1-b679-4084-a11a-4ccc68d4a062.htseq.counts.gz&quot; &quot;e2c687dd-e061-4896-a362-7832f6ab30b2.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:546] &quot;4aaa2284427a531815924b6175f0bdbd&quot; &quot;eb429c00b03f986d530aa1c6a9876502&quot; &quot;0beb417953055b7ec6bd293cdb924028&quot; &quot;e4c6908edfc6531049ce3d49422e03fb&quot; ...
-  ..$ size    : num [1:546] 244631 254300 255738 251844 251431 ...
-  ..$ state   : chr [1:546] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ LGG :Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 529 obs. of  5 variables:
-  ..$ id      : chr [1:529] &quot;2fac3221-11c6-4969-904f-edd64ae2c653&quot; &quot;649769af-57ef-448c-a707-06087266a870&quot; &quot;593bcc3e-a743-4b80-ad87-ef8a97b44fb5&quot; &quot;c96c12d8-626b-41c4-a9fe-32047c53bb57&quot; ...
-  ..$ filename: chr [1:529] &quot;20552a71-e597-4d07-9b9a-cb5bacb72222.htseq.counts.gz&quot; &quot;cecb9503-5b1f-4a02-bbdf-9d0ae63de828.htseq.counts.gz&quot; &quot;785ce6d8-79a1-4478-a516-a6dd263d99d2.htseq.counts.gz&quot; &quot;faa24ff0-dcf4-4245-b232-a172b0f19148.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:529] &quot;cca191503a2c56766e3fdaeea9e64304&quot; &quot;c1ebf0c8f117814206aa589bf581da88&quot; &quot;6c1bbfcfdbbbbcdb6d43086a1f62feef&quot; &quot;88ac152fd468dd09aeebf50a8c45ddf9&quot; ...
-  ..$ size    : num [1:529] 251346 257407 255114 253623 256471 ...
-  ..$ state   : chr [1:529] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ THCA:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 568 obs. of  5 variables:
-  ..$ id      : chr [1:568] &quot;b251a320-1852-4fcb-b989-c8ac746f669b&quot; &quot;fb5aff72-5a4f-4f10-abe4-9207cfbaffe5&quot; &quot;633311be-3520-4306-9197-801c90fe337b&quot; &quot;a512642f-b720-4efb-a4e9-49b746980809&quot; ...
-  ..$ filename: chr [1:568] &quot;f2b7624d-a767-498f-91cb-e5d2455c2b87.htseq.counts.gz&quot; &quot;0edf649b-505c-4363-8b74-6066f5efb48f.htseq.counts.gz&quot; &quot;5ea8eb81-9496-41a1-b4d5-8c544782ad44.htseq.counts.gz&quot; &quot;4690efed-5d11-4191-addb-8d290ddc063a.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:568] &quot;c120c75431526321c5401764424e8529&quot; &quot;86dc7622d9b442abfd29f93fa8773892&quot; &quot;f6836d20ff1785a7df135da2feea5741&quot; &quot;d1a9a8b8095b01769048904ac8379037&quot; ...
-  ..$ size    : num [1:568] 255404 250659 252597 257612 256793 ...
-  ..$ state   : chr [1:568] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ LUSC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 551 obs. of  5 variables:
-  ..$ id      : chr [1:551] &quot;29dec939-10b2-4455-8385-8f1184187a41&quot; &quot;c7a4ec19-0ec5-4de6-89a8-022dba8ed6c4&quot; &quot;6e9a018d-b6c7-4bf6-a5ab-c0be4250f23c&quot; &quot;1bba5f6d-7583-4592-82b7-4b8e4b6e5530&quot; ...
-  ..$ filename: chr [1:551] &quot;f490e7cb-8d67-47af-85c0-5dd5c7139efd.htseq.counts.gz&quot; &quot;d146cc22-0cb0-4adf-b507-95c343419dc1.htseq.counts.gz&quot; &quot;5f5460db-801d-4d87-ac5c-4b28ab42d8b9.htseq.counts.gz&quot; &quot;7936117f-4540-4f26-bde6-878d6ea8b837.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:551] &quot;a6c4327910da35444edfc7d26b628ab4&quot; &quot;5465204821c56fd420a0046672bda5a0&quot; &quot;46130dc152f07749cd226d19977a2069&quot; &quot;8bd09bc746a03aa1b7f8ad7d7830532b&quot; ...
-  ..$ size    : num [1:551] 256868 252524 254549 253392 250766 ...
-  ..$ state   : chr [1:551] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ PRAD:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 551 obs. of  5 variables:
-  ..$ id      : chr [1:551] &quot;e77902da-11de-4baa-ba38-c5bae4368704&quot; &quot;8d0c6b3a-8c49-4711-85d3-d28e06df265b&quot; &quot;e6dbe569-0e7a-4fb2-8707-3be12f0cf33a&quot; &quot;3e6f8b24-a47e-48e2-be5c-77e27272a92f&quot; ...
-  ..$ filename: chr [1:551] &quot;57ca9711-f3fa-44a9-9f0e-adb315107f8c.htseq.counts.gz&quot; &quot;b55df224-46ae-4601-b8fc-c0309f27baa5.htseq.counts.gz&quot; &quot;4a8849c2-9e21-4ccf-b703-b6d6311744e0.htseq.counts.gz&quot; &quot;f676c6d1-b263-467c-ae4f-547628572df8.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:551] &quot;c084163aedeaa4e42ef8143baa277452&quot; &quot;6f9e88734b6fe9249139748f08fad1d4&quot; &quot;1f442daf78b59827e532b378ada6ff59&quot; &quot;5290536cbe884708b94cd2e72d3e5a43&quot; ...
-  ..$ size    : num [1:551] 252323 258472 253274 253644 250236 ...
-  ..$ state   : chr [1:551] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ SKCM:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 472 obs. of  5 variables:
-  ..$ id      : chr [1:472] &quot;069b7c02-dc78-4478-b093-e9235deff82b&quot; &quot;54a53321-1b5a-4a99-9fcf-8b309806c668&quot; &quot;5e3deb50-64f9-4aa1-94b0-d67e399473ec&quot; &quot;70ec1f88-5d24-4171-8f1d-bde0c674a302&quot; ...
-  ..$ filename: chr [1:472] &quot;1ad750c4-add7-42e7-936b-30d3d2cb1738.htseq.counts.gz&quot; &quot;84757beb-52a0-4f25-9eba-ef6190d344b7.htseq.counts.gz&quot; &quot;f8f9da4d-0d27-4f93-894d-a93b9968ac0e.htseq.counts.gz&quot; &quot;ad165038-c75c-4352-9cb3-b7fd8790d7c7.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:472] &quot;f0d2dc18b98bf56ff33d921d3e732a7f&quot; &quot;fcf34ed9814e76c98f558a0350cd8f7a&quot; &quot;8021c0f74a6328654838b534a2271548&quot; &quot;d6b869fceb2a76955bb7b172c7de3309&quot; ...
-  ..$ size    : num [1:472] 251422 249370 251539 244973 250676 ...
-  ..$ state   : chr [1:472] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ COAD:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 521 obs. of  5 variables:
-  ..$ id      : chr [1:521] &quot;ac2e69fd-8e13-4d95-8210-595d09f616c6&quot; &quot;7af900ab-0a1a-471e-89a2-f887e2dcf433&quot; &quot;4571794b-22d1-49fc-9b84-c4ec3e6411b8&quot; &quot;24c0b854-79c3-436a-87a7-4d0bbfac626a&quot; ...
-  ..$ filename: chr [1:521] &quot;d15c1117-5ccd-47da-bb0a-51e5a71535ff.htseq.counts.gz&quot; &quot;0319a4cc-ee3f-4c6f-83e1-7cdd5f865dc0.htseq.counts.gz&quot; &quot;4ea4ed16-8597-426c-9485-0fc8a8d81973.htseq.counts.gz&quot; &quot;9e189255-33ba-4802-934b-dd8a7898ef0a.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:521] &quot;06215c71c3b1167e4b79df9dc613c57f&quot; &quot;dc9fa2748ff54309e025f053905e1373&quot; &quot;442f6994a8247397e9310248e7715de6&quot; &quot;d15e5cea960e499ef776fe2d539b81d9&quot; ...
-  ..$ size    : num [1:521] 245736 250057 242518 237651 243891 ...
-  ..$ state   : chr [1:521] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ STAD:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 407 obs. of  5 variables:
-  ..$ id      : chr [1:407] &quot;4e0ab0ae-6e48-4165-83e3-b7102486da14&quot; &quot;c9188e6d-d899-490a-ad54-10ff4729460b&quot; &quot;2f3a9352-0454-452d-913f-b20f09e8d936&quot; &quot;0dc94b1a-83c2-4305-b903-dcb26ecf4a32&quot; ...
-  ..$ filename: chr [1:407] &quot;9bef6ea0-d0ac-4552-863e-9bba7c91b6a6.htseq.counts.gz&quot; &quot;c92efe73-3258-44e8-aaa1-628ed1ca937d.htseq.counts.gz&quot; &quot;a7ee0b2a-298d-4e7a-88f8-eb466962e396.htseq.counts.gz&quot; &quot;cd3fbe8b-71e3-4437-983f-809f1ae5e9cf.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:407] &quot;481311d9ae82c1df7c47222934f73fe8&quot; &quot;64508a923aabd6fc9b5d57ba52f50492&quot; &quot;de1de5942c302a57c8687b0b919a8376&quot; &quot;8bcfddbefac26d54a46911da7d217d50&quot; ...
-  ..$ size    : num [1:407] 271303 262256 260433 259882 263984 ...
-  ..$ state   : chr [1:407] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ BLCA:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 433 obs. of  5 variables:
-  ..$ id      : chr [1:433] &quot;2cba507b-7b5b-42a3-9847-a2882860aa8a&quot; &quot;55bb90d8-21d7-4a80-92dd-4211e82bc352&quot; &quot;2113e2c0-1de3-4016-9eff-52358f7260b3&quot; &quot;7d977500-bbdd-4a01-a6d6-b57941a8b1d3&quot; ...
-  ..$ filename: chr [1:433] &quot;f018a202-567b-4ab7-9970-bf4ec8c1dff8.htseq.counts.gz&quot; &quot;fcd7dc6c-37b2-4550-901b-71a35ce4ca60.htseq.counts.gz&quot; &quot;09960f41-c1aa-4f75-8431-4df396f1a099.htseq.counts.gz&quot; &quot;58e60ae5-3245-46f5-8e76-bfe09910002a.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:433] &quot;bdb2cae217de009381fbad03ca7add41&quot; &quot;cd3b4af5d4a3bd7758a8cde0c2be8538&quot; &quot;f32dfd77538affd19953135791ee7ee0&quot; &quot;673c8e4bb71cadefc99dbb9bf81ef14e&quot; ...
-  ..$ size    : num [1:433] 250484 248887 248519 249993 254938 ...
-  ..$ state   : chr [1:433] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ LIHC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 424 obs. of  5 variables:
-  ..$ id      : chr [1:424] &quot;4aa3fefb-9665-4b0e-acc0-2c6970c26d72&quot; &quot;96daf97d-3b90-4dd9-9cf9-6b3c3a9f3a06&quot; &quot;f4ec7a19-c28c-4634-83ee-8628187367ea&quot; &quot;a5bbe584-d543-464c-8a53-8a4cfe28ac34&quot; ...
-  ..$ filename: chr [1:424] &quot;88f04bea-2fa9-45ef-b1b0-8e199b6abad7.htseq.counts.gz&quot; &quot;d0000779-67f0-46d6-9e09-546f32a80700.htseq.counts.gz&quot; &quot;712b7554-c2d3-4e05-bff0-2528aa23b1b7.htseq.counts.gz&quot; &quot;a73871e9-6fcf-4dcb-b8a2-f6864ee00f68.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:424] &quot;c31fa986d1694ffdf88c0018f70bcb9a&quot; &quot;e1a55a253e31633b68b483b1370d8e41&quot; &quot;6edf16625e89c448b66ab4906618e5ca&quot; &quot;db497c5688f6087b02d089646ff00b1d&quot; ...
-  ..$ size    : num [1:424] 249824 240080 245730 247242 251778 ...
-  ..$ state   : chr [1:424] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ CESC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 309 obs. of  5 variables:
-  ..$ id      : chr [1:309] &quot;bea71447-be2d-47cc-953e-93764f9281fb&quot; &quot;48072e96-4f5b-408d-af76-31dd5fce23ce&quot; &quot;a04a7a95-fc51-47e1-a654-f28478479eaf&quot; &quot;ea24e07e-9be0-451f-8c35-91b7b9a5f646&quot; ...
-  ..$ filename: chr [1:309] &quot;aded01c7-6a5b-44f3-a709-688fefa919eb.htseq.counts.gz&quot; &quot;ad9ecdf1-2d45-4063-aafe-c94699da2180.htseq.counts.gz&quot; &quot;a5a11873-eb01-4ec7-b1e6-d69987db5a72.htseq.counts.gz&quot; &quot;26e46ac5-1829-4fc6-bb61-fd40a2707f12.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:309] &quot;724138244c56a31385349b52c41a6854&quot; &quot;ee23b7fca13bdaa558458bcc23f21d72&quot; &quot;d37260b287d56ab105927aa15500b873&quot; &quot;d2cfc39dd651c6b109434461c7d4389c&quot; ...
-  ..$ size    : num [1:309] 253404 255691 254582 258303 249668 ...
-  ..$ state   : chr [1:309] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ KIRP:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 321 obs. of  5 variables:
-  ..$ id      : chr [1:321] &quot;06d6e591-7a3d-449d-a40a-4175a1e237b2&quot; &quot;e591db22-1eaa-440c-ade2-e4414a79a04b&quot; &quot;f4ca0e31-5f0f-41e2-8355-5956ceceeffa&quot; &quot;43b9c87d-4e93-4080-b082-8471dee57598&quot; ...
-  ..$ filename: chr [1:321] &quot;77acfb74-9209-4f4c-9110-cd441e3920d0.htseq.counts.gz&quot; &quot;38f141c2-4d24-45a7-bc7f-ecdba7082f72.htseq.counts.gz&quot; &quot;ea237009-dee2-42a0-aa54-9ac165e9aa26.htseq.counts.gz&quot; &quot;8ca718d6-8075-4e98-aaca-bc467dabc482.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:321] &quot;a20b5b46ed038b7a82414c824890d55c&quot; &quot;346d58a637c0649fbe38333b0471da80&quot; &quot;1a61de181d5a3896a889d0bc1bada890&quot; &quot;8e69eb2a0c27cb4be17cd4ced5ea67b8&quot; ...
-  ..$ size    : num [1:321] 241153 250328 250436 253946 255063 ...
-  ..$ state   : chr [1:321] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ SARC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 265 obs. of  5 variables:
-  ..$ id      : chr [1:265] &quot;2ed99e29-4d23-43e0-b627-645e2427ff89&quot; &quot;c62a9a17-da02-4232-ad93-47d3c6f27601&quot; &quot;08a6ea88-5439-45ea-b509-351328eb6a78&quot; &quot;42ac4a0f-852a-46d8-981a-441ad000bb14&quot; ...
-  ..$ filename: chr [1:265] &quot;44db1348-8a8c-4ef2-99e9-e5a13a9c81ec.htseq.counts.gz&quot; &quot;e18f1492-00e7-4f95-85da-9cf0bd4ca229.htseq.counts.gz&quot; &quot;6e4b3f8b-5ade-45f6-8df3-4274fbfbb3b3.htseq.counts.gz&quot; &quot;df23e234-4acd-4eb5-b271-ff6bb18ccc1a.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:265] &quot;37cacd3425f8a808b45a518165f6d6fc&quot; &quot;4de13ed1d1d86918669b0d92604a5149&quot; &quot;f2400bccc58f81ab55b14d962af5881c&quot; &quot;e4362b3410fdbef9edb1ca82a423ae0f&quot; ...
-  ..$ size    : num [1:265] 246623 250713 253757 251525 252814 ...
-  ..$ state   : chr [1:265] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ LAML:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 151 obs. of  5 variables:
-  ..$ id      : chr [1:151] &quot;a2dc4c89-9ea1-4faa-b51e-914ef373f32e&quot; &quot;b5b95505-4b21-4db6-bf4d-1e189d0971b8&quot; &quot;0ecdf0e9-6a1f-42da-a42f-51bc69cc814a&quot; &quot;58cb229f-403f-4730-a07c-2a72837d3b9c&quot; ...
-  ..$ filename: chr [1:151] &quot;fe4e1221-8143-485e-8010-87787d40fa95.htseq.counts.gz&quot; &quot;4619b035-e95d-4267-9d74-e58bdbaf5d43.htseq.counts.gz&quot; &quot;6fc4ab63-6afc-4de5-a774-2ae0badb4f55.htseq.counts.gz&quot; &quot;93905cf5-5bfa-476a-9684-2b86c0062bf1.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:151] &quot;ffa9fe4aca674478a590402f1471b24b&quot; &quot;b994c18406e8a896e04d73f952fd95c3&quot; &quot;981f2fc401a79aea6b46f9e855185c6a&quot; &quot;079b73164d7c93557a4f14633737bb1b&quot; ...
-  ..$ size    : num [1:151] 259750 256538 259259 256717 258402 ...
-  ..$ state   : chr [1:151] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ ESCA:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 173 obs. of  5 variables:
-  ..$ id      : chr [1:173] &quot;f0e54d9d-9890-4fa1-8cae-8e2a3eec0d24&quot; &quot;e5a869d4-e0b0-4fd6-b7a4-3e7b1e324941&quot; &quot;b5b09d15-d884-4ed5-8288-f78ea1ada68f&quot; &quot;59c30c69-f7e6-4d23-b429-64b9fa39feda&quot; ...
-  ..$ filename: chr [1:173] &quot;23b6f4d8-a9da-4b20-977a-5f303707949f.htseq.counts.gz&quot; &quot;a1ea6dad-4010-4625-8eac-3b6b2325faae.htseq.counts.gz&quot; &quot;70c8b949-6b79-437e-8470-6648096471e5.htseq.counts.gz&quot; &quot;fcce1bdf-84ec-4679-b2a1-6b716aac4222.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:173] &quot;156e40ac228b419fcdbab632b582e1af&quot; &quot;d0b03c65e985b37fbbd4c030b76bbe1d&quot; &quot;bc880d032d3440a846eba3fa64001a78&quot; &quot;57cafc90e69fd71273a2acbcd0b4aa60&quot; ...
-  ..$ size    : num [1:173] 260658 262550 257039 262109 257478 ...
-  ..$ state   : chr [1:173] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ PAAD:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 182 obs. of  5 variables:
-  ..$ id      : chr [1:182] &quot;78bb8d49-54aa-43a1-aec4-31da818cdb14&quot; &quot;82d7d3b5-85bc-46b9-b9cd-2bdeb279dc0f&quot; &quot;13dfd8da-5d36-48fa-a82c-77b5c5e77e7b&quot; &quot;92f64f33-457b-439a-a4e5-15aed43be325&quot; ...
-  ..$ filename: chr [1:182] &quot;1f997074-0020-47e6-9928-5bf7209c552d.htseq.counts.gz&quot; &quot;cc133a8a-77ad-4570-852e-df72548c6897.htseq.counts.gz&quot; &quot;232f085b-6201-4e4d-8473-e592b8d8e16d.htseq.counts.gz&quot; &quot;30ce3471-112b-426c-ab57-6c0ab8e85dd2.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:182] &quot;31eaf2ddc469f44cbbcddf92e631af67&quot; &quot;435a535f7904090d6b97eb2eee7ed71e&quot; &quot;fb22772a5d5948778ea2f77cdecb3050&quot; &quot;352759d59ad3828d97c6c9f84343486a&quot; ...
-  ..$ size    : num [1:182] 250443 255221 252815 252300 254378 ...
-  ..$ state   : chr [1:182] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ PCPG:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 186 obs. of  5 variables:
-  ..$ id      : chr [1:186] &quot;f4a7afba-06e3-4346-9bac-a38cb3dfbbd2&quot; &quot;8ff4f6be-9a03-4f8b-a95f-9b7d6c0878a2&quot; &quot;466a4770-7604-4061-9f92-26548e101962&quot; &quot;b9d12340-c19b-490d-b907-d40e322bf731&quot; ...
-  ..$ filename: chr [1:186] &quot;07733705-c0b8-42be-806d-577cebf01f40.htseq.counts.gz&quot; &quot;5c630361-71e3-49ec-8557-01e1d722ebe1.htseq.counts.gz&quot; &quot;525b4383-ee34-4858-92ed-3899e4fa8802.htseq.counts.gz&quot; &quot;ba3a754c-be2a-4358-b880-7932a7d589f8.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:186] &quot;060f8d8ac4adb66e4022dcdbeac61715&quot; &quot;32e8d76b02499d00afb35b6b99454bcd&quot; &quot;586dd2a50ac38067db00f9caad396fa7&quot; &quot;aa4c8f670b26317045db6746b76e8a0e&quot; ...
-  ..$ size    : num [1:186] 251611 250954 254955 250552 250528 ...
-  ..$ state   : chr [1:186] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ READ:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 177 obs. of  5 variables:
-  ..$ id      : chr [1:177] &quot;7516a33f-2b76-4fed-b6b4-7393cbddab2c&quot; &quot;2e754e78-f929-4cf8-bec4-3300bd16d375&quot; &quot;7cd227a3-f901-4c3a-897e-aae50cc7154e&quot; &quot;b473a450-e04e-4ddc-8db4-6d32e31ea61e&quot; ...
-  ..$ filename: chr [1:177] &quot;857c670d-8322-4648-a3de-8279a9d015b7.htseq.counts.gz&quot; &quot;3008e71d-b93e-4122-b483-a25801996efd.htseq.counts.gz&quot; &quot;cead40ee-a5f8-4ce8-8273-bb8daedf0d5b.htseq.counts.gz&quot; &quot;7a2ea46c-25ce-4105-9366-a82292ea1340.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:177] &quot;2ff3ec3c9e7fcf1a7f76ba6050654e69&quot; &quot;b289406759e9027712904d021dc1c38c&quot; &quot;30a647c93181b528c67ef8f756bfc897&quot; &quot;5ac8fead502ab6b5c3fa5b75447fc766&quot; ...
-  ..$ size    : num [1:177] 253811 242943 248909 246223 255326 ...
-  ..$ state   : chr [1:177] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ TGCT:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 156 obs. of  5 variables:
-  ..$ id      : chr [1:156] &quot;0a60e1af-e1d6-4672-8ed0-f560f63f732d&quot; &quot;9568c91a-033c-480d-8eb2-90915239a0b0&quot; &quot;9470cc53-3190-4076-a931-26222c4b1dda&quot; &quot;75d5092b-7f20-4745-a9ef-35345c37cbe7&quot; ...
-  ..$ filename: chr [1:156] &quot;ffb1ecc1-105a-49c2-8c6e-3dbbbe8b92e1.htseq.counts.gz&quot; &quot;e492d61d-34be-4271-aaba-1d5d15a355fa.htseq.counts.gz&quot; &quot;33c0ea24-063a-499d-b964-54eb6b7a65ab.htseq.counts.gz&quot; &quot;f45f5868-3fb0-4a2c-b641-2bc4eb11e3f6.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:156] &quot;007f858468e15a4325409eafec534efd&quot; &quot;e35a1672fdb8096822981fb83df9f48f&quot; &quot;e80c9aa6cc552076abe7adb6759e3d1c&quot; &quot;eb0df9b561da314f3231a28f1b33e387&quot; ...
-  ..$ size    : num [1:156] 254967 254004 252380 256108 254630 ...
-  ..$ state   : chr [1:156] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ THYM:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 121 obs. of  5 variables:
-  ..$ id      : chr [1:121] &quot;5076c3df-8a51-4354-97cf-300eff2fc2e6&quot; &quot;bf01de95-095c-40cc-8357-c867d5f2d21c&quot; &quot;7307b89f-6927-4b51-949a-f319aa0bfcaf&quot; &quot;b2563a8a-e950-4027-9f34-a453ebb7702b&quot; ...
-  ..$ filename: chr [1:121] &quot;40472747-13f3-4100-a3c8-944e46b9bcfd.htseq.counts.gz&quot; &quot;598b8f85-8e10-4bc8-bbd6-3307fcaab25e.htseq.counts.gz&quot; &quot;81a8465a-bb66-44c9-bb81-efcd16f06937.htseq.counts.gz&quot; &quot;94eda95b-357a-4a91-9073-47d5b4c94453.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:121] &quot;47d95e1e5b0a8935d97aaa3109162826&quot; &quot;0d7518394282dfc588e5dc2955c890f9&quot; &quot;23e54877d5ec2f7e571ba39acb86143b&quot; &quot;a5dd278efcce5f6c31b13f276a0cec8e&quot; ...
-  ..$ size    : num [1:121] 252413 252339 248415 253954 259771 ...
-  ..$ state   : chr [1:121] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ KICH:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 89 obs. of  5 variables:
-  ..$ id      : chr [1:89] &quot;94f989da-0707-4d09-b102-b998f9185429&quot; &quot;9deff463-3986-4a92-8a59-7ef3c4be2f89&quot; &quot;b230f8a5-1e4a-4ddf-8682-91992bd66e14&quot; &quot;d46397c0-cda4-4109-8c70-42b7ab4a1f9f&quot; ...
-  ..$ filename: chr [1:89] &quot;e8c9698c-db12-4332-a58e-3e975aba9083.htseq.counts.gz&quot; &quot;d8db22cf-377f-4a0b-b7a7-9d49073ad5b3.htseq.counts.gz&quot; &quot;cbc71a28-a3f3-4f77-9939-92abce731b1d.htseq.counts.gz&quot; &quot;cdeabe84-4e20-4777-b944-44eeb8b0818c.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:89] &quot;8d0c8b232641b22c3a9846c8fd49c6e1&quot; &quot;a2c11fc29a78c16d728093128342dabf&quot; &quot;22ec14f6c661730ec24edab75f8f3b84&quot; &quot;299cc5cf12ab6a784be203b91f96732e&quot; ...
-  ..$ size    : num [1:89] 253272 255366 257428 255891 255520 ...
-  ..$ state   : chr [1:89] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ ACC :Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 79 obs. of  5 variables:
-  ..$ id      : chr [1:79] &quot;1811532e-e3ed-4167-8ff8-95c59b83f3fb&quot; &quot;8122c3ec-d1e1-42b6-984e-4c1ff13fff59&quot; &quot;4650fc40-5614-40c0-9034-1321bd7cd0d7&quot; &quot;9d6703a4-49fd-4ce0-ab28-b51e704f1272&quot; ...
-  ..$ filename: chr [1:79] &quot;a7288950-b8b0-4e3e-8ff3-6a1ef519eddf.htseq.counts.gz&quot; &quot;77ce7ba1-9173-4a9e-afe4-66f8411d88c0.htseq.counts.gz&quot; &quot;75fbb2a1-84b0-420a-a988-87c5726ca7db.htseq.counts.gz&quot; &quot;0ca40fc8-e6f8-452d-b18d-9a25ee3a5616.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:79] &quot;56fd1bdb9e1ae8c4121658796787a826&quot; &quot;cb0e1dbe5977a54f67ec15a5efb609fa&quot; &quot;344be650be40008da444e89adc2fef8e&quot; &quot;f0a0ca5c9a86b5966c2b7d2afa783ddc&quot; ...
-  ..$ size    : num [1:79] 230763 239584 238524 247942 243714 ...
-  ..$ state   : chr [1:79] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ MESO:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 86 obs. of  5 variables:
-  ..$ id      : chr [1:86] &quot;1084c475-8651-4d30-ba75-1c1cade3c633&quot; &quot;28390d33-2b16-428c-9ac0-2c55f970b3c8&quot; &quot;22244de5-e5c7-4f2a-9a48-9a90b7637cc4&quot; &quot;e55357ff-d99c-4f01-bb77-0b5e1a560559&quot; ...
-  ..$ filename: chr [1:86] &quot;f97de4a4-485e-47ac-9cf2-6201206b383a.htseq.counts.gz&quot; &quot;9fa6189c-26cd-41b2-9970-3fb612154e34.htseq.counts.gz&quot; &quot;a5a7ed23-d7e1-41c7-a821-c8710e49396a.htseq.counts.gz&quot; &quot;76513ac2-b3cb-419b-9634-e595703051f3.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:86] &quot;0aea5512d3b20d6ba016663aa7e0fbfc&quot; &quot;bc01b380ea4383512b1435a774626d73&quot; &quot;ffeab0b637b27d32a09219deea61ee6f&quot; &quot;33d75aad8d7e16602b00d99b1c47b617&quot; ...
-  ..$ size    : num [1:86] 250122 248362 252660 247903 250278 ...
-  ..$ state   : chr [1:86] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ UVM :Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 80 obs. of  5 variables:
-  ..$ id      : chr [1:80] &quot;93fee0ad-4995-43b5-9b3d-4e51e529fc4e&quot; &quot;fc3cefd2-7d9e-41fe-83c3-7ddb4998b3dd&quot; &quot;ca3dab87-6bd9-405e-8810-34c5d095a2a2&quot; &quot;53a6d51b-3895-49b0-9dff-cee8f3c0ab75&quot; ...
-  ..$ filename: chr [1:80] &quot;87c98a63-24f5-49c7-b452-1d7185fb16a9.htseq.counts.gz&quot; &quot;7d1546b5-f408-4d76-9621-88f49b4310e4.htseq.counts.gz&quot; &quot;ce58ee65-6131-496e-b29a-b5f97a26eb9d.htseq.counts.gz&quot; &quot;6e56e113-2176-4273-a87b-178315cbb4f7.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:80] &quot;e04e110b985308dd9c75083721e63d4e&quot; &quot;0103d48943fd6614eba3c3987570359f&quot; &quot;2d708a10efad30e593fa5bad9cd7c7ef&quot; &quot;9e2175684dc9dcbc121be933c4af5480&quot; ...
-  ..$ size    : num [1:80] 248201 247981 250853 241696 240266 ...
-  ..$ state   : chr [1:80] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ DLBC:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 48 obs. of  5 variables:
-  ..$ id      : chr [1:48] &quot;fc613497-afd8-45c0-9efd-8021a4ba85d8&quot; &quot;871ee67b-b56f-4832-955a-74b9ea241cb0&quot; &quot;83a0dbed-743d-4831-87a1-ad93dacbfc34&quot; &quot;9643a07c-905a-410c-9b23-5af7dae3c073&quot; ...
-  ..$ filename: chr [1:48] &quot;19877f23-cba6-4720-acb5-fcd5cd783495.htseq.counts.gz&quot; &quot;98f19837-11d9-4d6b-9b83-98eece1e27ea.htseq.counts.gz&quot; &quot;80d693b7-f6a2-4cb5-8e42-d71e8c279e7d.htseq.counts.gz&quot; &quot;c6fabdd4-e882-437d-bb68-0080ef9e7bde.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:48] &quot;11fbfc71fea491d75a8a1b96c82457b7&quot; &quot;a3ad134303f723ef354f55663757d05f&quot; &quot;5fa022ff89a9364b98c7db129ce38c0c&quot; &quot;b8e44e86f4b78de79e2d7d96a8590fde&quot; ...
-  ..$ size    : num [1:48] 251893 253081 253226 250936 240827 ...
-  ..$ state   : chr [1:48] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ UCS :Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 56 obs. of  5 variables:
-  ..$ id      : chr [1:56] &quot;428559d9-0b01-4d34-ab49-69c5c3d50984&quot; &quot;27c35c63-1f38-4a57-a75c-2913ed3c4356&quot; &quot;525c10b3-5ded-4b68-a488-c3f32246e252&quot; &quot;7959ccfa-bc3e-42e7-aa61-e2c789bd6d5b&quot; ...
-  ..$ filename: chr [1:56] &quot;84c893d7-3ad8-45bf-9db1-c7d1c9086267.htseq.counts.gz&quot; &quot;4dd62d93-f835-4664-b9a5-6cdf0dd5f176.htseq.counts.gz&quot; &quot;f72258b9-fa1e-4c96-9229-f9f711c72dc5.htseq.counts.gz&quot; &quot;b9771e93-d477-4491-ae58-0e52190be2d7.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:56] &quot;39a503a0e88d3af44f6fff95793ab395&quot; &quot;d64363646af2bd43403025c76d25c234&quot; &quot;830df5e0c98334e8a2d5f513b86219cd&quot; &quot;3859f63d45b3250e21ceeabd9d11903c&quot; ...
-  ..$ size    : num [1:56] 256927 251909 256658 256583 256655 ...
-  ..$ state   : chr [1:56] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )
- $ CHOL:Classes &#39;GDCManifest&#39;, &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 45 obs. of  5 variables:
-  ..$ id      : chr [1:45] &quot;42994602-7f8d-4d05-a191-9bcec686aaf7&quot; &quot;d9249d25-d852-4008-a71e-dd9be6cb68e9&quot; &quot;8e06ea1c-dbca-4b01-8f00-e4259507a77a&quot; &quot;e7a3c801-4e2f-45fd-948b-cef353403afb&quot; ...
-  ..$ filename: chr [1:45] &quot;de26b3ba-4ca2-4c78-b603-4eb240315148.htseq.counts.gz&quot; &quot;fbdb830c-2f70-45f5-a2d6-2d8317301af3.htseq.counts.gz&quot; &quot;04df2e2a-04c6-4a8d-9bf3-b7a7a075101e.htseq.counts.gz&quot; &quot;85bebda7-644b-4f9b-a928-b758f4fd9495.htseq.counts.gz&quot; ...
-  ..$ md5     : chr [1:45] &quot;8d88c044f885879491c35622c7ac1d3d&quot; &quot;ff06ba6ee5c0d6b9875310f592c5b9ff&quot; &quot;2ddac17e810ae67a50a5bb2953044135&quot; &quot;42c0bfc4cfee65de94638755320d41f4&quot; ...
-  ..$ size    : num [1:45] 249278 243981 244236 254152 243141 ...
-  ..$ state   : chr [1:45] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
-  ..- attr(*, &quot;spec&quot;)=
-  .. .. cols(
-  .. ..   id = col_character(),
-  .. ..   filename = col_character(),
-  .. ..   md5 = col_character(),
-  .. ..   size = col_double(),
-  .. ..   state = col_character()
-  .. .. )</code></pre>
-<pre class="r"><code># combined into a single table
+str(tcga_countfile_manifest)
+
+# save for later use
+saveRDS(tcga_countfile_manifest, &quot;output/tcga_gdc_manifest.rds&quot;)
+
+# combined into a single table
 combined_manifest &lt;- bind_rows(tcga_countfile_manifest, .id = &quot;column_label&quot;)
 
 #----------------------------
@@ -1350,6 +882,388 @@ missing_ids &lt;- combined_man_tbl %&gt;%
   filter(filename %in% missing) %&gt;%
   pull(id)</code></pre>
 <p>No further missing files</p>
+</div>
+</div>
+<div id="combine-reads-into-single-dataframes-by-cancer-type" class="section level2">
+<h2>Combine reads into single dataframes by cancer type</h2>
+<p>Load data</p>
+<pre class="r"><code>tcga_manifest &lt;- readRDS(&quot;output/tcga_gdc_manifest.rds&quot;)</code></pre>
+<p>Combine files into dataframes</p>
+<pre class="r"><code>filepaths &lt;- map(tcga_manifest, function(df){
+  df %&gt;% dplyr::select(filename) %&gt;% 
+    mutate(filename = (str_replace(filename, &quot;.gz&quot;, &quot;&quot;))) %&gt;%
+    mutate(filepath = (str_c(&quot;data/htseq_counts/&quot;, filename)))
+           })</code></pre>
+<pre class="r"><code># read in BRCA files
+BRCA_paths &lt;- filepaths$BRCA %&gt;% pull(filepath)
+
+BRCA_df &lt;- map(BRCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$BRCA %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(BRCA_df) &lt;- cols
+BRCA_df</code></pre>
+<pre class="r"><code># read in GBM files
+GBM_paths &lt;- filepaths$GBM %&gt;% pull(filepath)
+
+GBM_df &lt;- map(GBM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$GBM %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(GBM_df) &lt;- cols
+GBM_df</code></pre>
+<pre class="r"><code># read in OV files
+OV_paths &lt;- filepaths$OV %&gt;% pull(filepath)
+
+OV_df &lt;- map(OV_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$OV %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(OV_df) &lt;- cols
+OV_df</code></pre>
+<pre class="r"><code># read in LUAD files
+LUAD_paths &lt;- filepaths$LUAD %&gt;% pull(filepath)
+
+LUAD_df &lt;- map(LUAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$LUAD %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(LUAD_df) &lt;- cols
+LUAD_df</code></pre>
+<pre class="r"><code># read in UCEC files
+UCEC_paths &lt;- filepaths$UCEC %&gt;% pull(filepath)
+
+UCEC_df &lt;- map(UCEC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$UCEC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(UCEC_df) &lt;- cols
+UCEC_df</code></pre>
+<pre class="r"><code># read in KIRC files
+KIRC_paths &lt;- filepaths$KIRC %&gt;% pull(filepath)
+
+KIRC_df &lt;- map(KIRC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$KIRC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(KIRC_df) &lt;- cols
+KIRC_df</code></pre>
+<pre class="r"><code># read in HNSC files
+HNSC_paths &lt;- filepaths$HNSC %&gt;% pull(filepath)
+
+HNSC_df &lt;- map(HNSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$HNSC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(HNSC_df) &lt;- cols
+HNSC_df</code></pre>
+<pre class="r"><code># read in LGG files
+LGG_paths &lt;- filepaths$LGG %&gt;% pull(filepath)
+
+LGG_df &lt;- map(LGG_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$LGG %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(LGG_df) &lt;- cols
+LGG_df</code></pre>
+<pre class="r"><code># read in THCA files
+THCA_paths &lt;- filepaths$THCA %&gt;% pull(filepath)
+
+THCA_df &lt;- map(THCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$THCA %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(THCA_df) &lt;- cols
+THCA_df</code></pre>
+<pre class="r"><code># read in LUSC files
+LUSC_paths &lt;- filepaths$LUSC %&gt;% pull(filepath)
+
+LUSC_df &lt;- map(LUSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$LUSC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(LUSC_df) &lt;- cols
+LUSC_df</code></pre>
+<pre class="r"><code># read in PRAD files
+PRAD_paths &lt;- filepaths$PRAD %&gt;% pull(filepath)
+
+PRAD_df &lt;- map(PRAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$PRAD %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(PRAD_df) &lt;- cols
+PRAD_df</code></pre>
+<pre class="r"><code># read in SKCM files
+SKCM_paths &lt;- filepaths$SKCM %&gt;% pull(filepath)
+
+SKCM_df &lt;- map(SKCM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$SKCM %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(SKCM_df) &lt;- cols
+SKCM_df</code></pre>
+<pre class="r"><code># read in COAD files
+COAD_paths &lt;- filepaths$COAD %&gt;% pull(filepath)
+
+COAD_df &lt;- map(COAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$COAD %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(COAD_df) &lt;- cols
+COAD_df</code></pre>
+<pre class="r"><code># read in STAD files
+STAD_paths &lt;- filepaths$STAD %&gt;% pull(filepath)
+
+STAD_df &lt;- map(STAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$STAD %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(STAD_df) &lt;- cols
+STAD_df</code></pre>
+<pre class="r"><code># read in BLCA files
+BLCA_paths &lt;- filepaths$BLCA %&gt;% pull(filepath)
+
+BLCA_df &lt;- map(BLCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$BLCA %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(BLCA_df) &lt;- cols
+BLCA_df</code></pre>
+<pre class="r"><code># read in LIHC files
+LIHC_paths &lt;- filepaths$LIHC %&gt;% pull(filepath)
+
+LIHC_df &lt;- map(LIHC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$LIHC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(LIHC_df) &lt;- cols
+LIHC_df</code></pre>
+<pre class="r"><code># read in CESC files
+CESC_paths &lt;- filepaths$CESC %&gt;% pull(filepath)
+
+CESC_df &lt;- map(CESC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$CESC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(CESC_df) &lt;- cols
+CESC_df</code></pre>
+<pre class="r"><code># read in KIRP files
+KIRP_paths &lt;- filepaths$KIRP %&gt;% pull(filepath)
+
+KIRP_df &lt;- map(KIRP_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$KIRP %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(KIRP_df) &lt;- cols
+KIRP_df</code></pre>
+<pre class="r"><code># read in SARC files
+SARC_paths &lt;- filepaths$SARC %&gt;% pull(filepath)
+
+SARC_df &lt;- map(SARC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$SARC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(SARC_df) &lt;- cols
+SARC_df</code></pre>
+<pre class="r"><code># read in LAML files
+LAML_paths &lt;- filepaths$LAML %&gt;% pull(filepath)
+
+LAML_df &lt;- map(LAML_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$LAML %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(LAML_df) &lt;- cols
+LAML_df</code></pre>
+<pre class="r"><code># read in ESCA files
+ESCA_paths &lt;- filepaths$ESCA %&gt;% pull(filepath)
+
+ESCA_df &lt;- map(ESCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$ESCA %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(ESCA_df) &lt;- cols
+ESCA_df</code></pre>
+<pre class="r"><code># read in PAAD files
+PAAD_paths &lt;- filepaths$PAAD %&gt;% pull(filepath)
+
+PAAD_df &lt;- map(PAAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$PAAD %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(PAAD_df) &lt;- cols
+PAAD_df</code></pre>
+<pre class="r"><code># read in PCPG files
+PCPG_paths &lt;- filepaths$PCPG %&gt;% pull(filepath)
+
+PCPG_df &lt;- map(PCPG_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$PCPG %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(PCPG_df) &lt;- cols
+PCPG_df</code></pre>
+<pre class="r"><code># read in READ files
+READ_paths &lt;- filepaths$READ %&gt;% pull(filepath)
+
+READ_df &lt;- map(READ_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$READ %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(READ_df) &lt;- cols
+READ_df</code></pre>
+<pre class="r"><code># read in TGCT files
+TGCT_paths &lt;- filepaths$TGCT %&gt;% pull(filepath)
+
+TGCT_df &lt;- map(TGCT_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$TGCT %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(TGCT_df) &lt;- cols
+TGCT_df</code></pre>
+<pre class="r"><code># read in THYM files
+THYM_paths &lt;- filepaths$THYM %&gt;% pull(filepath)
+
+THYM_df &lt;- map(THYM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$THYM %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(THYM_df) &lt;- cols
+THYM_df</code></pre>
+<pre class="r"><code># read in KICH files
+KICH_paths &lt;- filepaths$KICH %&gt;% pull(filepath)
+
+KICH_df &lt;- map(KICH_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$KICH %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(KICH_df) &lt;- cols
+KICH_df</code></pre>
+<pre class="r"><code># read in ACC files
+ACC_paths &lt;- filepaths$ACC %&gt;% pull(filepath)
+
+ACC_df &lt;- map(ACC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$ACC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(ACC_df) &lt;- cols
+ACC_df</code></pre>
+<pre class="r"><code># read in MESO files
+MESO_paths &lt;- filepaths$MESO %&gt;% pull(filepath)
+
+MESO_df &lt;- map(MESO_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$MESO %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(MESO_df) &lt;- cols
+MESO_df</code></pre>
+<pre class="r"><code># read in UVM files
+UVM_paths &lt;- filepaths$UVM %&gt;% pull(filepath)
+
+UVM_df &lt;- map(UVM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$UVM %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(UVM_df) &lt;- cols
+UVM_df</code></pre>
+<pre class="r"><code># read in DLBC files
+DLBC_paths &lt;- filepaths$DLBC %&gt;% pull(filepath)
+
+DLBC_df &lt;- map(DLBC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$DLBC %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(DLBC_df) &lt;- cols
+DLBC_df</code></pre>
+<pre class="r"><code># read in UCS files
+UCS_paths &lt;- filepaths$UCS %&gt;% pull(filepath)
+
+UCS_df &lt;- map(UCS_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$UCS %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(UCS_df) &lt;- cols
+UCS_df</code></pre>
+<pre class="r"><code># read in CHOL files
+CHOL_paths &lt;- filepaths$CHOL %&gt;% pull(filepath)
+
+CHOL_df &lt;- map(CHOL_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# get column names
+cols &lt;- tcga_manifest$CHOL %&gt;% pull(id)
+cols &lt;- c(&quot;gene&quot;, cols)
+colnames(CHOL_df) &lt;- cols
+CHOL_df</code></pre>
+</div>
+<div id="gather-up-the-dataframes" class="section level2">
+<h2>Gather up the dataframes</h2>
+<pre class="r"><code>count_df_list &lt;- list(BRCA_df, GBM_df, OV_df, LUAD_df, UCEC_df, KIRC_df, HNSC_df, LGG_df, THCA_df, LUSC_df, PRAD_df, SKCM_df, COAD_df, STAD_df, BLCA_df, LIHC_df, CESC_df, KIRP_df, SARC_df, LAML_df, ESCA_df, PAAD_df, PCPG_df, READ_df, TGCT_df, THYM_df, KICH_df, ACC_df, MESO_df, UVM_df, DLBC_df, UCS_df, CHOL_df)
+
+# save list of count dataframes for later
+saveRDS(count_df_list, &quot;output/tcga_counts_dataframe_list.rds&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1358,65 +1272,6 @@ missing_ids &lt;- combined_man_tbl %&gt;%
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.5.3 (2019-03-11)
-Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Mojave 10.14.4
-
-Matrix products: default
-BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
-
-locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
-
-other attached packages:
- [1] forcats_0.4.0            stringr_1.4.0           
- [3] dplyr_0.8.1              purrr_0.3.2             
- [5] readr_1.3.1              tidyr_0.8.3             
- [7] tibble_2.1.3             ggplot2_3.1.1           
- [9] tidyverse_1.2.1          GenomicDataCommons_1.6.0
-[11] magrittr_1.5            
-
-loaded via a namespace (and not attached):
- [1] Rcpp_1.0.1                  lubridate_1.7.4            
- [3] lattice_0.20-38             assertthat_0.2.1           
- [5] rprojroot_1.3-2             digest_0.6.19              
- [7] cellranger_1.1.0            R6_2.4.0                   
- [9] GenomeInfoDb_1.18.2         plyr_1.8.4                 
-[11] backports_1.1.4             stats4_3.5.3               
-[13] evaluate_0.14               httr_1.4.0                 
-[15] highr_0.8                   pillar_1.4.1               
-[17] zlibbioc_1.28.0             rlang_0.3.4                
-[19] curl_3.3                    readxl_1.3.1               
-[21] lazyeval_0.2.2              rstudioapi_0.10            
-[23] whisker_0.3-2               S4Vectors_0.20.1           
-[25] Matrix_1.2-17               rmarkdown_1.13             
-[27] BiocParallel_1.16.6         RCurl_1.95-4.12            
-[29] munsell_0.5.0               DelayedArray_0.8.0         
-[31] broom_0.5.2                 modelr_0.1.4               
-[33] compiler_3.5.3              xfun_0.7                   
-[35] pkgconfig_2.0.2             BiocGenerics_0.28.0        
-[37] htmltools_0.3.6             tidyselect_0.2.5           
-[39] SummarizedExperiment_1.12.0 GenomeInfoDbData_1.2.0     
-[41] workflowr_1.4.0             IRanges_2.16.0             
-[43] matrixStats_0.54.0          withr_2.1.2                
-[45] crayon_1.3.4                bitops_1.0-6               
-[47] rappdirs_0.3.1              grid_3.5.3                 
-[49] nlme_3.1-140                jsonlite_1.6               
-[51] gtable_0.3.0                git2r_0.25.2               
-[53] scales_1.0.0                cli_1.1.0                  
-[55] stringi_1.4.3               XVector_0.22.0             
-[57] fs_1.3.1                    xml2_1.2.0                 
-[59] generics_0.0.2              tools_3.5.3                
-[61] Biobase_2.42.0              glue_1.3.1                 
-[63] hms_0.4.2                   parallel_3.5.3             
-[65] yaml_2.2.0                  colorspace_1.4-1           
-[67] GenomicRanges_1.34.0        rvest_0.3.4                
-[69] knitr_1.23                  haven_2.1.0                </code></pre>
-</div>
 </div>
 </div>
 
