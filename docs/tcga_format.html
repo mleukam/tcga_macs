@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="mleukam" />
+
+<meta name="date" content="2019-06-10" />
+
+<title>Formatting TCGA data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Macrophage signatures in TCGA</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mleukam/tcga_macs">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Formatting TCGA data</h1>
+<h4 class="author">mleukam</h4>
+<h4 class="date">2019-06-10</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2019-06-10
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>tcga_macs/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.4.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20190409code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20190409)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20190409code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20190409)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree97258995c3e7d4e8aac06739fcd9bad14a92c2a8targetblank9725899a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/97258995c3e7d4e8aac06739fcd9bad14a92c2a8" target="_blank">9725899</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree97258995c3e7d4e8aac06739fcd9bad14a92c2a8targetblank9725899a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/.DS_Store
+    Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+    Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
+    Ignored:    data/GSE46903_RAW.tar
+    Ignored:    data/GSE46903_non-normalized.txt
+    Ignored:    data/GSE46903_nonnormalized copy.tsv
+    Ignored:    data/gse_46903.rds
+    Ignored:    data/htseq_counts/
+    Ignored:    output/dge_frame.csv
+    Ignored:    output/downreg_c1.csv
+    Ignored:    output/downreg_c2.csv
+    Ignored:    output/downreg_c3.csv
+    Ignored:    output/downreg_c4.csv
+    Ignored:    output/downreg_c5.csv
+    Ignored:    output/downreg_c6.csv
+    Ignored:    output/downreg_c7.csv
+    Ignored:    output/expression_set.rds
+    Ignored:    output/km_cluster_assignments.csv
+    Ignored:    output/mac_eset.rds
+    Ignored:    output/mac_eset_w_clusters.rds
+    Ignored:    output/nested_list_dge_top50_updown.rds
+    Ignored:    output/normalized_probe_intensities.Rds
+    Ignored:    output/processed_lumi_46903.Rds
+    Ignored:    output/processed_lumi_46903.tsv
+    Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/table_c1.csv
+    Ignored:    output/table_c2.csv
+    Ignored:    output/table_c3.csv
+    Ignored:    output/table_c4.csv
+    Ignored:    output/table_c5.csv
+    Ignored:    output/table_c6.csv
+    Ignored:    output/table_c7.csv
+    Ignored:    output/tcga_counts_dataframe_list.rds
+    Ignored:    output/tcga_counts_list.rds
+    Ignored:    output/tcga_gdc_manifest.rds
+    Ignored:    output/tcga_metadata_list.rds
+    Ignored:    output/tcga_total_counts.csv
+    Ignored:    output/upreg_c1.csv
+    Ignored:    output/upreg_c2.csv
+    Ignored:    output/upreg_c3.csv
+    Ignored:    output/upreg_c4.csv
+    Ignored:    output/upreg_c5.csv
+    Ignored:    output/upreg_c6.csv
+    Ignored:    output/upreg_c7.csv
+
+Unstaged changes:
+    Modified:   analysis/ss_gsea.Rmd
+    Modified:   analysis/tcga_download.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the R Markdown and HTML files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view them.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/97258995c3e7d4e8aac06739fcd9bad14a92c2a8/analysis/tcga_format.Rmd" target="_blank">9725899</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+working formatting notebook
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>Clear workspace</p>
+<pre class="r"><code>rm(list = ls())</code></pre>
+<p>All of this is recorded for completeness - this notebook is not intended to be run more than once and the global options for evaluation are set to FALSE. Once this notebook was completed, results were stored in RDS objects for further.</p>
+<pre class="r"><code>knitr::opts_chunk$set(eval = FALSE)</code></pre>
+<p>Load packages</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+</div>
+<div id="combine-reads-into-single-dataframes-by-cancer-type" class="section level2">
+<h2>Combine reads into single dataframes by cancer type</h2>
+<p>Load data</p>
+<pre class="r"><code>tcga_manifest &lt;- readRDS(&quot;output/tcga_gdc_manifest.rds&quot;)</code></pre>
+<p>Combine files into dataframes</p>
+<pre class="r"><code>filepaths &lt;- map(tcga_manifest, function(df){
+  df %&gt;% dplyr::select(filename) %&gt;% 
+    mutate(filename = (str_replace(filename, &quot;.gz&quot;, &quot;&quot;))) %&gt;%
+    mutate(filepath = (str_c(&quot;data/htseq_counts/&quot;, filename)))
+           })</code></pre>
+<pre class="r"><code># read in BRCA files
+BRCA_paths &lt;- filepaths$BRCA %&gt;% pull(filepath)
+
+BRCA_df &lt;- map(BRCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;BRCA&quot;, seq(1, (ncol(BRCA_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(BRCA_df) &lt;- allcols
+
+# get metadata
+BRCA_pheno &lt;- tcga_manifest$BRCA
+enframe(cols) 
+BRCA_pheno &lt;- add_column(BRCA_pheno, cols, .before = 1)
+BRCA_pheno &lt;- dplyr::rename(BRCA_pheno, sample = cols)
+
+# review results
+BRCA_pheno
+BRCA_df</code></pre>
+<pre class="r"><code># read in GBM files
+GBM_paths &lt;- filepaths$GBM %&gt;% pull(filepath)
+
+GBM_df &lt;- map(GBM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;GBM&quot;, seq(1, (ncol(GBM_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(GBM_df) &lt;- allcols
+
+# get metadata
+GBM_pheno &lt;- tcga_manifest$GBM
+enframe(cols) 
+GBM_pheno &lt;- add_column(GBM_pheno, cols, .before = 1)
+GBM_pheno &lt;- dplyr::rename(GBM_pheno, sample = cols)
+
+# review results
+GBM_pheno
+GBM_df</code></pre>
+<pre class="r"><code># read in OV files
+OV_paths &lt;- filepaths$OV %&gt;% pull(filepath)
+
+OV_df &lt;- map(OV_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;OV&quot;, seq(1, (ncol(OV_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(OV_df) &lt;- allcols
+
+# get metadata
+OV_pheno &lt;- tcga_manifest$OV
+enframe(cols) 
+OV_pheno &lt;- add_column(OV_pheno, cols, .before = 1)
+OV_pheno &lt;- dplyr::rename(OV_pheno, sample = cols)
+
+# review results
+OV_pheno
+OV_df</code></pre>
+<pre class="r"><code># read in LUAD files
+LUAD_paths &lt;- filepaths$LUAD %&gt;% pull(filepath)
+
+LUAD_df &lt;- map(LUAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;LUAD&quot;, seq(1, (ncol(LUAD_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(LUAD_df) &lt;- allcols
+
+# get metadata
+LUAD_pheno &lt;- tcga_manifest$LUAD
+enframe(cols) 
+LUAD_pheno &lt;- add_column(LUAD_pheno, cols, .before = 1)
+LUAD_pheno &lt;- dplyr::rename(LUAD_pheno, sample = cols)
+
+# review results
+LUAD_pheno
+LUAD_df</code></pre>
+<pre class="r"><code># read in UCEC files
+UCEC_paths &lt;- filepaths$UCEC %&gt;% pull(filepath)
+
+UCEC_df &lt;- map(UCEC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;UCEC&quot;, seq(1, (ncol(UCEC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(UCEC_df) &lt;- allcols
+
+# get metadata
+UCEC_pheno &lt;- tcga_manifest$UCEC
+enframe(cols) 
+UCEC_pheno &lt;- add_column(UCEC_pheno, cols, .before = 1)
+UCEC_pheno &lt;- dplyr::rename(UCEC_pheno, sample = cols)
+
+# review results
+UCEC_pheno
+UCEC_df</code></pre>
+<pre class="r"><code># read in KIRC files
+KIRC_paths &lt;- filepaths$KIRC %&gt;% pull(filepath)
+
+KIRC_df &lt;- map(KIRC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;KIRC&quot;, seq(1, (ncol(KIRC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(KIRC_df) &lt;- allcols
+
+# get metadata
+KIRC_pheno &lt;- tcga_manifest$KIRC
+enframe(cols) 
+KIRC_pheno &lt;- add_column(KIRC_pheno, cols, .before = 1)
+KIRC_pheno &lt;- dplyr::rename(KIRC_pheno, sample = cols)
+
+# review results
+KIRC_pheno
+KIRC_df</code></pre>
+<pre class="r"><code># read in HNSC files
+HNSC_paths &lt;- filepaths$HNSC %&gt;% pull(filepath)
+
+HNSC_df &lt;- map(HNSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;HNSC&quot;, seq(1, (ncol(HNSC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(HNSC_df) &lt;- allcols
+
+# get metadata
+HNSC_pheno &lt;- tcga_manifest$HNSC
+enframe(cols) 
+HNSC_pheno &lt;- add_column(HNSC_pheno, cols, .before = 1)
+HNSC_pheno &lt;- dplyr::rename(HNSC_pheno, sample = cols)
+
+# review results
+HNSC_pheno
+HNSC_df</code></pre>
+<pre class="r"><code># read in LGG files
+LGG_paths &lt;- filepaths$LGG %&gt;% pull(filepath)
+
+LGG_df &lt;- map(LGG_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;LGG&quot;, seq(1, (ncol(LGG_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(LGG_df) &lt;- allcols
+
+# get metadata
+LGG_pheno &lt;- tcga_manifest$LGG
+enframe(cols) 
+LGG_pheno &lt;- add_column(LGG_pheno, cols, .before = 1)
+LGG_pheno &lt;- dplyr::rename(LGG_pheno, sample = cols)
+
+# review results
+LGG_pheno
+LGG_df</code></pre>
+<pre class="r"><code># read in THCA files
+THCA_paths &lt;- filepaths$THCA %&gt;% pull(filepath)
+
+THCA_df &lt;- map(THCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;THCA&quot;, seq(1, (ncol(THCA_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(THCA_df) &lt;- allcols
+
+# get metadata
+THCA_pheno &lt;- tcga_manifest$THCA
+enframe(cols) 
+THCA_pheno &lt;- add_column(THCA_pheno, cols, .before = 1)
+THCA_pheno &lt;- dplyr::rename(THCA_pheno, sample = cols)
+
+# review results
+THCA_pheno
+THCA_df</code></pre>
+<pre class="r"><code># read in LUSC files
+LUSC_paths &lt;- filepaths$LUSC %&gt;% pull(filepath)
+
+LUSC_df &lt;- map(LUSC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;LUSC&quot;, seq(1, (ncol(LUSC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(LUSC_df) &lt;- allcols
+
+# get metadata
+LUSC_pheno &lt;- tcga_manifest$LUSC
+enframe(cols) 
+LUSC_pheno &lt;- add_column(LUSC_pheno, cols, .before = 1)
+LUSC_pheno &lt;- dplyr::rename(LUSC_pheno, sample = cols)
+
+# review results
+LUSC_pheno
+LUSC_df</code></pre>
+<pre class="r"><code># read in PRAD files
+PRAD_paths &lt;- filepaths$PRAD %&gt;% pull(filepath)
+
+PRAD_df &lt;- map(PRAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;PRAD&quot;, seq(1, (ncol(PRAD_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(PRAD_df) &lt;- allcols
+
+# get metadata
+PRAD_pheno &lt;- tcga_manifest$PRAD
+enframe(cols) 
+PRAD_pheno &lt;- add_column(PRAD_pheno, cols, .before = 1)
+PRAD_pheno &lt;- dplyr::rename(PRAD_pheno, sample = cols)
+
+# review results
+PRAD_pheno
+PRAD_df</code></pre>
+<pre class="r"><code># read in SKCM files
+SKCM_paths &lt;- filepaths$SKCM %&gt;% pull(filepath)
+
+SKCM_df &lt;- map(SKCM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;SKCM&quot;, seq(1, (ncol(SKCM_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(SKCM_df) &lt;- allcols
+
+# get metadata
+SKCM_pheno &lt;- tcga_manifest$SKCM
+enframe(cols) 
+SKCM_pheno &lt;- add_column(SKCM_pheno, cols, .before = 1)
+SKCM_pheno &lt;- dplyr::rename(SKCM_pheno, sample = cols)
+
+# review results
+SKCM_pheno
+SKCM_df</code></pre>
+<pre class="r"><code># read in COAD files
+COAD_paths &lt;- filepaths$COAD %&gt;% pull(filepath)
+
+COAD_df &lt;- map(COAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;COAD&quot;, seq(1, (ncol(COAD_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(COAD_df) &lt;- allcols
+
+# get metadata
+COAD_pheno &lt;- tcga_manifest$COAD
+enframe(cols) 
+COAD_pheno &lt;- add_column(COAD_pheno, cols, .before = 1)
+COAD_pheno &lt;- dplyr::rename(COAD_pheno, sample = cols)
+
+# review results
+COAD_pheno
+COAD_df</code></pre>
+<pre class="r"><code># read in STAD files
+STAD_paths &lt;- filepaths$STAD %&gt;% pull(filepath)
+
+STAD_df &lt;- map(STAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;STAD&quot;, seq(1, (ncol(STAD_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(STAD_df) &lt;- allcols
+
+# get metadata
+STAD_pheno &lt;- tcga_manifest$STAD
+enframe(cols) 
+STAD_pheno &lt;- add_column(STAD_pheno, cols, .before = 1)
+STAD_pheno &lt;- dplyr::rename(STAD_pheno, sample = cols)
+
+# review results
+STAD_pheno
+STAD_df</code></pre>
+<pre class="r"><code># read in BLCA files
+BLCA_paths &lt;- filepaths$BLCA %&gt;% pull(filepath)
+
+BLCA_df &lt;- map(BLCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;BLCA&quot;, seq(1, (ncol(BLCA_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(BLCA_df) &lt;- allcols
+
+# get metadata
+BLCA_pheno &lt;- tcga_manifest$BLCA
+enframe(cols) 
+BLCA_pheno &lt;- add_column(BLCA_pheno, cols, .before = 1)
+BLCA_pheno &lt;- dplyr::rename(BLCA_pheno, sample = cols)
+
+# review results
+BLCA_pheno
+BLCA_df</code></pre>
+<pre class="r"><code># read in LIHC files
+LIHC_paths &lt;- filepaths$LIHC %&gt;% pull(filepath)
+
+LIHC_df &lt;- map(LIHC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;LIHC&quot;, seq(1, (ncol(LIHC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(LIHC_df) &lt;- allcols
+
+# get metadata
+LIHC_pheno &lt;- tcga_manifest$LIHC
+enframe(cols) 
+LIHC_pheno &lt;- add_column(LIHC_pheno, cols, .before = 1)
+LIHC_pheno &lt;- dplyr::rename(LIHC_pheno, sample = cols)
+
+# review results
+LIHC_pheno
+LIHC_df</code></pre>
+<pre class="r"><code># read in CESC files
+CESC_paths &lt;- filepaths$CESC %&gt;% pull(filepath)
+
+CESC_df &lt;- map(CESC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;CESC&quot;, seq(1, (ncol(CESC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(CESC_df) &lt;- allcols
+
+# get metadata
+CESC_pheno &lt;- tcga_manifest$CESC
+enframe(cols) 
+CESC_pheno &lt;- add_column(CESC_pheno, cols, .before = 1)
+CESC_pheno &lt;- dplyr::rename(CESC_pheno, sample = cols)
+
+# review results
+CESC_pheno
+CESC_df</code></pre>
+<pre class="r"><code># read in KIRP files
+KIRP_paths &lt;- filepaths$KIRP %&gt;% pull(filepath)
+
+KIRP_df &lt;- map(KIRP_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;KIRP&quot;, seq(1, (ncol(KIRP_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(KIRP_df) &lt;- allcols
+
+# get metadata
+KIRP_pheno &lt;- tcga_manifest$KIRP
+enframe(cols) 
+KIRP_pheno &lt;- add_column(KIRP_pheno, cols, .before = 1)
+KIRP_pheno &lt;- dplyr::rename(KIRP_pheno, sample = cols)
+
+# review results
+KIRP_pheno
+KIRP_df</code></pre>
+<pre class="r"><code># read in SARC files
+SARC_paths &lt;- filepaths$SARC %&gt;% pull(filepath)
+
+SARC_df &lt;- map(SARC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;SARC&quot;, seq(1, (ncol(SARC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(SARC_df) &lt;- allcols
+
+# get metadata
+SARC_pheno &lt;- tcga_manifest$SARC
+enframe(cols) 
+SARC_pheno &lt;- add_column(SARC_pheno, cols, .before = 1)
+SARC_pheno &lt;- dplyr::rename(SARC_pheno, sample = cols)
+
+# review results
+SARC_pheno
+SARC_df</code></pre>
+<pre class="r"><code># read in LAML files
+LAML_paths &lt;- filepaths$LAML %&gt;% pull(filepath)
+
+LAML_df &lt;- map(LAML_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;LAML&quot;, seq(1, (ncol(LAML_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(LAML_df) &lt;- allcols
+
+# get metadata
+LAML_pheno &lt;- tcga_manifest$LAML
+enframe(cols) 
+LAML_pheno &lt;- add_column(LAML_pheno, cols, .before = 1)
+LAML_pheno &lt;- dplyr::rename(LAML_pheno, sample = cols)
+
+# review results
+LAML_pheno
+LAML_df</code></pre>
+<pre class="r"><code># read in ESCA files
+ESCA_paths &lt;- filepaths$ESCA %&gt;% pull(filepath)
+
+ESCA_df &lt;- map(ESCA_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;ESCA&quot;, seq(1, (ncol(ESCA_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(ESCA_df) &lt;- allcols
+
+# get metadata
+ESCA_pheno &lt;- tcga_manifest$ESCA
+enframe(cols) 
+ESCA_pheno &lt;- add_column(ESCA_pheno, cols, .before = 1)
+ESCA_pheno &lt;- dplyr::rename(ESCA_pheno, sample = cols)
+
+# review results
+ESCA_pheno
+ESCA_df</code></pre>
+<pre class="r"><code># read in PAAD files
+PAAD_paths &lt;- filepaths$PAAD %&gt;% pull(filepath)
+
+PAAD_df &lt;- map(PAAD_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;PAAD&quot;, seq(1, (ncol(PAAD_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(PAAD_df) &lt;- allcols
+
+# get metadata
+PAAD_pheno &lt;- tcga_manifest$PAAD
+enframe(cols) 
+PAAD_pheno &lt;- add_column(PAAD_pheno, cols, .before = 1)
+PAAD_pheno &lt;- dplyr::rename(PAAD_pheno, sample = cols)
+
+# review results
+PAAD_pheno
+PAAD_df</code></pre>
+<pre class="r"><code># read in PCPG files
+PCPG_paths &lt;- filepaths$PCPG %&gt;% pull(filepath)
+
+PCPG_df &lt;- map(PCPG_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;PCPG&quot;, seq(1, (ncol(PCPG_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(PCPG_df) &lt;- allcols
+
+# get metadata
+PCPG_pheno &lt;- tcga_manifest$PCPG
+enframe(cols) 
+PCPG_pheno &lt;- add_column(PCPG_pheno, cols, .before = 1)
+PCPG_pheno &lt;- dplyr::rename(PCPG_pheno, sample = cols)
+
+# review results
+PCPG_pheno
+PCPG_df</code></pre>
+<pre class="r"><code># read in READ files
+READ_paths &lt;- filepaths$READ %&gt;% pull(filepath)
+
+READ_df &lt;- map(READ_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;READ&quot;, seq(1, (ncol(READ_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(READ_df) &lt;- allcols
+
+# get metadata
+READ_pheno &lt;- tcga_manifest$READ
+enframe(cols) 
+READ_pheno &lt;- add_column(READ_pheno, cols, .before = 1)
+READ_pheno &lt;- dplyr::rename(READ_pheno, sample = cols)
+
+# review results
+READ_pheno
+READ_df</code></pre>
+<pre class="r"><code># read in TGCT files
+TGCT_paths &lt;- filepaths$TGCT %&gt;% pull(filepath)
+
+TGCT_df &lt;- map(TGCT_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;TGCT&quot;, seq(1, (ncol(TGCT_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(TGCT_df) &lt;- allcols
+
+# get metadata
+TGCT_pheno &lt;- tcga_manifest$TGCT
+enframe(cols) 
+TGCT_pheno &lt;- add_column(TGCT_pheno, cols, .before = 1)
+TGCT_pheno &lt;- dplyr::rename(TGCT_pheno, sample = cols)
+
+# review results
+TGCT_pheno
+TGCT_df</code></pre>
+<pre class="r"><code># read in THYM files
+THYM_paths &lt;- filepaths$THYM %&gt;% pull(filepath)
+
+THYM_df &lt;- map(THYM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;THYM&quot;, seq(1, (ncol(THYM_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(THYM_df) &lt;- allcols
+
+# get metadata
+THYM_pheno &lt;- tcga_manifest$THYM
+enframe(cols) 
+THYM_pheno &lt;- add_column(THYM_pheno, cols, .before = 1)
+THYM_pheno &lt;- dplyr::rename(THYM_pheno, sample = cols)
+
+# review results
+THYM_pheno
+THYM_df</code></pre>
+<pre class="r"><code># read in KICH files
+KICH_paths &lt;- filepaths$KICH %&gt;% pull(filepath)
+
+KICH_df &lt;- map(KICH_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;KICH&quot;, seq(1, (ncol(KICH_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(KICH_df) &lt;- allcols
+
+# get metadata
+KICH_pheno &lt;- tcga_manifest$KICH
+enframe(cols) 
+KICH_pheno &lt;- add_column(KICH_pheno, cols, .before = 1)
+KICH_pheno &lt;- dplyr::rename(KICH_pheno, sample = cols)
+
+# review results
+KICH_pheno
+KICH_df</code></pre>
+<pre class="r"><code># read in ACC files
+ACC_paths &lt;- filepaths$ACC %&gt;% pull(filepath)
+
+ACC_df &lt;- map(ACC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;ACC&quot;, seq(1, (ncol(ACC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(ACC_df) &lt;- allcols
+
+# get metadata
+ACC_pheno &lt;- tcga_manifest$ACC
+enframe(cols) 
+ACC_pheno &lt;- add_column(ACC_pheno, cols, .before = 1)
+ACC_pheno &lt;- dplyr::rename(ACC_pheno, sample = cols)
+
+# review results
+ACC_pheno
+ACC_df</code></pre>
+<pre class="r"><code># read in MESO files
+MESO_paths &lt;- filepaths$MESO %&gt;% pull(filepath)
+
+MESO_df &lt;- map(MESO_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;MESO&quot;, seq(1, (ncol(MESO_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(MESO_df) &lt;- allcols
+
+# get metadata
+MESO_pheno &lt;- tcga_manifest$MESO
+enframe(cols) 
+MESO_pheno &lt;- add_column(MESO_pheno, cols, .before = 1)
+MESO_pheno &lt;- dplyr::rename(MESO_pheno, sample = cols)
+
+# review results
+MESO_pheno
+MESO_df</code></pre>
+<pre class="r"><code># read in UVM files
+UVM_paths &lt;- filepaths$UVM %&gt;% pull(filepath)
+
+UVM_df &lt;- map(UVM_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;UVM&quot;, seq(1, (ncol(UVM_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(UVM_df) &lt;- allcols
+
+# get metadata
+UVM_pheno &lt;- tcga_manifest$UVM
+enframe(cols) 
+UVM_pheno &lt;- add_column(UVM_pheno, cols, .before = 1)
+UVM_pheno &lt;- dplyr::rename(UVM_pheno, sample = cols)
+
+# review results
+UVM_pheno
+UVM_df</code></pre>
+<pre class="r"><code># read in DLBC files
+DLBC_paths &lt;- filepaths$DLBC %&gt;% pull(filepath)
+
+DLBC_df &lt;- map(DLBC_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;DLBC&quot;, seq(1, (ncol(DLBC_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(DLBC_df) &lt;- allcols
+
+# get metadata
+DLBC_pheno &lt;- tcga_manifest$DLBC
+enframe(cols) 
+DLBC_pheno &lt;- add_column(DLBC_pheno, cols, .before = 1)
+DLBC_pheno &lt;- dplyr::rename(DLBC_pheno, sample = cols)
+
+# review results
+DLBC_pheno
+DLBC_df</code></pre>
+<pre class="r"><code># read in UCS files
+UCS_paths &lt;- filepaths$UCS %&gt;% pull(filepath)
+
+UCS_df &lt;- map(UCS_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;% 
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;UCS&quot;, seq(1, (ncol(UCS_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(UCS_df) &lt;- allcols
+
+# get metadata
+UCS_pheno &lt;- tcga_manifest$UCS
+enframe(cols) 
+UCS_pheno &lt;- add_column(UCS_pheno, cols, .before = 1)
+UCS_pheno &lt;- dplyr::rename(UCS_pheno, sample = cols)
+
+# review results
+UCS_pheno
+UCS_df</code></pre>
+<pre class="r"><code># read in CHOL files
+CHOL_paths &lt;- filepaths$CHOL %&gt;% pull(filepath)
+
+CHOL_df &lt;- map(CHOL_paths, function(x){read_tsv(x, col_names = FALSE)}) %&gt;%
+  reduce(left_join, by = &quot;X1&quot;)
+
+# set column names
+cols &lt;- paste0(&quot;CHOL&quot;, seq(1, (ncol(CHOL_df) - 1)))
+allcols &lt;- c(&quot;gene&quot;, cols)
+colnames(CHOL_df) &lt;- allcols
+
+# get metadata
+CHOL_pheno &lt;- tcga_manifest$CHOL
+enframe(cols) 
+CHOL_pheno &lt;- add_column(CHOL_pheno, cols, .before = 1)
+CHOL_pheno &lt;- dplyr::rename(CHOL_pheno, sample = cols)
+
+# review results
+CHOL_pheno
+CHOL_df</code></pre>
+</div>
+<div id="gather-up-the-dataframes" class="section level2">
+<h2>Gather up the dataframes</h2>
+<pre class="r"><code>count_df_list &lt;- list(BRCA_df, GBM_df, OV_df, LUAD_df, UCEC_df, KIRC_df, HNSC_df, LGG_df, THCA_df, LUSC_df, PRAD_df, SKCM_df, COAD_df, STAD_df, BLCA_df, LIHC_df, CESC_df, KIRP_df, SARC_df, LAML_df, ESCA_df, PAAD_df, PCPG_df, READ_df, TGCT_df, THYM_df, KICH_df, ACC_df, MESO_df, UVM_df, DLBC_df, UCS_df, CHOL_df)
+
+names(counts_df_list) &lt;- list(&quot;BRCA&quot;, &quot;GBM&quot;, &quot;OV&quot;, &quot;LUAD&quot;, &quot;UCEC&quot;, &quot;KIRC&quot;, &quot;HNSC&quot;, &quot;LGG&quot;, &quot;THCA&quot;, &quot;LUSC&quot;, &quot;PRAD&quot;, &quot;SKCM&quot;, &quot;COAD&quot;, &quot;STAD&quot;, &quot;BLCA&quot;, &quot;LIHC&quot;, &quot;CESC&quot;, &quot;KIRP&quot;, &quot;SARC&quot;, &quot;LAML&quot;, &quot;ESCA&quot;, &quot;PAAD&quot;, &quot;PCPG&quot;, &quot;READ&quot;, &quot;TGCT&quot;, &quot;THYM&quot;, &quot;KICH&quot;, &quot;ACC&quot;, &quot;MESO&quot;, &quot;UVM&quot;, &quot;DLBC&quot;, &quot;UCS&quot;, &quot;CHOL&quot;)
+
+pheno_df_list &lt;- list(BRCA_pheno, GBM_pheno, OV_pheno, LUAD_pheno, UCEC_pheno, KIRC_pheno, HNSC_pheno, LGG_pheno, THCA_pheno, LUSC_pheno, PRAD_pheno, SKCM_pheno, COAD_pheno, STAD_pheno, BLCA_pheno, LIHC_pheno, CESC_pheno, KIRP_pheno, SARC_pheno, LAML_pheno, ESCA_pheno, PAAD_pheno, PCPG_pheno, READ_pheno, TGCT_pheno, THYM_pheno, KICH_pheno, ACC_pheno, MESO_pheno, UVM_pheno, DLBC_pheno, UCS_pheno, CHOL_pheno)
+
+names(pheno_df_list) &lt;- list(&quot;BRCA&quot;, &quot;GBM&quot;, &quot;OV&quot;, &quot;LUAD&quot;, &quot;UCEC&quot;, &quot;KIRC&quot;, &quot;HNSC&quot;, &quot;LGG&quot;, &quot;THCA&quot;, &quot;LUSC&quot;, &quot;PRAD&quot;, &quot;SKCM&quot;, &quot;COAD&quot;, &quot;STAD&quot;, &quot;BLCA&quot;, &quot;LIHC&quot;, &quot;CESC&quot;, &quot;KIRP&quot;, &quot;SARC&quot;, &quot;LAML&quot;, &quot;ESCA&quot;, &quot;PAAD&quot;, &quot;PCPG&quot;, &quot;READ&quot;, &quot;TGCT&quot;, &quot;THYM&quot;, &quot;KICH&quot;, &quot;ACC&quot;, &quot;MESO&quot;, &quot;UVM&quot;, &quot;DLBC&quot;, &quot;UCS&quot;, &quot;CHOL&quot;)
+
+# save list of count dataframes for later
+saveRDS(count_df_list, &quot;output/tcga_counts_list.rds&quot;)
+saveRDS(pheno_df_list, &quot;output/tcga_metadata_list.rds&quot;)</code></pre>
+</div>
+<div id="create-single-dataframe" class="section level2">
+<h2>Create single dataframe</h2>
+<pre class="r"><code>total_counts &lt;- count_df_list %&gt;% reduce(left_join, by = &quot;gene&quot;)
+
+# save count dataframe for later
+write_csv(total_counts, &quot;output/tcga_total_counts.csv&quot;)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
