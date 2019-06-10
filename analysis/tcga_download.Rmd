@@ -182,7 +182,7 @@ Unzipped and moved in command line similar to above
 Check for missing files again
 ```{r}
 # get filenames that were downloaded
-downloaded_fnames <- list.files("~/tcga_macs/data/htseq_counts/", all.files = FALSE) 
+downloaded_fnames <- list.files("data/htseq_counts/", all.files = FALSE) 
 
 all_fnames_v <- all_fnames_vector %>% str_replace(".gz", "")
 
