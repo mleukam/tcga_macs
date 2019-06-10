@@ -13,7 +13,7 @@
 
 <meta name="date" content="2019-06-08" />
 
-<title>tcga_download</title>
+<title>Download and Format TCGA Data</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -418,7 +418,7 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">tcga_download</h1>
+<h1 class="title toc-ignore">Download and Format TCGA Data</h1>
 <h4 class="author">mleukam</h4>
 <h4 class="date">2019-06-08</h4>
 
@@ -560,10 +560,10 @@ data/htseq_counts
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree8358b4e6dc2836ea571a525b148d04db9fda9acftargetblank8358b4ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/8358b4e6dc2836ea571a525b148d04db9fda9acf" target="_blank">8358b4e</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree146b5f7c75db1f93b5889ae5bf304120d334c674targetblank146b5f7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/146b5f7c75db1f93b5889ae5bf304120d334c674" target="_blank">146b5f7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree8358b4e6dc2836ea571a525b148d04db9fda9acftargetblank8358b4ea" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree146b5f7c75db1f93b5889ae5bf304120d334c674targetblank146b5f7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -665,6 +665,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/mleukam/tcga_macs/blob/146b5f7c75db1f93b5889ae5bf304120d334c674/analysis/tcga_download.Rmd" target="_blank">146b5f7</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+completed tcga download notebook - ending with list of dataframes of
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/d264e8ca5b9bbdf402a8810dc721c3fcf1bce6d3/docs/tcga_download.html" target="_blank">d264e8c</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/mleukam/tcga_macs/blob/8358b4e6dc2836ea571a525b148d04db9fda9acf/analysis/tcga_download.Rmd" target="_blank">8358b4e</a>
 </td>
 <td>
@@ -720,6 +754,7 @@ working download with all files
 </div>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
+<p>All of this is recorded for completeness - this notebook is not intended to be run more than once and the global options for evaluation are set to FALSE. Once this notebook was completed, results were stored in a list of dataframes saved with the saveRDS function.</p>
 <pre class="r"><code>knitr::opts_chunk$set(eval=FALSE)</code></pre>
 <pre class="r"><code>library(&quot;GenomicDataCommons&quot;)
 library(&quot;tidyverse&quot;)</code></pre>
