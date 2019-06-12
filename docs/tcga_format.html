@@ -445,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-10
+<strong>Last updated:</strong> 2019-06-12
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -536,10 +536,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree97258995c3e7d4e8aac06739fcd9bad14a92c2a8targetblank9725899a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/97258995c3e7d4e8aac06739fcd9bad14a92c2a8" target="_blank">9725899</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9771192bd3e34712812fd25fbeeefd2efc378fb4targetblank9771192a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9771192bd3e34712812fd25fbeeefd2efc378fb4" target="_blank">9771192</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree97258995c3e7d4e8aac06739fcd9bad14a92c2a8targetblank9725899a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9771192bd3e34712812fd25fbeeefd2efc378fb4targetblank9771192a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -566,7 +566,12 @@ Ignored files:
     Ignored:    output/downreg_c5.csv
     Ignored:    output/downreg_c6.csv
     Ignored:    output/downreg_c7.csv
+    Ignored:    output/expr_matrix.rds
     Ignored:    output/expression_set.rds
+    Ignored:    output/filtered.total.phenodata.rds
+    Ignored:    output/flat_total_counts.rds
+    Ignored:    output/flat_total_pheno.rds
+    Ignored:    output/gset_ids_complete.rds
     Ignored:    output/km_cluster_assignments.csv
     Ignored:    output/mac_eset.rds
     Ignored:    output/mac_eset_w_clusters.rds
@@ -575,6 +580,8 @@ Ignored files:
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/score_matrix.csv
+    Ignored:    output/selected.total.counts.rds
     Ignored:    output/table_c1.csv
     Ignored:    output/table_c2.csv
     Ignored:    output/table_c3.csv
@@ -595,9 +602,13 @@ Ignored files:
     Ignored:    output/upreg_c6.csv
     Ignored:    output/upreg_c7.csv
 
+Untracked files:
+    Untracked:  data/160genes_ensembl.gencode28.txt
+    Untracked:  data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
+    Untracked:  data/kyle.gdc_tcga_bam_metadata.txt
+
 Unstaged changes:
     Modified:   analysis/ss_gsea.Rmd
-    Modified:   analysis/tcga_download.Rmd
 
 </code></pre>
 <p>
@@ -636,6 +647,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/9771192bd3e34712812fd25fbeeefd2efc378fb4/analysis/tcga_format.Rmd" target="_blank">9771192</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-12
+</td>
+<td>
+formatting and filtering of TCGA data now filtered for tumor only
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/df824148421f81b406a0854093def75907c761b3/docs/tcga_format.html" target="_blank">df82414</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1353,13 +1398,109 @@ names(pheno_df_list) &lt;- list(&quot;BRCA&quot;, &quot;GBM&quot;, &quot;OV&quot
 # save list of count dataframes for later
 saveRDS(count_df_list, &quot;output/tcga_counts_list.rds&quot;)
 saveRDS(pheno_df_list, &quot;output/tcga_metadata_list.rds&quot;)</code></pre>
-</div>
-<div id="create-single-dataframe" class="section level2">
-<h2>Create single dataframe</h2>
+<div id="create-single-dataframes" class="section level4">
+<h4>Create single dataframes</h4>
 <pre class="r"><code>total_counts &lt;- count_df_list %&gt;% reduce(left_join, by = &quot;gene&quot;)
+saveRDS(total_counts, &quot;output/flat_total_counts.rds&quot;)</code></pre>
+<pre class="r"><code>total_pheno &lt;- bind_rows(pheno_df_list) %&gt;%
+  dplyr::rename(file_names = filename, file_id = id)
+saveRDS(total_pheno, &quot;output/flat_total_pheno.rds&quot;)</code></pre>
+</div>
+</div>
+<div id="clinical-annotation-and-metadata" class="section level2">
+<h2>Clinical annotation and metadata</h2>
+<p>Goals: Remove non-tumor data and split metastatic from primary tumors&gt; Remove non-solid tumors.</p>
+<div id="get-extended-pheno-data" class="section level4">
+<h4>Get extended pheno data</h4>
+<p>Helper function from Kevin Blighe: <a href="https://www.biostars.org/p/318756/#318919" class="uri">https://www.biostars.org/p/318756/#318919</a></p>
+<pre class="r"><code># Build a query of HTSeq files availble in GDC from TCGA
+qfiles &lt;- files() %&gt;%
+  GenomicDataCommons::filter(~ cases.project.project_id == &#39;TCGA*&#39; &amp; 
+           type == &#39;gene_expression&#39; &amp; 
+           analysis.workflow_type ==&#39;HTSeq - Counts&#39; ) 
 
-# save count dataframe for later
-write_csv(total_counts, &quot;output/tcga_total_counts.csv&quot;)</code></pre>
+# get a table of filenames and ids from the query
+total_manifest &lt;- manifest(qfiles)
+
+# read in helper function
+TCGAtranslateID = function(file_names, legacy = TRUE)
+{
+  info = files(legacy = legacy) %&gt;%
+    filter( ~ file_name %in% file_names) %&gt;%
+    select(&#39;cases.samples.submitter_id&#39;) %&gt;%
+    results_all()
+
+  id_list = lapply(info$cases,function(a)
+  {
+    a[[1]][[1]][[1]]
+  })
+
+    barcodes_per_file = sapply(id_list,length)
+
+    return(data.frame(file_id = rep(ids(info),barcodes_per_file), submitter_id = unlist(id_list), file_names = file_names))
+}
+
+file_table &lt;- TCGAtranslateID(total_manifest$filename, legacy = FALSE) %&gt;% as_tibble()
+file_table
+
+# read in kyle&#39;s TCGA metadata table
+kyle_table &lt;- read_tsv(&quot;data/kyle.gdc_tcga_bam_metadata.txt&quot;)
+kyle_table &lt;- kyle_table %&gt;% 
+  dplyr::rename(submitter_id = cases_0_samples_0_submitter_id) %&gt;%
+  dplyr::select(-file_id)
+
+# combine downloaded sample data with kyle&#39;s table using submitter_id
+lookup_table &lt;- file_table %&gt;% 
+  left_join(kyle_table, by = &quot;submitter_id&quot;) %&gt;% 
+  dplyr::select(submitter_id, 
+                file_id, 
+                project_id = cases_0_project_project_id, 
+                sample_type = cases_0_samples_0_sample_type,
+                everything()) %&gt;%
+  dplyr::select(-data_type, 
+                -file_name, 
+                -data_category, 
+                -analysis_workflow_type)
+
+# join with pheno data
+pheno_df &lt;- total_pheno %&gt;% left_join(lookup_table)</code></pre>
+</div>
+<div id="filter-pheno-data" class="section level4">
+<h4>Filter pheno data</h4>
+<pre class="r"><code># review sample types
+pheno_df %&gt;% dplyr::select(sample_type) %&gt;% 
+  mutate(sample_type = as.factor(sample_type)) %&gt;% 
+  summary()
+
+# remove blood cancers
+pheno_data_filtered &lt;- pheno_df %&gt;%
+  dplyr::filter(!project_id %in% c(&quot;TCGA-THYM&quot;, 
+                                   &quot;TCGA-LAML&quot;, 
+                                   &quot;TCGA-DLBC&quot;)) %&gt;%
+# keep only relevant tumor types
+  dplyr::filter(sample_type %in% c(&quot;Primary Tumor&quot;, &quot;Recurrent Tumor&quot;, &quot;Metastatic&quot;)) %&gt;%
+  # review
+  print()
+
+# get included sample names
+filteredsamples &lt;- pheno_data_filtered %&gt;% pull(sample)</code></pre>
+</div>
+<div id="select-count-data" class="section level4">
+<h4>Select count data</h4>
+<pre class="r"><code># select columns based on membership in samplename list
+gene_names &lt;- total_counts %&gt;%
+  dplyr::select(gene)
+
+counts_selected &lt;- total_counts %&gt;%
+  dplyr::select(one_of(filteredsamples))
+
+total_counts_selected &lt;- bind_cols(gene_names, counts_selected)</code></pre>
+</div>
+</div>
+<div id="save-combined-tables-for-later-use" class="section level2">
+<h2>Save combined tables for later use</h2>
+<pre class="r"><code>write_csv(total_counts_selected, &quot;output/selected.total.counts.rds&quot;)
+write_csv(pheno_data_filtered, &quot;output/filtered.total.phenodata.rds&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
