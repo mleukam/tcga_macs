@@ -847,12 +847,120 @@ saveRDS(pheno_df_list, "output/tcga_metadata_list.rds")
 ```
 
 
-## Create single dataframe
+#### Create single dataframes
 ```{r}
 total_counts <- count_df_list %>% reduce(left_join, by = "gene")
+saveRDS(total_counts, "output/flat_total_counts.rds")
+```
 
-# save count dataframe for later
-write_csv(total_counts, "output/tcga_total_counts.csv")
+```{r}
+total_pheno <- bind_rows(pheno_df_list) %>%
+  dplyr::rename(file_names = filename, file_id = id)
+saveRDS(total_pheno, "output/flat_total_pheno.rds")
+```
+
+## Clinical annotation and metadata
+
+Goals: Remove non-tumor data and split metastatic from primary tumors> Remove non-solid tumors.
+
+#### Get extended pheno data
+
+Helper function from Kevin Blighe: https://www.biostars.org/p/318756/#318919
+
+```{r}
+# Build a query of HTSeq files availble in GDC from TCGA
+qfiles <- files() %>%
+  GenomicDataCommons::filter(~ cases.project.project_id == 'TCGA*' & 
+           type == 'gene_expression' & 
+           analysis.workflow_type =='HTSeq - Counts' ) 
+
+# get a table of filenames and ids from the query
+total_manifest <- manifest(qfiles)
+
+# read in helper function
+TCGAtranslateID = function(file_names, legacy = TRUE)
+{
+  info = files(legacy = legacy) %>%
+    filter( ~ file_name %in% file_names) %>%
+    select('cases.samples.submitter_id') %>%
+    results_all()
+
+  id_list = lapply(info$cases,function(a)
+  {
+    a[[1]][[1]][[1]]
+  })
+
+    barcodes_per_file = sapply(id_list,length)
+
+    return(data.frame(file_id = rep(ids(info),barcodes_per_file), submitter_id = unlist(id_list), file_names = file_names))
+}
+
+file_table <- TCGAtranslateID(total_manifest$filename, legacy = FALSE) %>% as_tibble()
+file_table
+
+# read in kyle's TCGA metadata table
+kyle_table <- read_tsv("data/kyle.gdc_tcga_bam_metadata.txt")
+kyle_table <- kyle_table %>% 
+  dplyr::rename(submitter_id = cases_0_samples_0_submitter_id) %>%
+  dplyr::select(-file_id)
+
+# combine downloaded sample data with kyle's table using submitter_id
+lookup_table <- file_table %>% 
+  left_join(kyle_table, by = "submitter_id") %>% 
+  dplyr::select(submitter_id, 
+                file_id, 
+                project_id = cases_0_project_project_id, 
+                sample_type = cases_0_samples_0_sample_type,
+                everything()) %>%
+  dplyr::select(-data_type, 
+                -file_name, 
+                -data_category, 
+                -analysis_workflow_type)
+
+# join with pheno data
+pheno_df <- total_pheno %>% left_join(lookup_table)
+```
+
+#### Filter pheno data
+
+```{r}
+# review sample types
+pheno_df %>% dplyr::select(sample_type) %>% 
+  mutate(sample_type = as.factor(sample_type)) %>% 
+  summary()
+
+# remove blood cancers
+pheno_data_filtered <- pheno_df %>%
+  dplyr::filter(!project_id %in% c("TCGA-THYM", 
+                                   "TCGA-LAML", 
+                                   "TCGA-DLBC")) %>%
+# keep only relevant tumor types
+  dplyr::filter(sample_type %in% c("Primary Tumor", "Recurrent Tumor", "Metastatic")) %>%
+  # review
+  print()
+
+# get included sample names
+filteredsamples <- pheno_data_filtered %>% pull(sample)
+```
+
+#### Select count data
+
+```{r}
+# select columns based on membership in samplename list
+gene_names <- total_counts %>%
+  dplyr::select(gene)
+
+counts_selected <- total_counts %>%
+  dplyr::select(one_of(filteredsamples))
+
+total_counts_selected <- bind_cols(gene_names, counts_selected)
+```
+
+## Save combined tables for later use
+
+```{r}
+write_csv(total_counts_selected, "output/selected.total.counts.rds")
+write_csv(pheno_data_filtered, "output/filtered.total.phenodata.rds")
 ```
 
 
