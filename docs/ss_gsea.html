@@ -445,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-10
+<strong>Last updated:</strong> 2019-06-12
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -536,10 +536,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreeb3f3025e937ef56c3036575fae8b8934093f69c4targetblankb3f3025a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/b3f3025e937ef56c3036575fae8b8934093f69c4" target="_blank">b3f3025</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree6288da104a3f55b98db0f6b8f1c26bd5264a72c5targetblank6288da1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/6288da104a3f55b98db0f6b8f1c26bd5264a72c5" target="_blank">6288da1</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreeb3f3025e937ef56c3036575fae8b8934093f69c4targetblankb3f3025a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree6288da104a3f55b98db0f6b8f1c26bd5264a72c5targetblank6288da1a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -566,14 +566,22 @@ Ignored files:
     Ignored:    output/downreg_c5.csv
     Ignored:    output/downreg_c6.csv
     Ignored:    output/downreg_c7.csv
+    Ignored:    output/expr_matrix.rds
     Ignored:    output/expression_set.rds
+    Ignored:    output/filtered.total.phenodata.rds
+    Ignored:    output/flat_total_counts.rds
+    Ignored:    output/flat_total_pheno.rds
+    Ignored:    output/gset_ids_complete.rds
     Ignored:    output/km_cluster_assignments.csv
     Ignored:    output/mac_eset.rds
     Ignored:    output/mac_eset_w_clusters.rds
+    Ignored:    output/nested_list_dge_top50_updown.rds
     Ignored:    output/normalized_probe_intensities.Rds
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/score_matrix.csv
+    Ignored:    output/selected.total.counts.rds
     Ignored:    output/table_c1.csv
     Ignored:    output/table_c2.csv
     Ignored:    output/table_c3.csv
@@ -582,7 +590,10 @@ Ignored files:
     Ignored:    output/table_c6.csv
     Ignored:    output/table_c7.csv
     Ignored:    output/tcga_counts_dataframe_list.rds
+    Ignored:    output/tcga_counts_list.rds
     Ignored:    output/tcga_gdc_manifest.rds
+    Ignored:    output/tcga_metadata_list.rds
+    Ignored:    output/tcga_total_counts.csv
     Ignored:    output/upreg_c1.csv
     Ignored:    output/upreg_c2.csv
     Ignored:    output/upreg_c3.csv
@@ -590,6 +601,11 @@ Ignored files:
     Ignored:    output/upreg_c5.csv
     Ignored:    output/upreg_c6.csv
     Ignored:    output/upreg_c7.csv
+
+Untracked files:
+    Untracked:  data/160genes_ensembl.gencode28.txt
+    Untracked:  data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
+    Untracked:  data/kyle.gdc_tcga_bam_metadata.txt
 
 </code></pre>
 <p>
@@ -628,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/6288da104a3f55b98db0f6b8f1c26bd5264a72c5/analysis/ss_gsea.Rmd" target="_blank">6288da1</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-12
+</td>
+<td>
+partially working GVSA analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/f7f6d34f895f240a8359c6260ad62912e243e865/docs/ss_gsea.html" target="_blank">f7f6d34</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -675,17 +725,44 @@ multiple updates
 <pre class="r"><code># clear environment
 rm(list = ls())</code></pre>
 <p>Load packages</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>── Attaching packages ──────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre class="r"><code>library(&quot;tidyverse&quot;)</code></pre>
+<pre><code>── Attaching packages ──────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>✔ ggplot2 3.1.1     ✔ purrr   0.3.2
 ✔ tibble  2.1.3     ✔ dplyr   0.8.1
 ✔ tidyr   0.8.3     ✔ stringr 1.4.0
 ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>── Conflicts ─────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>── Conflicts ─────────────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<p>Read in data</p>
-<pre class="r"><code>counts_df_list &lt;- readRDS(&quot;output/tcga_counts_dataframe_list.rds&quot;)</code></pre>
+<pre class="r"><code>library(&quot;edgeR&quot;)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>library(&quot;limma&quot;)
+library(&quot;GSVA&quot;)
+library(&quot;GenomicDataCommons&quot;)</code></pre>
+<pre><code>Loading required package: magrittr</code></pre>
+<pre><code>
+Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:purrr&#39;:
+
+    set_names</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    extract</code></pre>
+<pre><code>
+Attaching package: &#39;GenomicDataCommons&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    count, filter, select</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    expand</code></pre>
+<pre><code>The following object is masked from &#39;package:stats&#39;:
+
+    filter</code></pre>
+</div>
+<div id="gene-list-preprocessing" class="section level2">
+<h2>Gene list preprocessing</h2>
+<p>Read in custom gene lists</p>
 <pre class="r"><code>up_files &lt;- list.files(&quot;output/&quot;, &quot;^upreg_c&quot;)
 down_files &lt;- list.files(&quot;output/&quot;, &quot;downreg_c&quot;)
 file_list &lt;- c(up_files, down_files)
@@ -832,9 +909,561 @@ cols(
   B = col_double()
 )</code></pre>
 <pre class="r"><code>names(dge_list) &lt;- str_replace_all(file_list, &quot;.csv&quot;, &quot;&quot;)</code></pre>
+<p>Read in lookup table for features, gencode v22 (used by GDC to label features)</p>
+<pre class="r"><code>gencode_gtf &lt;- read_tsv(&quot;data/gencode.v22.primary_assembly.annotation.gtf.geneinfo&quot;)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  gene_id = col_character(),
+  gene_type = col_character(),
+  gene_status = col_character(),
+  gene_name = col_character(),
+  level = col_double(),
+  havana_gene = col_character()
+)</code></pre>
+<pre><code>Warning: 10327 parsing failures.
+  row col  expected    actual                                                        file
+ 5304  -- 6 columns 5 columns &#39;data/gencode.v22.primary_assembly.annotation.gtf.geneinfo&#39;
+12445  -- 6 columns 5 columns &#39;data/gencode.v22.primary_assembly.annotation.gtf.geneinfo&#39;
+12913  -- 6 columns 5 columns &#39;data/gencode.v22.primary_assembly.annotation.gtf.geneinfo&#39;
+13082  -- 6 columns 5 columns &#39;data/gencode.v22.primary_assembly.annotation.gtf.geneinfo&#39;
+13310  -- 6 columns 5 columns &#39;data/gencode.v22.primary_assembly.annotation.gtf.geneinfo&#39;
+..... ... ......... ......... ...........................................................
+See problems(...) for more details.</code></pre>
+<pre class="r"><code># read in T-cell inflammation signature
+tcell &lt;- read_tsv(&quot;data/160genes_ensembl.gencode28.txt&quot;, col_names = FALSE)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  X1 = col_character(),
+  X2 = col_character(),
+  X3 = col_character()
+)</code></pre>
+<pre class="r"><code># convert to gene_id
+gene_ids &lt;- gencode_gtf %&gt;%
+  dplyr::select(gene_id, gene_name)
+tcell &lt;- tcell %&gt;% dplyr::rename(gene_name = X1)
+tcell_gset &lt;- tcell %&gt;% left_join(gene_ids, by = &quot;gene_name&quot;) %&gt;%
+  pull(gene_id)
+
+tcell_gset &lt;- tcell_gset[!is.na(tcell_gset)]</code></pre>
+<pre class="r"><code># define function that uses lookup table to convert gene symbols to gene id
+# then returns a list of gene ids that define the gene set
+ensemblgset &lt;- function(df, gtf){
+  gene_ids &lt;- gtf %&gt;%
+  dplyr::select(gene_id, gene_name) %&gt;%
+  dplyr::rename(gene = gene_name)
+gset &lt;- df %&gt;% left_join(gene_ids) %&gt;%
+  pull(gene_id)
+gset
+}
+
+# apply function to list of gene sets
+gset_ids &lt;- map(dge_list, function(x){ensemblgset(x, gtf = gencode_gtf)})</code></pre>
+<pre><code>Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;
+Joining, by = &quot;gene&quot;</code></pre>
+<pre class="r"><code># remove nas (small number of gene symbols do not map to gencode gene ids)
+gset_ids &lt;- map(gset_ids, function(x){
+  x[!is.na(x)]
+})
+
+# add T-cell signature to gset list
+gset_ids_complete &lt;- c(gset_ids, tcell_gset = list(tcell_gset))</code></pre>
+</div>
+<div id="count-data-preprocessing" class="section level2">
+<h2>Count data preprocessing</h2>
+<p>Preprocessing following methods outlined here: <a href="https://f1000research.com/articles/5-1408/v3" class="uri">https://f1000research.com/articles/5-1408/v3</a></p>
+<p>Read in data</p>
+<pre class="r"><code>total_counts &lt;- read_csv(&quot;output/tcga_total_counts.csv&quot;)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  .default = col_double(),
+  gene = col_character()
+)</code></pre>
+<pre><code>See spec(...) for full column specifications.</code></pre>
+<div id="filter-for-protein-coding-genes" class="section level4">
+<h4>Filter for protein coding genes</h4>
+<pre class="r"><code># filter for protein coding genes
+total_counts_prcode &lt;- total_counts %&gt;%
+  dplyr::rename(gene_id = gene) %&gt;%
+  left_join(gencode_gtf, by = &quot;gene_id&quot;) %&gt;%
+  dplyr::filter(gene_type == &quot;protein_coding&quot;) %&gt;%
+  dplyr::select(-gene_name, -gene_type, -gene_status, -level, -havana_gene) %&gt;%
+  dplyr::select(gene_id, everything())
+
+nrow(total_counts_prcode)</code></pre>
+<pre><code>[1] 19814</code></pre>
+</div>
+<div id="normalize-counts" class="section level4">
+<h4>Normalize counts</h4>
+<p>Normalisation by the method of trimmed mean of M-values (TMM) is performed using the calcNormFactors function in edgeR.</p>
+<pre class="r"><code># normalize by log cpm using EdgeR
+df_data &lt;- total_counts_prcode %&gt;% 
+  dplyr::select(-gene_id) %&gt;% as.matrix()
+df_names &lt;- total_counts_prcode %&gt;% dplyr::select(gene_id) 
+out_data &lt;- cpm(df_data, log = FALSE) %&gt;% as_tibble()
+total_counts_prcode_cpm &lt;- bind_cols(df_names, out_data)</code></pre>
+</div>
+<div id="density-plots" class="section level4">
+<h4>Density plots</h4>
+<pre class="r"><code># Density plots
+# tidy data
+tidy_cpm &lt;- total_counts_prcode_cpm %&gt;% 
+  gather(key = &quot;sampleID&quot;, value = &quot;intensity&quot;, -gene_id) 
+
+tidy_cpm &lt;- tidy_cpm %&gt;%
+  mutate(group = str_sub(sampleID, 1, 4))
+
+# representative plots
+brca_cpm &lt;- tidy_cpm %&gt;%
+  dplyr::filter(group == &quot;BRCA&quot;)
+dplot_brca &lt;- ggplot(brca_cpm, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = &quot;none&quot;)
+dplot_brca</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>gbm_cpm &lt;- tidy_cpm %&gt;%
+  dplyr::filter(grepl(&quot;GBM*&quot;, group))
+dplot_gbm &lt;- ggplot(gbm_cpm, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = &quot;none&quot;) +
+  xlim(-6, 15)
+dplot_gbm</code></pre>
+<pre><code>Warning: Removed 1633339 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="filter-by-expression-levels" class="section level4">
+<h4>Filter by expression levels</h4>
+<pre class="r"><code># move gene names to rownames
+totcounts_prcode_cpm_matrix &lt;- total_counts_prcode_cpm %&gt;%
+  as.data.frame() %&gt;%
+  column_to_rownames(var = &quot;gene_id&quot;)
+totcounts_prcode_cpm_matrix[1:5, 1:5]</code></pre>
+<pre><code>                       BRCA1      BRCA2     BRCA3      BRCA4     BRCA5
+ENSG00000000003.13 37.019035 86.2823791 70.916573 55.8841542 35.525131
+ENSG00000000005.5   4.102186  0.5067543 29.356090  0.1215401  2.208254
+ENSG00000000419.11 23.576924 37.8277212 24.424392 17.2100831 24.495930
+ENSG00000000457.12 29.538578 38.3344755 21.162604  9.4315145 34.270167
+ENSG00000000460.15  9.708980 19.2566650  4.588352  2.2606465 13.539130</code></pre>
+<pre class="r"><code># filter out genes that aren&#39;t at least expressed greater than 1 in at least 45 cases (45 being about the size of the smallest group)
+total_cpm_stats &lt;- data.frame(
+  total = apply(totcounts_prcode_cpm_matrix, 1, function(x) sum(x &gt; 1, na.rm = TRUE)))
+keep &lt;- which(total_cpm_stats$total &gt;= 45) 
+
+dim(totcounts_prcode_cpm_matrix)</code></pre>
+<pre><code>[1] 19814 11093</code></pre>
+<pre class="r"><code>total_cpm_filtered = totcounts_prcode_cpm_matrix[keep,]
+dim(total_cpm_filtered)</code></pre>
+<pre><code>[1] 18138 11093</code></pre>
+</div>
+<div id="normalize-gene-expression-distributions" class="section level4">
+<h4>Normalize gene expression distributions</h4>
+<p>Normalisation by the method of trimmed mean of M-values (TMM)12 is performed using the calcNormFactors function in edgeR. The normalisation factors calculated here are used as a scaling factor for the library sizes.</p>
+<pre class="r"><code># get normalization factors
+norm_factors &lt;- calcNormFactors(total_cpm_filtered, method = &quot;TMM&quot;)
+
+# apply factor to each column
+total_cpm_norm &lt;- map2_dfc(total_cpm_filtered, norm_factors, `*`)
+total_cpm_norm &lt;- as.data.frame(total_cpm_norm)
+rownames(total_cpm_norm) &lt;- rownames(total_cpm_filtered)
+total_cpm_norm[1:5, 1:5]</code></pre>
+<pre><code>                       BRCA1      BRCA2     BRCA3      BRCA4     BRCA5
+ENSG00000000003.13 44.766216 93.3727156 61.438379 48.5508142 41.266530
+ENSG00000000005.5   4.960673  0.5483974 25.432569  0.1055912  2.565141
+ENSG00000000419.11 28.510999 40.9362502 21.160005 14.9517079 28.454842
+ENSG00000000457.12 35.720282 41.4846475 18.334164  8.1938738 39.808745
+ENSG00000000460.15 11.740833 20.8390998  3.975106  1.9639955 15.727258</code></pre>
+</div>
+<div id="log-transform" class="section level4">
+<h4>Log transform</h4>
+<pre class="r"><code>total_log_cpm_filtered_norm &lt;- log2(total_cpm_norm)</code></pre>
+</div>
+<div id="review-representative-density-plots" class="section level4">
+<h4>Review representative density plots</h4>
+<pre class="r"><code># Density plots
+# tidy data
+final_total_df &lt;- total_log_cpm_filtered_norm %&gt;%
+  rownames_to_column(var = &quot;gene_id&quot;) %&gt;%
+  dplyr::select(gene_id, everything())
+
+tidy_norm_cpm &lt;- final_total_df %&gt;% 
+  gather(key = &quot;sampleID&quot;, value = &quot;intensity&quot;, -gene_id) 
+
+tidy_norm_cpm &lt;- tidy_norm_cpm %&gt;%
+  mutate(group = str_sub(sampleID, 1, 4))
+
+# representative plots
+brca_norm_cpm &lt;- tidy_norm_cpm %&gt;%
+  dplyr::filter(group == &quot;BRCA&quot;)
+dplot_norm_brca &lt;- ggplot(brca_norm_cpm, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = &quot;none&quot;)
+dplot_norm_brca</code></pre>
+<pre><code>Warning: Removed 1306076 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>gbm_norm_cpm &lt;- tidy_norm_cpm %&gt;%
+  dplyr::filter(grepl(&quot;GBM*&quot;, group))
+dplot_norm_gbm &lt;- ggplot(gbm_norm_cpm, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = &quot;none&quot;) +
+  xlim(-6, 15)
+dplot_norm_gbm</code></pre>
+<pre><code>Warning: Removed 163084 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="gsva" class="section level2">
 <h2>GSVA</h2>
+<p>Will be done on cluster due to extreme system requirements Write out matrix and gene set lists for import into stats cluster.</p>
+<pre class="r"><code># gset list
+saveRDS(gset_ids_complete, &quot;output/gset_ids_complete.rds&quot;)
+
+expr_matrix &lt;- total_log_cpm_filtered_norm %&gt;%
+  as.matrix()
+
+saveRDS(expr_matrix, &quot;output/expr_matrix.rds&quot;)</code></pre>
+<p>Get macrophage gene set GSVA scores</p>
+<pre class="r"><code># Run on cluster
+# tcga_es &lt;- gsva(expr_matrix, gset_ids_complete,
+#                annotation = NULL,
+#                method = &quot;gsva&quot;,
+#                mx.diff = FALSE,
+#                verbose = TRUE)
+
+# saveRDS(tcga_es, &quot;/gpfs/data/kline-lab/tcga_macs/tcga_es.rds&quot;)
+# moved to local hard drive from cluster and stored in output folder</code></pre>
+</div>
+<div id="plots" class="section level2">
+<h2>Plots</h2>
+<pre class="r"><code># read in RDS from cluster
+# tcga_es &lt;- readRDS(&quot;output/tcga_es.rds&quot;)</code></pre>
+</div>
+<div id="manipulation-of-csv-temporary-fix-for-presentation" class="section level2">
+<h2>Manipulation of CSV (temporary fix for presentation)</h2>
+<pre class="r"><code># temporary: read in CSV
+tcga_es_csv &lt;- read_csv(&quot;output/score_matrix.csv&quot;, col_names = TRUE)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  .default = col_double()
+)</code></pre>
+<pre><code>See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>tcga_es_csv</code></pre>
+<pre><code># A tibble: 14 x 11,093
+    BRCA1  BRCA2  BRCA3  BRCA4  BRCA5  BRCA6  BRCA7  BRCA8  BRCA9 BRCA10
+    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 -0.304 -0.231  0.279  0.288  0.263 -0.447 -0.452  0.445  0.303 -0.461
+ 2  0.385 -0.197  0.203 -0.211  0.254 -0.294 -0.479  0.368 -0.463 -0.377
+ 3  0.305 -0.196  0.368 -0.253  0.325 -0.222 -0.298  0.454 -0.200 -0.273
+ 4  0.232 -0.219  0.386 -0.463  0.297 -0.276 -0.291  0.252  0.177 -0.308
+ 5 -0.317 -0.408 -0.211 -0.435 -0.295 -0.517 -0.605 -0.354 -0.274 -0.474
+ 6  0.128 -0.441  0.536 -0.341  0.311 -0.475 -0.352  0.308  0.174 -0.327
+ 7  0.269 -0.505 -0.238 -0.195 -0.351 -0.404 -0.562  0.193 -0.357 -0.512
+ 8 -0.220 -0.491  0.466  0.164 -0.196 -0.496 -0.547  0.498 -0.267 -0.493
+ 9  0.293 -0.498  0.516  0.499  0.505 -0.420 -0.237  0.726  0.457  0.135
+10  0.260 -0.247  0.602 -0.250 -0.248 -0.405 -0.322  0.359 -0.264 -0.283
+11  0.185  0.210  0.268 -0.230 -0.356 -0.266 -0.269 -0.249 -0.345  0.265
+12  0.202 -0.531  0.513  0.387  0.260 -0.379 -0.247  0.556  0.369 -0.253
+13 -0.347 -0.389 -0.236  0.279 -0.399 -0.353 -0.382  0.324  0.245 -0.301
+14  0.153 -0.476  0.492  0.378  0.269 -0.377 -0.226  0.599  0.356 -0.367
+# … with 11,083 more variables: BRCA11 &lt;dbl&gt;, BRCA12 &lt;dbl&gt;, BRCA13 &lt;dbl&gt;,
+#   BRCA14 &lt;dbl&gt;, BRCA15 &lt;dbl&gt;, BRCA16 &lt;dbl&gt;, BRCA17 &lt;dbl&gt;, BRCA18 &lt;dbl&gt;,
+#   BRCA19 &lt;dbl&gt;, BRCA20 &lt;dbl&gt;, BRCA21 &lt;dbl&gt;, BRCA22 &lt;dbl&gt;, BRCA23 &lt;dbl&gt;,
+#   BRCA24 &lt;dbl&gt;, BRCA25 &lt;dbl&gt;, BRCA26 &lt;dbl&gt;, BRCA27 &lt;dbl&gt;, BRCA28 &lt;dbl&gt;,
+#   BRCA29 &lt;dbl&gt;, BRCA30 &lt;dbl&gt;, BRCA31 &lt;dbl&gt;, BRCA32 &lt;dbl&gt;, BRCA33 &lt;dbl&gt;,
+#   BRCA34 &lt;dbl&gt;, BRCA35 &lt;dbl&gt;, BRCA36 &lt;dbl&gt;, BRCA37 &lt;dbl&gt;, BRCA38 &lt;dbl&gt;,
+#   BRCA39 &lt;dbl&gt;, BRCA40 &lt;dbl&gt;, BRCA41 &lt;dbl&gt;, BRCA42 &lt;dbl&gt;, BRCA43 &lt;dbl&gt;,
+#   BRCA44 &lt;dbl&gt;, BRCA45 &lt;dbl&gt;, BRCA46 &lt;dbl&gt;, BRCA47 &lt;dbl&gt;, BRCA48 &lt;dbl&gt;,
+#   BRCA49 &lt;dbl&gt;, BRCA50 &lt;dbl&gt;, BRCA51 &lt;dbl&gt;, BRCA52 &lt;dbl&gt;, BRCA53 &lt;dbl&gt;,
+#   BRCA54 &lt;dbl&gt;, BRCA55 &lt;dbl&gt;, BRCA56 &lt;dbl&gt;, BRCA57 &lt;dbl&gt;, BRCA58 &lt;dbl&gt;,
+#   BRCA59 &lt;dbl&gt;, BRCA60 &lt;dbl&gt;, BRCA61 &lt;dbl&gt;, BRCA62 &lt;dbl&gt;, BRCA63 &lt;dbl&gt;,
+#   BRCA64 &lt;dbl&gt;, BRCA65 &lt;dbl&gt;, BRCA66 &lt;dbl&gt;, BRCA67 &lt;dbl&gt;, BRCA68 &lt;dbl&gt;,
+#   BRCA69 &lt;dbl&gt;, BRCA70 &lt;dbl&gt;, BRCA71 &lt;dbl&gt;, BRCA72 &lt;dbl&gt;, BRCA73 &lt;dbl&gt;,
+#   BRCA74 &lt;dbl&gt;, BRCA75 &lt;dbl&gt;, BRCA76 &lt;dbl&gt;, BRCA77 &lt;dbl&gt;, BRCA78 &lt;dbl&gt;,
+#   BRCA79 &lt;dbl&gt;, BRCA80 &lt;dbl&gt;, BRCA81 &lt;dbl&gt;, BRCA82 &lt;dbl&gt;, BRCA83 &lt;dbl&gt;,
+#   BRCA84 &lt;dbl&gt;, BRCA85 &lt;dbl&gt;, BRCA86 &lt;dbl&gt;, BRCA87 &lt;dbl&gt;, BRCA88 &lt;dbl&gt;,
+#   BRCA89 &lt;dbl&gt;, BRCA90 &lt;dbl&gt;, BRCA91 &lt;dbl&gt;, BRCA92 &lt;dbl&gt;, BRCA93 &lt;dbl&gt;,
+#   BRCA94 &lt;dbl&gt;, BRCA95 &lt;dbl&gt;, BRCA96 &lt;dbl&gt;, BRCA97 &lt;dbl&gt;, BRCA98 &lt;dbl&gt;,
+#   BRCA99 &lt;dbl&gt;, BRCA100 &lt;dbl&gt;, BRCA101 &lt;dbl&gt;, BRCA102 &lt;dbl&gt;,
+#   BRCA103 &lt;dbl&gt;, BRCA104 &lt;dbl&gt;, BRCA105 &lt;dbl&gt;, BRCA106 &lt;dbl&gt;,
+#   BRCA107 &lt;dbl&gt;, BRCA108 &lt;dbl&gt;, BRCA109 &lt;dbl&gt;, BRCA110 &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>tcga_es_slice &lt;- tcga_es_csv[1:7, ]
+tcga_es_slice &lt;- as.data.frame(tcga_es_slice)
+rownames(tcga_es_slice) &lt;- c(&quot;cluster1_up&quot;, 
+                             &quot;cluster2_up&quot;, 
+                             &quot;cluster3_up&quot;, 
+                             &quot;cluster4_up&quot;, 
+                             &quot;cluster5_up&quot;, 
+                             &quot;cluster6_up&quot;, 
+                             &quot;cluster7_up&quot;)
+tcga_es_slice[1:5, 1:5]</code></pre>
+<pre><code>                 BRCA1      BRCA2      BRCA3      BRCA4      BRCA5
+cluster1_up -0.3038360 -0.2311346  0.2787957  0.2878954  0.2630863
+cluster2_up  0.3845835 -0.1967818  0.2032777 -0.2106304  0.2540838
+cluster3_up  0.3045176 -0.1957608  0.3677508 -0.2527436  0.3254061
+cluster4_up  0.2321848 -0.2194778  0.3857729 -0.4630314  0.2973114
+cluster5_up -0.3165677 -0.4080791 -0.2108493 -0.4351221 -0.2945597</code></pre>
+<pre class="r"><code>tcga_es_tbl &lt;- tcga_es_slice %&gt;% rownames_to_column(var = &quot;cluster&quot;) %&gt;% as_tibble()
+tcga_es_tbl</code></pre>
+<pre><code># A tibble: 7 x 11,094
+  cluster  BRCA1  BRCA2  BRCA3  BRCA4  BRCA5  BRCA6  BRCA7  BRCA8  BRCA9
+  &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+1 cluste… -0.304 -0.231  0.279  0.288  0.263 -0.447 -0.452  0.445  0.303
+2 cluste…  0.385 -0.197  0.203 -0.211  0.254 -0.294 -0.479  0.368 -0.463
+3 cluste…  0.305 -0.196  0.368 -0.253  0.325 -0.222 -0.298  0.454 -0.200
+4 cluste…  0.232 -0.219  0.386 -0.463  0.297 -0.276 -0.291  0.252  0.177
+5 cluste… -0.317 -0.408 -0.211 -0.435 -0.295 -0.517 -0.605 -0.354 -0.274
+6 cluste…  0.128 -0.441  0.536 -0.341  0.311 -0.475 -0.352  0.308  0.174
+7 cluste…  0.269 -0.505 -0.238 -0.195 -0.351 -0.404 -0.562  0.193 -0.357
+# … with 11,084 more variables: BRCA10 &lt;dbl&gt;, BRCA11 &lt;dbl&gt;, BRCA12 &lt;dbl&gt;,
+#   BRCA13 &lt;dbl&gt;, BRCA14 &lt;dbl&gt;, BRCA15 &lt;dbl&gt;, BRCA16 &lt;dbl&gt;, BRCA17 &lt;dbl&gt;,
+#   BRCA18 &lt;dbl&gt;, BRCA19 &lt;dbl&gt;, BRCA20 &lt;dbl&gt;, BRCA21 &lt;dbl&gt;, BRCA22 &lt;dbl&gt;,
+#   BRCA23 &lt;dbl&gt;, BRCA24 &lt;dbl&gt;, BRCA25 &lt;dbl&gt;, BRCA26 &lt;dbl&gt;, BRCA27 &lt;dbl&gt;,
+#   BRCA28 &lt;dbl&gt;, BRCA29 &lt;dbl&gt;, BRCA30 &lt;dbl&gt;, BRCA31 &lt;dbl&gt;, BRCA32 &lt;dbl&gt;,
+#   BRCA33 &lt;dbl&gt;, BRCA34 &lt;dbl&gt;, BRCA35 &lt;dbl&gt;, BRCA36 &lt;dbl&gt;, BRCA37 &lt;dbl&gt;,
+#   BRCA38 &lt;dbl&gt;, BRCA39 &lt;dbl&gt;, BRCA40 &lt;dbl&gt;, BRCA41 &lt;dbl&gt;, BRCA42 &lt;dbl&gt;,
+#   BRCA43 &lt;dbl&gt;, BRCA44 &lt;dbl&gt;, BRCA45 &lt;dbl&gt;, BRCA46 &lt;dbl&gt;, BRCA47 &lt;dbl&gt;,
+#   BRCA48 &lt;dbl&gt;, BRCA49 &lt;dbl&gt;, BRCA50 &lt;dbl&gt;, BRCA51 &lt;dbl&gt;, BRCA52 &lt;dbl&gt;,
+#   BRCA53 &lt;dbl&gt;, BRCA54 &lt;dbl&gt;, BRCA55 &lt;dbl&gt;, BRCA56 &lt;dbl&gt;, BRCA57 &lt;dbl&gt;,
+#   BRCA58 &lt;dbl&gt;, BRCA59 &lt;dbl&gt;, BRCA60 &lt;dbl&gt;, BRCA61 &lt;dbl&gt;, BRCA62 &lt;dbl&gt;,
+#   BRCA63 &lt;dbl&gt;, BRCA64 &lt;dbl&gt;, BRCA65 &lt;dbl&gt;, BRCA66 &lt;dbl&gt;, BRCA67 &lt;dbl&gt;,
+#   BRCA68 &lt;dbl&gt;, BRCA69 &lt;dbl&gt;, BRCA70 &lt;dbl&gt;, BRCA71 &lt;dbl&gt;, BRCA72 &lt;dbl&gt;,
+#   BRCA73 &lt;dbl&gt;, BRCA74 &lt;dbl&gt;, BRCA75 &lt;dbl&gt;, BRCA76 &lt;dbl&gt;, BRCA77 &lt;dbl&gt;,
+#   BRCA78 &lt;dbl&gt;, BRCA79 &lt;dbl&gt;, BRCA80 &lt;dbl&gt;, BRCA81 &lt;dbl&gt;, BRCA82 &lt;dbl&gt;,
+#   BRCA83 &lt;dbl&gt;, BRCA84 &lt;dbl&gt;, BRCA85 &lt;dbl&gt;, BRCA86 &lt;dbl&gt;, BRCA87 &lt;dbl&gt;,
+#   BRCA88 &lt;dbl&gt;, BRCA89 &lt;dbl&gt;, BRCA90 &lt;dbl&gt;, BRCA91 &lt;dbl&gt;, BRCA92 &lt;dbl&gt;,
+#   BRCA93 &lt;dbl&gt;, BRCA94 &lt;dbl&gt;, BRCA95 &lt;dbl&gt;, BRCA96 &lt;dbl&gt;, BRCA97 &lt;dbl&gt;,
+#   BRCA98 &lt;dbl&gt;, BRCA99 &lt;dbl&gt;, BRCA100 &lt;dbl&gt;, BRCA101 &lt;dbl&gt;,
+#   BRCA102 &lt;dbl&gt;, BRCA103 &lt;dbl&gt;, BRCA104 &lt;dbl&gt;, BRCA105 &lt;dbl&gt;,
+#   BRCA106 &lt;dbl&gt;, BRCA107 &lt;dbl&gt;, BRCA108 &lt;dbl&gt;, BRCA109 &lt;dbl&gt;, …</code></pre>
+<p>Clean up group assignments</p>
+<pre class="r"><code>tcga_es_df &lt;- tcga_es_tbl %&gt;% 
+  gather(key = &quot;sampleID&quot;, value = &quot;score&quot;, -cluster) 
+
+tidy_es &lt;- tcga_es_df %&gt;%
+  mutate(group = str_sub(sampleID, 1, 4)) %&gt;%
+  mutate(group = ifelse(grepl(&quot;GBM*&quot;, group), &quot;GBM&quot;, group)) %&gt;%
+  mutate(group = ifelse(grepl(&quot;OV*&quot;, group), &quot;OV&quot;, group)) %&gt;%
+  mutate(group = ifelse(grepl(&quot;LGG*&quot;, group), &quot;LGG&quot;, group)) %&gt;%
+  mutate(group = ifelse(grepl(&quot;UVM*&quot;, group), &quot;UVM&quot;, group)) %&gt;%
+  mutate(group = ifelse(grepl(&quot;UCS*&quot;, group), &quot;UCS&quot;, group)) %&gt;%
+  mutate(group = ifelse(grepl(&quot;ACC*&quot;, group), &quot;ACC&quot;, group)) %&gt;%
+  mutate(group = as.factor(group))
+
+# remove non-solid tumors
+tidy_es &lt;- tidy_es %&gt;%
+  dplyr::filter(!group %in% c(&quot;THYM&quot;, &quot;DLBC&quot;, &quot;LAML&quot;)) %&gt;%
+  mutate(group = fct_drop(group))
+summary(tidy_es$group)</code></pre>
+<pre><code> ACC BLCA BRCA CESC ESCA  GBM HNSC KICH KIRC KIRP  LGG LIHC LUAD LUSC   OV 
+ 553 3031 8554 2163 1211 1218 3822  623 4277 2247 3703 2968 4158 3857 7217 
+PAAD PCPG PRAD READ SARC SKCM STAD TGCT THCA  UCS  UVM 
+1274 1302 3857 1239 1855 3304 2849 1092 3976 4501  560 </code></pre>
+<p>Remove non-tumor data and split metastatic from primary tumors Helper function from Kevin Blighe: <a href="https://www.biostars.org/p/318756/#318919" class="uri">https://www.biostars.org/p/318756/#318919</a></p>
+<pre class="r"><code># Build a query of HTSeq files availble in GDC from TCGA
+qfiles &lt;- files() %&gt;%
+  GenomicDataCommons::filter(~ cases.project.project_id == &#39;TCGA*&#39; &amp; 
+           type == &#39;gene_expression&#39; &amp; 
+           analysis.workflow_type ==&#39;HTSeq - Counts&#39; ) 
+
+# get a table of filenames and ids from the query
+total_manifest &lt;- manifest(qfiles)
+
+# read in helper function
+TCGAtranslateID = function(file_names, legacy = TRUE)
+{
+  info = files(legacy = legacy) %&gt;%
+    filter( ~ file_name %in% file_names) %&gt;%
+    select(&#39;cases.samples.submitter_id&#39;) %&gt;%
+    results_all()
+
+  id_list = lapply(info$cases,function(a)
+  {
+    a[[1]][[1]][[1]]
+  })
+
+    barcodes_per_file = sapply(id_list,length)
+
+    return(data.frame(file_id=rep(ids(info),barcodes_per_file), submitter_id=unlist(id_list), file_names=file_names))
+}
+
+file_table &lt;- TCGAtranslateID(total_manifest$filename, legacy = FALSE) %&gt;% as_tibble()
+file_table</code></pre>
+<pre><code># A tibble: 11,093 x 3
+   file_id                 submitter_id    file_names                      
+   &lt;fct&gt;                   &lt;fct&gt;           &lt;fct&gt;                           
+ 1 e09d9ae2-b5b5-47ac-8d2… TCGA-23-1028-0… 56427511-2167-465f-bdde-689b895…
+ 2 b02459dd-1f1d-4a66-a5d… TCGA-24-1923-0… 5327762f-5add-4008-ac5f-beca30e…
+ 3 329ae6b7-3f35-4fb8-bf0… TCGA-24-1604-0… 9ac17699-409b-4750-9317-aacc8c0…
+ 4 ff7edff0-bfb5-4520-b72… TCGA-13-0884-0… 25d6dd26-51c7-40dd-962a-c00abb7…
+ 5 644e21d7-13c5-4239-bac… TCGA-29-1766-0… 65d87c44-cb1f-4889-bdfa-4788f71…
+ 6 feb4ff14-7dcb-41a5-80d… TCGA-29-1710-0… 65ce7190-f1ef-496a-8e47-bcedd8d…
+ 7 469769fc-b712-4bbd-981… TCGA-25-1631-0… 3769209b-a12f-4a84-9d68-0e1c934…
+ 8 28b17bd0-672a-4a73-a82… TCGA-30-1853-0… de855db4-12d8-47bc-855b-96f61d3…
+ 9 2e5423de-4c4c-4b74-a47… TCGA-31-1944-0… caa50267-cc68-4ccc-b506-49a89b1…
+10 63381694-16d0-4c7a-b2d… TCGA-24-1567-0… 88f9c446-a966-4131-b379-63e3cc1…
+# … with 11,083 more rows</code></pre>
+<pre class="r"><code># read in kyle&#39;s TCGA metadata table
+kyle_table &lt;- read_tsv(&quot;data/kyle.gdc_tcga_bam_metadata.txt&quot;)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  cases_0_submitter_id = col_character(),
+  cases_0_case_id = col_character(),
+  data_type = col_character(),
+  cases_0_samples_0_sample_type = col_character(),
+  cases_0_samples_0_tissue_type = col_logical(),
+  file_name = col_character(),
+  cases_0_samples_0_submitter_id = col_character(),
+  cases_0_project_project_id = col_character(),
+  cases_0_samples_0_portions_0_analytes_0_aliquots_0_aliquot_id = col_character(),
+  cases_0_samples_0_sample_id = col_character(),
+  file_id = col_character(),
+  data_category = col_character(),
+  cases_0_samples_0_tumor_descriptor = col_logical(),
+  cases_0_samples_0_portions_0_analytes_0_aliquots_0_submitter_id = col_character(),
+  analysis_workflow_type = col_character()
+)</code></pre>
+<pre class="r"><code>kyle_table &lt;- kyle_table %&gt;% 
+  dplyr::rename(submitter_id = cases_0_samples_0_submitter_id) %&gt;%
+  dplyr::select(-file_id)
+
+lookup_table &lt;- file_table %&gt;% 
+  left_join(kyle_table, by = &quot;submitter_id&quot;) %&gt;% 
+  dplyr::select(submitter_id, 
+                file_id, 
+                project_id = cases_0_project_project_id, 
+                sample_type = cases_0_samples_0_sample_type,
+                everything()) %&gt;%
+  dplyr::select(-data_type, 
+                -file_name, 
+                -data_category, 
+                -analysis_workflow_type)</code></pre>
+<pre><code>Warning: Column `submitter_id` joining factor and character vector,
+coercing into character vector</code></pre>
+<p>qfile_results &lt;- cases() %&gt;% GenomicDataCommons::filter( ~ project.project_id == ’TCGA*’ &amp; files.type == ‘gene_expression’ &amp; files.analysis.workflow_type == ‘HTSeq - Counts’ ) %&gt;% results()</p>
+<pre class="r"><code>library(ggsci)
+library(ggpubr)</code></pre>
+<pre><code>
+Attaching package: &#39;ggpubr&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:GenomicDataCommons&#39;:
+
+    facet</code></pre>
+<pre class="r"><code>library(ggbeeswarm)
+
+tidy_es_c1 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster1_up&quot;)
+c1plot &lt;- ggplot(tidy_es_c1,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 1: \&quot;Alternate activation (M2)\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c1plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tidy_es_c2 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster2_up&quot;)
+c2plot &lt;- ggplot(tidy_es_c2,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 2: \&quot;Classical activation (M1)\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c2plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tidy_es_c3 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster3_up&quot;)
+c3plot &lt;- ggplot(tidy_es_c3,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 3: \&quot;Deactivated macrophages\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c3plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tidy_es_c4 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster4_up&quot;)
+c4plot &lt;- ggplot(tidy_es_c4,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 4 \&quot;Acute inflammation/migration\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c4plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tidy_es_c5 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster5_up&quot;)
+c5plot &lt;- ggplot(tidy_es_c5,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 5: \&quot;Chronic wound\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c5plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tidy_es_c6 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster6_up&quot;)
+c6plot &lt;- ggplot(tidy_es_c6,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 6: \&quot;Immunosuppresive macrophages\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c6plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tidy_es_c7 &lt;- tidy_es %&gt;% dplyr::filter(cluster == &quot;cluster7_up&quot;)
+c7plot &lt;- ggplot(tidy_es_c7,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = &quot;crossbar&quot;, width = 0.5, color = &quot;red&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab(&quot;TGCA tumor type&quot;) +
+  ylab(&quot;GSVA enrichment score&quot;) +
+  ggtitle(&quot;Macrophage Cluster 7: \&quot;Mixed immune response\&quot;&quot;) +
+  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;)
+c7plot</code></pre>
+<p><img src="figure/ss_gsea.Rmd/unnamed-chunk-21-7.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -858,24 +1487,66 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] forcats_0.4.0   stringr_1.4.0   dplyr_0.8.1     purrr_0.3.2    
-[5] readr_1.3.1     tidyr_0.8.3     tibble_2.1.3    ggplot2_3.1.1  
-[9] tidyverse_1.2.1
+ [1] ggbeeswarm_0.6.0         ggpubr_0.2              
+ [3] ggsci_2.9                GenomicDataCommons_1.6.0
+ [5] magrittr_1.5             GSVA_1.30.0             
+ [7] edgeR_3.24.3             limma_3.38.3            
+ [9] forcats_0.4.0            stringr_1.4.0           
+[11] dplyr_0.8.1              purrr_0.3.2             
+[13] readr_1.3.1              tidyr_0.8.3             
+[15] tibble_2.1.3             ggplot2_3.1.1           
+[17] tidyverse_1.2.1         
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.1       cellranger_1.1.0 plyr_1.8.4       pillar_1.4.1    
- [5] compiler_3.5.3   git2r_0.25.2     workflowr_1.4.0  tools_3.5.3     
- [9] digest_0.6.19    lubridate_1.7.4  jsonlite_1.6     evaluate_0.14   
-[13] nlme_3.1-140     gtable_0.3.0     lattice_0.20-38  pkgconfig_2.0.2 
-[17] rlang_0.3.4      cli_1.1.0        rstudioapi_0.10  yaml_2.2.0      
-[21] haven_2.1.0      xfun_0.7         withr_2.1.2      xml2_1.2.0      
-[25] httr_1.4.0       knitr_1.23       hms_0.4.2        generics_0.0.2  
-[29] fs_1.3.1         rprojroot_1.3-2  grid_3.5.3       tidyselect_0.2.5
-[33] glue_1.3.1       R6_2.4.0         readxl_1.3.1     rmarkdown_1.13  
-[37] modelr_0.1.4     magrittr_1.5     whisker_0.3-2    backports_1.1.4 
-[41] scales_1.0.0     htmltools_0.3.6  rvest_0.3.4      assertthat_0.2.1
-[45] colorspace_1.4-1 stringi_1.4.3    lazyeval_0.2.2   munsell_0.5.0   
-[49] broom_0.5.2      crayon_1.3.4    </code></pre>
+ [1] nlme_3.1-140                matrixStats_0.54.0         
+ [3] bitops_1.0-6                fs_1.3.1                   
+ [5] lubridate_1.7.4             bit64_0.9-7                
+ [7] RColorBrewer_1.1-2          httr_1.4.0                 
+ [9] rprojroot_1.3-2             GenomeInfoDb_1.18.2        
+[11] tools_3.5.3                 backports_1.1.4            
+[13] utf8_1.1.4                  R6_2.4.0                   
+[15] vipor_0.4.5                 DBI_1.0.0                  
+[17] lazyeval_0.2.2              BiocGenerics_0.28.0        
+[19] colorspace_1.4-1            withr_2.1.2                
+[21] tidyselect_0.2.5            curl_3.3                   
+[23] bit_1.1-14                  compiler_3.5.3             
+[25] git2r_0.25.2                graph_1.60.0               
+[27] cli_1.1.0                   rvest_0.3.4                
+[29] Biobase_2.42.0              xml2_1.2.0                 
+[31] DelayedArray_0.8.0          labeling_0.3               
+[33] scales_1.0.0                rappdirs_0.3.1             
+[35] digest_0.6.19               rmarkdown_1.13             
+[37] XVector_0.22.0              pkgconfig_2.0.2            
+[39] htmltools_0.3.6             rlang_0.3.4                
+[41] readxl_1.3.1                rstudioapi_0.10            
+[43] RSQLite_2.1.1               shiny_1.3.2                
+[45] generics_0.0.2              jsonlite_1.6               
+[47] BiocParallel_1.16.6         RCurl_1.95-4.12            
+[49] GenomeInfoDbData_1.2.0      Matrix_1.2-17              
+[51] fansi_0.4.0                 Rcpp_1.0.1                 
+[53] munsell_0.5.0               S4Vectors_0.20.1           
+[55] stringi_1.4.3               whisker_0.3-2              
+[57] yaml_2.2.0                  SummarizedExperiment_1.12.0
+[59] zlibbioc_1.28.0             plyr_1.8.4                 
+[61] grid_3.5.3                  blob_1.1.1                 
+[63] parallel_3.5.3              promises_1.0.1             
+[65] crayon_1.3.4                lattice_0.20-38            
+[67] haven_2.1.0                 annotate_1.60.1            
+[69] hms_0.4.2                   locfit_1.5-9.1             
+[71] zeallot_0.1.0               knitr_1.23                 
+[73] pillar_1.4.1                GenomicRanges_1.34.0       
+[75] geneplotter_1.60.0          stats4_3.5.3               
+[77] XML_3.98-1.20               glue_1.3.1                 
+[79] evaluate_0.14               modelr_0.1.4               
+[81] vctrs_0.1.0                 httpuv_1.5.1               
+[83] cellranger_1.1.0            gtable_0.3.0               
+[85] assertthat_0.2.1            xfun_0.7                   
+[87] mime_0.6                    xtable_1.8-4               
+[89] broom_0.5.2                 later_0.8.0                
+[91] shinythemes_1.1.2           beeswarm_0.2.3             
+[93] AnnotationDbi_1.44.0        memoise_1.1.0              
+[95] IRanges_2.16.0              workflowr_1.4.0            
+[97] ellipsis_0.1.0              GSEABase_1.44.0            </code></pre>
 </div>
 </div>
 
