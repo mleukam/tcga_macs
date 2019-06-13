@@ -14,11 +14,20 @@ A T cell inflamed signature has been defined and described across tumor types in
 
 ## Defining macrophage gene sets
 
-Find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. The original data is obtained from GEO, ID=[GSE46903](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903).
+Derived differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes for downstream analyses. The original data is obtained from GEO, ID=[GSE46903](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903).
 
  * [Download data from GEO](data_download.html)
  * [Data cleaning](preprocessing.html)
  * [Clustering and correlation analyses](clustering.html)
+ 
+ Dissimilarity matrix showing correlation scores among samples:
+ 
+ ![](assets/corrmatrix.png)
+ 
+K-means clustering based on Pearson correlation coefficients (k =7):
+
+ ![](assets/k7cluster.png)
+
  * [Differential gene expression to derive gene lists](invitro_mac_dge.html)
  
 ## Investigating patterns in TGCA data
