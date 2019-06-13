@@ -24,7 +24,7 @@ Derived differential gene expression sets for each of a number of experimentally
  
  ![](assets/corrmatrix.png)
  
-K-means clustering based on Pearson correlation coefficients (k =7):
+K-means clustering of treatment groups based on Pearson correlation coefficients (k =7):
 
  ![](assets/k7cluster.png)
 
