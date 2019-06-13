@@ -344,7 +344,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-10
+<strong>Last updated:</strong> 2019-06-13
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -375,10 +375,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree5648679449d35ae85b71d4985e025ce5058f1a4ctargetblank5648679a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/5648679449d35ae85b71d4985e025ce5058f1a4c" target="_blank">5648679</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9b1985d0a311ea7bfc5f242faf949848ee301292targetblank9b1985da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9b1985d0a311ea7bfc5f242faf949848ee301292" target="_blank">9b1985d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree5648679449d35ae85b71d4985e025ce5058f1a4ctargetblank5648679a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9b1985d0a311ea7bfc5f242faf949848ee301292targetblank9b1985da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -390,13 +390,17 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
+    Ignored:    data/160genes_ensembl.gencode28.txt
     Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
     Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
     Ignored:    data/GSE46903_RAW.tar
     Ignored:    data/GSE46903_non-normalized.txt
     Ignored:    data/GSE46903_nonnormalized copy.tsv
+    Ignored:    data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
     Ignored:    data/gse_46903.rds
     Ignored:    data/htseq_counts/
+    Ignored:    data/kyle.gdc_tcga_bam_metadata.txt
+    Ignored:    docs/.DS_Store
     Ignored:    output/dge_frame.csv
     Ignored:    output/downreg_c1.csv
     Ignored:    output/downreg_c2.csv
@@ -405,7 +409,13 @@ Ignored files:
     Ignored:    output/downreg_c5.csv
     Ignored:    output/downreg_c6.csv
     Ignored:    output/downreg_c7.csv
+    Ignored:    output/expr_matrix.rds
     Ignored:    output/expression_set.rds
+    Ignored:    output/filtered.total.phenodata.csv
+    Ignored:    output/filtered.total.phenodata.rds
+    Ignored:    output/flat_total_counts.rds
+    Ignored:    output/flat_total_pheno.rds
+    Ignored:    output/gset_ids_complete.rds
     Ignored:    output/km_cluster_assignments.csv
     Ignored:    output/mac_eset.rds
     Ignored:    output/mac_eset_w_clusters.rds
@@ -414,6 +424,9 @@ Ignored files:
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/score_matrix.csv
+    Ignored:    output/selected.total.counts.csv
+    Ignored:    output/selected.total.counts.rds
     Ignored:    output/table_c1.csv
     Ignored:    output/table_c2.csv
     Ignored:    output/table_c3.csv
@@ -434,8 +447,15 @@ Ignored files:
     Ignored:    output/upreg_c6.csv
     Ignored:    output/upreg_c7.csv
 
+Untracked files:
+    Untracked:  code/gsva1.r
+    Untracked:  code/gsva1.sh
+    Untracked:  code/run_gvsa1.pbs
+    Untracked:  docs/assets/
+
 Unstaged changes:
     Modified:   analysis/ss_gsea.Rmd
+    Modified:   analysis/tcga_format.Rmd
 
 </code></pre>
 <p>
@@ -474,6 +494,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/9b1985d0a311ea7bfc5f242faf949848ee301292/analysis/index.Rmd" target="_blank">9b1985d</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-13
+</td>
+<td>
+added summary images
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/8f7d6840af2071b9f16f976507edc4d2fe988ecf/docs/index.html" target="_blank">8f7d684</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -794,11 +848,17 @@ Start workflowr project.
 </div>
 <div id="defining-macrophage-gene-sets" class="section level2">
 <h2>Defining macrophage gene sets</h2>
-<p>Find ranked differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes. These gene sets will be used for our downstream analyses. The original data is obtained from GEO, ID=<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">GSE46903</a>.</p>
+<p>Derived differential gene expression sets for each of a number of experimentally derived macrophage states compared to monocytes for downstream analyses. The original data is obtained from GEO, ID=<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46903">GSE46903</a>.</p>
 <ul>
 <li><a href="data_download.html">Download data from GEO</a></li>
 <li><a href="preprocessing.html">Data cleaning</a></li>
 <li><a href="clustering.html">Clustering and correlation analyses</a></li>
+</ul>
+<p>Dissimilarity matrix showing correlation scores among samples:</p>
+<p><img src="assets/corrmatrix.png" /></p>
+<p>K-means clustering based on Pearson correlation coefficients (k =7):</p>
+<p><img src="assets/k7cluster.png" /></p>
+<ul>
 <li><a href="invitro_mac_dge.html">Differential gene expression to derive gene lists</a></li>
 </ul>
 </div>
