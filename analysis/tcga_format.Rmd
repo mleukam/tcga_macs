@@ -959,8 +959,8 @@ total_counts_selected <- bind_cols(gene_names, counts_selected)
 ## Save combined tables for later use
 
 ```{r}
-write_csv(total_counts_selected, "output/selected.total.counts.rds")
-write_csv(pheno_data_filtered, "output/filtered.total.phenodata.rds")
+write_csv(total_counts_selected, "output/selected.total.counts.csv")
+write_csv(pheno_data_filtered, "output/filtered.total.phenodata.csv")
 ```
 
 

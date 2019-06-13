@@ -27,3 +27,4 @@ output/dge_frame.csv
 data/160genes_ensembl.gencode28.txt
 data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
 data/kyle.gdc_tcga_bam_metadata.txt
+docs/assets/corrmatrix.tiff

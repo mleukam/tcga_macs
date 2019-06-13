@@ -1,0 +1,23 @@
+## Define the shell
+#PBS -S /bin/bash
+
+## Name the job
+#PBS -N tximport
+
+## Request resources
+#PBS -l walltime=8:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=32G
+
+## Specify the combined output/error log
+#PBS -j oe
+#PBS -o /home/mleukam/logs/gsva1.log
+
+# navigate to shell dir
+cd /home/mleukam/shell
+
+# call shell scrpt
+./gvsa1.sh
+
+# exit code
+exit 0

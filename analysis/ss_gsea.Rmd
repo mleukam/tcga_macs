@@ -88,7 +88,7 @@ Preprocessing following methods outlined here: https://f1000research.com/article
 
 Read in data
 ```{r}
-total_counts <- read_csv("output/tcga_total_counts.csv")
+total_counts <- read_csv("output/selected.total.counts.csv")
 ```
 
 #### Filter for protein coding genes
@@ -106,10 +106,7 @@ nrow(total_counts_prcode)
 
 ```
 
-#### Normalize counts
-
-Normalisation by the method of trimmed mean of M-values (TMM) is performed using the calcNormFactors function in edgeR.
-
+#### Correct for library size: convert to CPM
 ```{r}
 # normalize by log cpm using EdgeR
 df_data <- total_counts_prcode %>% 
@@ -166,7 +163,7 @@ dim(total_cpm_filtered)
 
 #### Normalize gene expression distributions
 
-Normalisation by the method of trimmed mean of M-values (TMM)12 is performed using the calcNormFactors function in edgeR. The normalisation factors calculated here are used as a scaling factor for the library sizes. 
+Normalisation by the method of trimmed mean of M-values (TMM) is performed using the calcNormFactors function in edgeR. The normalisation factors calculated here are used as a scaling factor for the library sizes. 
 ```{r}
 # get normalization factors
 norm_factors <- calcNormFactors(total_cpm_filtered, method = "TMM")
@@ -178,7 +175,7 @@ rownames(total_cpm_norm) <- rownames(total_cpm_filtered)
 total_cpm_norm[1:5, 1:5]
 ```
 
-#### Log transform
+#### Log transformation
 ```{r}
 total_log_cpm_filtered_norm <- log2(total_cpm_norm)
 ```
@@ -269,7 +266,8 @@ rownames(tcga_es_slice) <- c("cluster1_up",
                              "cluster7_up")
 tcga_es_slice[1:5, 1:5]
 
-tcga_es_tbl <- tcga_es_slice %>% rownames_to_column(var = "cluster") %>% as_tibble()
+tcga_es_tbl <- tcga_es_slice %>% 
+  rownames_to_column(var = "cluster") %>% as_tibble()
 tcga_es_tbl
 ```
 
@@ -303,8 +301,8 @@ Helper function from Kevin Blighe: https://www.biostars.org/p/318756/#318919
 # Build a query of HTSeq files availble in GDC from TCGA
 qfiles <- files() %>%
   GenomicDataCommons::filter(~ cases.project.project_id == 'TCGA*' & 
-           type == 'gene_expression' & 
-           analysis.workflow_type =='HTSeq - Counts' ) 
+                               type == 'gene_expression' & 
+                               analysis.workflow_type =='HTSeq - Counts')
 
 # get a table of filenames and ids from the query
 total_manifest <- manifest(qfiles)
