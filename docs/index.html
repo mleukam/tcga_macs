@@ -375,10 +375,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9b1985d0a311ea7bfc5f242faf949848ee301292targetblank9b1985da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9b1985d0a311ea7bfc5f242faf949848ee301292" target="_blank">9b1985d</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree499940d74c3d7a6e5f292aa066598410d8ac4bd8targetblank499940da"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/499940d74c3d7a6e5f292aa066598410d8ac4bd8" target="_blank">499940d</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9b1985d0a311ea7bfc5f242faf949848ee301292targetblank9b1985da" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree499940d74c3d7a6e5f292aa066598410d8ac4bd8targetblank499940da" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -401,6 +401,7 @@ Ignored files:
     Ignored:    data/htseq_counts/
     Ignored:    data/kyle.gdc_tcga_bam_metadata.txt
     Ignored:    docs/.DS_Store
+    Ignored:    docs/assets/corrmatrix.tiff
     Ignored:    output/dge_frame.csv
     Ignored:    output/downreg_c1.csv
     Ignored:    output/downreg_c2.csv
@@ -447,15 +448,8 @@ Ignored files:
     Ignored:    output/upreg_c6.csv
     Ignored:    output/upreg_c7.csv
 
-Untracked files:
-    Untracked:  code/gsva1.r
-    Untracked:  code/gsva1.sh
-    Untracked:  code/run_gvsa1.pbs
-    Untracked:  docs/assets/
-
 Unstaged changes:
-    Modified:   analysis/ss_gsea.Rmd
-    Modified:   analysis/tcga_format.Rmd
+    Modified:   analysis/clustering.Rmd
 
 </code></pre>
 <p>
@@ -494,6 +488,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/499940d74c3d7a6e5f292aa066598410d8ac4bd8/analysis/index.Rmd" target="_blank">499940d</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-13
+</td>
+<td>
+minor text update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/08836cd7350cc17a30772f404d6bc1e1fcaa73dc/docs/index.html" target="_blank">08836cd</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -856,7 +884,7 @@ Start workflowr project.
 </ul>
 <p>Dissimilarity matrix showing correlation scores among samples:</p>
 <p><img src="assets/corrmatrix.png" /></p>
-<p>K-means clustering based on Pearson correlation coefficients (k =7):</p>
+<p>K-means clustering of treatment groups based on Pearson correlation coefficients (k =7):</p>
 <p><img src="assets/k7cluster.png" /></p>
 <ul>
 <li><a href="invitro_mac_dge.html">Differential gene expression to derive gene lists</a></li>
