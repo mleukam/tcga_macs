@@ -108,7 +108,7 @@ nrow(total_counts_prcode)
 
 #### Correct for library size: convert to CPM
 ```{r}
-# normalize by log cpm using EdgeR
+# normalize rows by log cpm using EdgeR
 df_data <- total_counts_prcode %>% 
   dplyr::select(-gene_id) %>% as.matrix()
 df_names <- total_counts_prcode %>% dplyr::select(gene_id) 
@@ -219,10 +219,11 @@ Write out matrix and gene set lists for import into stats cluster.
 # gset list
 saveRDS(gset_ids_complete, "output/gset_ids_complete.rds")
 
-expr_matrix <- total_log_cpm_filtered_norm %>%
-  as.matrix()
+expr_matrix <- total_log_cpm_filtered_norm %>% 
+  as.data.frame() %>%
+  rownames_to_column(var = "gene")
 
-saveRDS(expr_matrix, "output/expr_matrix.rds")
+write_csv(expr_matrix, "output/expr_matrix.csv")
 
 ```
 
@@ -244,58 +245,33 @@ Get macrophage gene set GSVA scores
 
 ## Plots
 
+#### Data cleaning and annotation for plots
 ```{r}
-# read in RDS from cluster
-# tcga_es <- readRDS("output/tcga_es.rds")
-```
+# read in RDS from cluster, convert to tibble
+tcga_es <- readRDS("output/tcga_gsva_17geneset_results.rds") %>% 
+  as.data.frame()
 
-## Manipulation of CSV (temporary fix for presentation)
-```{r}
-# temporary: read in CSV
-tcga_es_csv <- read_csv("output/score_matrix.csv", col_names = TRUE)
-tcga_es_csv
+tcga_es_tbl <- tcga_es %>% rownames_to_column(var = "gene_set") %>%
+  as_tibble()
 
-tcga_es_slice <- tcga_es_csv[1:7, ]
-tcga_es_slice <- as.data.frame(tcga_es_slice)
-rownames(tcga_es_slice) <- c("cluster1_up", 
-                             "cluster2_up", 
-                             "cluster3_up", 
-                             "cluster4_up", 
-                             "cluster5_up", 
-                             "cluster6_up", 
-                             "cluster7_up")
-tcga_es_slice[1:5, 1:5]
+tcga_es_tidy <- tcga_es_tbl %>% 
+  gather(key = "sampleID", value = "score", -gene_set) 
 
-tcga_es_tbl <- tcga_es_slice %>% 
-  rownames_to_column(var = "cluster") %>% as_tibble()
-tcga_es_tbl
-```
-
-Clean up group assignments
-```{r}
-
-tcga_es_df <- tcga_es_tbl %>% 
-  gather(key = "sampleID", value = "score", -cluster) 
-
-tidy_es <- tcga_es_df %>%
+tidy_es <- tcga_es_tidy %>%
   mutate(group = str_sub(sampleID, 1, 4)) %>%
-  mutate(group = ifelse(grepl("GBM*", group), "GBM", group)) %>%
-  mutate(group = ifelse(grepl("OV*", group), "OV", group)) %>%
-  mutate(group = ifelse(grepl("LGG*", group), "LGG", group)) %>%
-  mutate(group = ifelse(grepl("UVM*", group), "UVM", group)) %>%
-  mutate(group = ifelse(grepl("UCS*", group), "UCS", group)) %>%
-  mutate(group = ifelse(grepl("ACC*", group), "ACC", group)) %>%
+  mutate(group = ifelse(grepl("^GBM*", group), "GBM", group)) %>%
+  mutate(group = ifelse(grepl("^OV*", group), "OV", group)) %>%
+  mutate(group = ifelse(grepl("^LGG*", group), "LGG", group)) %>%
+  mutate(group = ifelse(grepl("^UVM*", group), "UVM", group)) %>%
+  mutate(group = ifelse(grepl("^UCS*", group), "UCS", group)) %>%
+  mutate(group = ifelse(grepl("^ACC*", group), "ACC", group)) %>%
   mutate(group = as.factor(group))
 
-# remove non-solid tumors
-tidy_es <- tidy_es %>%
-  dplyr::filter(!group %in% c("THYM", "DLBC", "LAML")) %>%
-  mutate(group = fct_drop(group))
-summary(tidy_es$group)
-  
+tidy_es
 ```
 
-Remove non-tumor data and split metastatic from primary tumors
+Split metastatic melanoma from primary tumors
+Build lookup table that includes clinical data linked to file uuID and filenames
 Helper function from Kevin Blighe: https://www.biostars.org/p/318756/#318919
 ```{r}
 # Build a query of HTSeq files availble in GDC from TCGA
@@ -311,8 +287,8 @@ total_manifest <- manifest(qfiles)
 TCGAtranslateID = function(file_names, legacy = TRUE)
 {
   info = files(legacy = legacy) %>%
-    filter( ~ file_name %in% file_names) %>%
-    select('cases.samples.submitter_id') %>%
+    GenomicDataCommons::filter( ~ file_name %in% file_names) %>%
+    GenomicDataCommons::select('cases.samples.submitter_id') %>%
     results_all()
 
   id_list = lapply(info$cases,function(a)
@@ -325,8 +301,8 @@ TCGAtranslateID = function(file_names, legacy = TRUE)
     return(data.frame(file_id=rep(ids(info),barcodes_per_file), submitter_id=unlist(id_list), file_names=file_names))
 }
 
-file_table <- TCGAtranslateID(total_manifest$filename, legacy = FALSE) %>% as_tibble()
-file_table
+file_table <- TCGAtranslateID(total_manifest$filename, legacy = FALSE) 
+file_table <- as_tibble(file_table)
 
 # read in kyle's TCGA metadata table
 kyle_table <- read_tsv("data/kyle.gdc_tcga_bam_metadata.txt")
@@ -345,21 +321,53 @@ lookup_table <- file_table %>%
                 -file_name, 
                 -data_category, 
                 -analysis_workflow_type)
-
-
 ```
 
-qfile_results <- cases() %>%
-  GenomicDataCommons::filter( ~ project.project_id == 'TCGA*' &
-                                files.type == 'gene_expression' &
-                                files.analysis.workflow_type == 'HTSeq - Counts' ) %>% results()
-                                
+Add sample names to lookup table and regroup melanoma
+```{r}
+# read in pheno data linked to my sample names
+pheno_data <- read_csv("output/filtered.total.phenodata.csv")
+
+pheno_joined <- pheno_data %>%
+  left_join(lookup_table) %>%
+  print()
+
+summary(as.factor(pheno_data$project_id))
+
+pheno_joined %>% 
+  dplyr::filter(project_id == "TCGA-SKCM") %>% 
+  mutate(sample_type = as.factor(sample_type)) %>%
+  dplyr::select(sample_type) %>%
+  summary()
+
+metastatic_vector <- pheno_joined %>% 
+  dplyr::filter(project_id == "TCGA-SKCM",
+                sample_type == "Metastatic") %>% 
+  pull(sample) %>%
+  print()
+
+primary_vector <- pheno_joined %>% 
+  dplyr::filter(project_id == "TCGA-SKCM",
+                sample_type == "Primary Tumor") %>% 
+  pull(sample) %>%
+  print()
+
+tidy_es_cleaned <- tidy_es %>%
+  mutate(group = as.character(group)) %>%
+  mutate(group = ifelse(sampleID %in% metastatic_vector, "SKCM_MET", group)) %>%
+  mutate(group = ifelse(sampleID %in% primary_vector, "SKCM_PRI", group)) %>%
+  mutate(group = as.factor(group)) 
+summary(tidy_es_cleaned$group)
+           
+```
+
+#### Beeswarm plots 
 ```{r}
 library(ggsci)
 library(ggpubr)
 library(ggbeeswarm)
 
-tidy_es_c1 <- tidy_es %>% dplyr::filter(cluster == "cluster1_up")
+tidy_es_c1 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c1")
 c1plot <- ggplot(tidy_es_c1,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -374,7 +382,7 @@ c1plot <- ggplot(tidy_es_c1,
   geom_hline(yintercept = 0, linetype = "dashed")
 c1plot
 
-tidy_es_c2 <- tidy_es %>% dplyr::filter(cluster == "cluster2_up")
+tidy_es_c2 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c2")
 c2plot <- ggplot(tidy_es_c2,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -389,7 +397,7 @@ c2plot <- ggplot(tidy_es_c2,
   geom_hline(yintercept = 0, linetype = "dashed")
 c2plot
 
-tidy_es_c3 <- tidy_es %>% dplyr::filter(cluster == "cluster3_up")
+tidy_es_c3 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c3")
 c3plot <- ggplot(tidy_es_c3,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -404,7 +412,7 @@ c3plot <- ggplot(tidy_es_c3,
   geom_hline(yintercept = 0, linetype = "dashed")
 c3plot
 
-tidy_es_c4 <- tidy_es %>% dplyr::filter(cluster == "cluster4_up")
+tidy_es_c4 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c4")
 c4plot <- ggplot(tidy_es_c4,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -419,7 +427,7 @@ c4plot <- ggplot(tidy_es_c4,
   geom_hline(yintercept = 0, linetype = "dashed")
 c4plot
 
-tidy_es_c5 <- tidy_es %>% dplyr::filter(cluster == "cluster5_up")
+tidy_es_c5 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c5")
 c5plot <- ggplot(tidy_es_c5,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -434,7 +442,7 @@ c5plot <- ggplot(tidy_es_c5,
   geom_hline(yintercept = 0, linetype = "dashed")
 c5plot
 
-tidy_es_c6 <- tidy_es %>% dplyr::filter(cluster == "cluster6_up")
+tidy_es_c6 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c6")
 c6plot <- ggplot(tidy_es_c6,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -449,7 +457,7 @@ c6plot <- ggplot(tidy_es_c6,
   geom_hline(yintercept = 0, linetype = "dashed")
 c6plot
 
-tidy_es_c7 <- tidy_es %>% dplyr::filter(cluster == "cluster7_up")
+tidy_es_c7 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c7")
 c7plot <- ggplot(tidy_es_c7,
        aes(x = fct_reorder(group, score, mean), y = score)) + 
   geom_quasirandom(alpha = 0.2) +
@@ -463,4 +471,255 @@ c7plot <- ggplot(tidy_es_c7,
   ggtitle("Macrophage Cluster 7: \"Mixed immune response\"") +
   geom_hline(yintercept = 0, linetype = "dashed")
 c7plot
+
+tidy_es_t <- tidy_es_cleaned %>% dplyr::filter(gene_set == "tcell_gset")
+tplot <- ggplot(tidy_es_t,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("T cell activation gene set") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+tplot
+```
+
+Downregulated gene sets
+```{r}
+tidy_es_c1d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c1")
+c1dplot <- ggplot(tidy_es_c1d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 1: \"Alternate activation (M2)\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c1dplot
+
+tidy_es_c2d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c2")
+c2dplot <- ggplot(tidy_es_c2d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 2: \"Classical activation (M1)\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c2dplot
+
+tidy_es_c3d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c3")
+c3dplot <- ggplot(tidy_es_c3d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 3: \"Deactivated macrophages\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c3dplot
+
+tidy_es_c4d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c4")
+c4dplot <- ggplot(tidy_es_c4d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 4 \"Acute inflammation/migration\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c4dplot
+
+tidy_es_c5d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c5")
+c5dplot <- ggplot(tidy_es_c5d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 5: \"Chronic wound\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c5dplot
+
+tidy_es_c6d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c6")
+c6dplot <- ggplot(tidy_es_c6d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 6: \"Immunosuppresive macrophages\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c6dplot
+
+tidy_es_c7d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c7")
+c7dplot <- ggplot(tidy_es_c7d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("Macrophage Cluster 7: \"Mixed immune response\"") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c7dplot
+
+tidy_es_t <- tidy_es_cleaned %>% dplyr::filter(gene_set == "tcell_gset")
+tplot <- ggplot(tidy_es_t,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("TGCA tumor type") +
+  ylab("GSVA enrichment score") +
+  ggtitle("T cell activation gene set") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+tplot
+```
+
+
+Annotate combined figure source: https://rpkgs.datanovia.com/ggpubr/reference/annotate_figure.html
+
+ggpubr tutorial: http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/
+
+
+```{r fig.height=12, fig.width=12}
+combined_up_plot <- ggarrange(c1plot, c2plot, c3plot, c4plot, c5plot, c6plot, c7plot, tplot,
+          labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+          ncol = 2, nrow = 4)
+
+combined_up_plot <- annotate_figure(combined_up_plot,
+                top = text_grob("Enrichment scores for upregulated genes in macrophage clusters", 
+                                color = "black", 
+                                face = "bold", 
+                                size = 14))
+
+combined_up_plot
+
+combined_down_plot <- ggarrange(c1dplot, c2dplot, c3dplot, c4dplot, c5dplot, c6dplot, c7dplot, tplot,
+          labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+          ncol = 2, nrow = 4)
+
+combined_down_plot <- annotate_figure(combined_down_plot,
+                top = text_grob("Enrichment scores for downregulated genes in macrophage clusters", 
+                                color = "black", 
+                                face = "bold", 
+                                size = 14))
+
+combined_down_plot
+
+```
+
+#### Box plots
+
+```{r}
+# iterate over list of groups
+# get list of groups
+grouplist <- summary(tidy_es_cleaned$group) %>% 
+  enframe() %>%
+  dplyr::select(name)
+grouplist <- as.list(c(grouplist$name))
+grouplist
+
+# define function
+boxplotter <- function(grouplist){
+  df <- tidy_es_cleaned %>%
+    dplyr::filter(group == grouplist) %>%
+    mutate(gene_set = as.factor(gene_set)) %>%
+    mutate(gene_set = fct_recode(gene_set, 
+                                 "T-cell inflamed" = "tcell_gset",
+                                 "C1 upregulated" = "upreg_c1", 
+                                 "C1 downregulated" = "downreg_c1",
+                                 "C2 upregulated" = "upreg_c2",
+                                 "C2 downregulated" = "downreg_c2",
+                                 "C3 upregulated" = "upreg_c3",
+                                 "C3 downregulated" = "downreg_c3",
+                                 "C4 upregulated" = "upreg_c4",
+                                 "C4 downregulated" = "downreg_c4",
+                                 "C5 upregulated" = "upreg_c5",
+                                 "C5 downregulated" = "downreg_c5",
+                                 "C6 upregulated" = "upreg_c6",
+                                 "C6 downregulated" = "downreg_c6",
+                                 "C7 upregulated" = "upreg_c7",
+                                 "C7 downregulated" = "downreg_c7")) %>%
+    mutate(gene_set = fct_relevel(gene_set, c("T-cell inflamed", 
+                                            "C1 upregulated", 
+                                            "C1 downregulated", 
+                                            "C2 upregulated", 
+                                            "C2 downregulated", 
+                                            "C3 upregulated", 
+                                            "C3 downregulated", 
+                                            "C4 upregulated", 
+                                            "C4 downregulated", 
+                                            "C5 upregulated", 
+                                            "C5 downregulated", 
+                                            "C6 upregulated", 
+                                            "C6 downregulated", 
+                                            "C7 upregulated", 
+                                            "C7 downregulated"))) %>%
+    mutate(cluster = str_sub(gene_set, 1, 2)) %>%
+    mutate(cluster = ifelse(cluster == "T-", "T", cluster)) %>%
+    group_by(gene_set) %>%
+    mutate(up_down = ifelse(gene_set == "T-cell inflamed", "upregulated", 
+                          ifelse(grepl("upregulated", gene_set), "upregulated",
+                                 ifelse(grepl("downregulated", gene_set), "downregulated", NA))))
+  boxplot <- ggplot(df, aes(y = score, x = cluster, fill = up_down)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set Type") +
+    scale_fill_igv() +
+    theme_classic2() +
+    ggtitle(paste0("GVSA scores for ", grouplist)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  boxplot
+}
+
+# map function to group list to get plots
+boxplots <- map(grouplist, boxplotter)
+names(boxplots) <- grouplist
+list2env(boxplots, env = environment())
+```
+
+Combine plots into a single plot
+```{r fig.height=16, fig.width=16}
+combined_boxplot <- ggarrange(ACC, BLCA, BRCA, CESC, CHOL, COAD, ESCA, GBM, HNSC,KICH, KIRC, KIRP, LGG, LIHC, LUAD, LUSC, MESO, OV, PAAD, PCPG, PRAD, READ, SARC, SKCM_MET, SKCM_PRI, STAD, TGCT, THCA, UCS, UVM, 
+                              ncol = 5, 
+                              nrow = 6,
+                              common.legend = TRUE,
+                              legend = "bottom")
+combined_boxplot
 ```
