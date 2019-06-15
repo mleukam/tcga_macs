@@ -20,10 +20,11 @@ rm(list = ls())
 # load packages
 library("tidyverse")
 library("GSVA")
+library("parallel")
 
 # read in data
-total_reads <- read_rds("~/gpfs/data/kline-lab/tcga_macs/data/selected.total.counts.rds")
-gset <- read_rds("~/gpfs/data/kline-lab/tcga_macs/data/gset_ids_complete.rds")
+total_reads <- read_csv("/gpfs/data/kline-lab/tcga_macs/data/expr_matrix.csv")
+gset <- readRDS("/gpfs/data/kline-lab/tcga_macs/data/gset_ids_complete.rds")
 
 # set up expression matrix
 rownames <- total_reads %>% pull(gene)
@@ -33,11 +34,7 @@ expr_matrix <- total_reads %>%
 rownames(expr_matrix) <- rownames
 
 # get gvsa scores
-tcga_es <- gsva(expr_matrix, gset,
-                annotation = NULL,
-                method = "gsva",
-                mx.diff = TRUE,
-                verbose = TRUE)
+tcga_es <- gsva(expr = expr_matrix, gset.idx.list = gset, annotation = NULL, method = "gsva", verbose = TRUE)
 
 # write out results
 saveRDS(tcga_es, "/gpfs/data/kline-lab/tcga_macs/output/tcga_gsva_17geneset_results.rds")

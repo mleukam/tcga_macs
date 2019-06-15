@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 
 ## Name the job
-#PBS -N tximport
+#PBS -N gsva_tcga
 
 ## Request resources
 #PBS -l walltime=8:00:00
@@ -17,7 +17,7 @@
 cd /home/mleukam/shell
 
 # call shell scrpt
-./gvsa1.sh
+./gsva1.sh
 
 # exit code
 exit 0
