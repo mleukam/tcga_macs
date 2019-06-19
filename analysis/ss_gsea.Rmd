@@ -620,7 +620,7 @@ ggpubr tutorial: http://www.sthda.com/english/articles/24-ggpubr-publication-rea
 ```{r fig.height=12, fig.width=12}
 combined_up_plot <- ggarrange(c1plot, c2plot, c3plot, c4plot, c5plot, c6plot, c7plot, tplot,
           labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
-          ncol = 2, nrow = 4)
+          ncol = 3, nrow = 3)
 
 combined_up_plot <- annotate_figure(combined_up_plot,
                 top = text_grob("Enrichment scores for upregulated genes in macrophage clusters", 
@@ -722,4 +722,84 @@ combined_boxplot <- ggarrange(ACC, BLCA, BRCA, CESC, CHOL, COAD, ESCA, GBM, HNSC
                               common.legend = TRUE,
                               legend = "bottom")
 combined_boxplot
+```
+
+Upregulated signatures only
+```{r}
+# iterate over list of groups
+# get list of groups
+grouplist <- summary(tidy_es_cleaned$group) %>% 
+  enframe() %>%
+  dplyr::select(name)
+grouplist <- as.list(c(grouplist$name))
+grouplist
+
+# define function
+boxplotter_up <- function(grouplist){
+  df <- tidy_es_cleaned %>%
+    dplyr::filter(group == grouplist) %>%
+    dplyr::filter(!grepl("downreg_", gene_set)) %>%
+    mutate(gene_set = as.factor(gene_set)) %>%
+    mutate(gene_set = fct_recode(gene_set, 
+                                 "T-cell inflamed" = "tcell_gset",
+                                 "C1" = "upreg_c1", 
+                                 "C2" = "upreg_c2",
+                                 "C3" = "upreg_c3",
+                                 "C4" = "upreg_c4",
+                                 "C5" = "upreg_c5",
+                                 "C6" = "upreg_c6",
+                                 "C7" = "upreg_c7")) %>%
+    mutate(gene_set = fct_relevel(gene_set, c("T-cell inflamed", 
+                                            "C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7"))) %>%
+    mutate(cluster = str_sub(gene_set, 1, 2)) %>%
+    mutate(cluster = ifelse(cluster == "T-", "T", cluster)) %>%
+    mutate(cluster = fct_recode(cluster, "T" = "T", 
+                                            "C1" = "C1", 
+                                            "C2" = "C2", 
+                                            "C3" = "C3", 
+                                            "C4" = "C4", 
+                                            "C5" = "C5",
+                                            "C6" = "C6", 
+                                            "C7" = "C7")) %>%
+    group_by(cluster)
+
+  boxplot <- ggplot(df, aes(y = score, x = cluster, fill = cluster)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set Type") +
+    scale_fill_igv() +
+    theme_classic2() +
+    ggtitle(paste0("GVSA scores for ", grouplist)) +
+    theme(legend.position = "none")
+  boxplot
+}
+
+# map function to group list to get plots
+boxplots <- map(grouplist, boxplotter_up)
+names(boxplots) <- grouplist
+list2env(boxplots, env = environment())
+```
+
+Combine plots into a single plot
+```{r fig.height=16, fig.width=16}
+combined_up_boxplot <- ggarrange(ACC, BLCA, BRCA, CESC, CHOL, COAD, ESCA, GBM, HNSC, KICH, KIRC, KIRP, LGG, LIHC, LUAD, LUSC, MESO, OV, PAAD, PCPG, PRAD, READ, SARC, SKCM_MET, SKCM_PRI, STAD, TGCT, THCA, UCS, UVM, 
+                              ncol = 8, 
+                              nrow = 4)
+combined_up_boxplot
+```
+
+
+```{r}
+# individual plots
+my_comparisons <- list(c("C1", "T"))
+KICH + stat_compare_means(comparisons = my_comparisons)
+LGG + stat_compare_means(comparisons = my_comparisons)
+THCA + stat_compare_means(comparisons = my_comparisons)
+
 ```
