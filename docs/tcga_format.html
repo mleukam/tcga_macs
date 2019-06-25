@@ -445,7 +445,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-12
+<strong>Last updated:</strong> 2019-06-25
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -536,10 +536,10 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9771192bd3e34712812fd25fbeeefd2efc378fb4targetblank9771192a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/9771192bd3e34712812fd25fbeeefd2efc378fb4" target="_blank">9771192</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree0188666004a3e503b05be00244ef7524d98b3bc2targetblank0188666a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/0188666004a3e503b05be00244ef7524d98b3bc2" target="_blank">0188666</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree9771192bd3e34712812fd25fbeeefd2efc378fb4targetblank9771192a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree0188666004a3e503b05be00244ef7524d98b3bc2targetblank0188666a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -551,13 +551,20 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
+    Ignored:    data/160genes_ensembl.gencode28.txt
     Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
     Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
     Ignored:    data/GSE46903_RAW.tar
     Ignored:    data/GSE46903_non-normalized.txt
-    Ignored:    data/GSE46903_nonnormalized copy.tsv
+    Ignored:    data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
     Ignored:    data/gse_46903.rds
     Ignored:    data/htseq_counts/
+    Ignored:    data/kyle.gdc_tcga_bam_metadata.txt
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/assets/corrmatrix.tiff
+    Ignored:    output/Combined_down_plots.pdf
+    Ignored:    output/Combined_up_plots.pdf
+    Ignored:    output/combined_boxplots.pdf
     Ignored:    output/dge_frame.csv
     Ignored:    output/downreg_c1.csv
     Ignored:    output/downreg_c2.csv
@@ -568,6 +575,7 @@ Ignored files:
     Ignored:    output/downreg_c7.csv
     Ignored:    output/expr_matrix.rds
     Ignored:    output/expression_set.rds
+    Ignored:    output/filtered.total.phenodata.csv
     Ignored:    output/filtered.total.phenodata.rds
     Ignored:    output/flat_total_counts.rds
     Ignored:    output/flat_total_pheno.rds
@@ -581,7 +589,6 @@ Ignored files:
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
     Ignored:    output/score_matrix.csv
-    Ignored:    output/selected.total.counts.rds
     Ignored:    output/table_c1.csv
     Ignored:    output/table_c2.csv
     Ignored:    output/table_c3.csv
@@ -592,6 +599,7 @@ Ignored files:
     Ignored:    output/tcga_counts_dataframe_list.rds
     Ignored:    output/tcga_counts_list.rds
     Ignored:    output/tcga_gdc_manifest.rds
+    Ignored:    output/tcga_gsva_17geneset_results.rds
     Ignored:    output/tcga_metadata_list.rds
     Ignored:    output/tcga_total_counts.csv
     Ignored:    output/upreg_c1.csv
@@ -603,11 +611,10 @@ Ignored files:
     Ignored:    output/upreg_c7.csv
 
 Untracked files:
-    Untracked:  data/160genes_ensembl.gencode28.txt
-    Untracked:  data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
-    Untracked:  data/kyle.gdc_tcga_bam_metadata.txt
+    Untracked:  analysis/gsva_results_exploration.Rmd
 
 Unstaged changes:
+    Modified:   .gitignore
     Modified:   analysis/ss_gsea.Rmd
 
 </code></pre>
@@ -647,6 +654,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/3f5af70b78e3bce377c516a0412784251a98bba5/analysis/tcga_format.Rmd" target="_blank">3f5af70</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-13
+</td>
+<td>
+gsva R scripts
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/6f17bb77a732918924387a12c56d693fe5b6ae73/docs/tcga_format.html" target="_blank">6f17bb7</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1499,8 +1540,8 @@ total_counts_selected &lt;- bind_cols(gene_names, counts_selected)</code></pre>
 </div>
 <div id="save-combined-tables-for-later-use" class="section level2">
 <h2>Save combined tables for later use</h2>
-<pre class="r"><code>write_csv(total_counts_selected, &quot;output/selected.total.counts.rds&quot;)
-write_csv(pheno_data_filtered, &quot;output/filtered.total.phenodata.rds&quot;)</code></pre>
+<pre class="r"><code>write_csv(total_counts_selected, &quot;output/selected.total.counts.csv&quot;)
+write_csv(pheno_data_filtered, &quot;output/filtered.total.phenodata.csv&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
