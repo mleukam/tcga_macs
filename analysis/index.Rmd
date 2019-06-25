@@ -38,6 +38,7 @@ Apply gene lists from above to TCGA pancancer bulk RNAseq counts data
 * [Download counts data from Genomic Data Commons](tcga_download.html)
 * [Format counts data](tcga_format.html)
 * [Gene set variation analysis](ss_gsea.html)
+* [Exploration and analysis of GSVA results](gsva_results_exploration.html)
 
 #### Figures:
 
