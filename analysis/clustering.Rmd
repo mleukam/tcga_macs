@@ -207,9 +207,11 @@ Source for plots: https://www.datanovia.com/en/blog/cluster-analysis-in-r-simpli
 # using 1000 most variable probes as defined above
 res_dist <- get_dist(datExpr, method = "pearson")
 head(round(as.matrix(res_dist), 2))[, 1:6]
+dim(res_dist)
 
 # plot dissimilarity matrix
-fviz_dist(res_dist, lab_size = 4)
+fviz_dist(res_dist, lab_size = 4) +
+  theme(axis.ticks = element_blank())
 ```
 
 Hierarchical and K-means clustering of correlations
@@ -369,9 +371,23 @@ fviz_silhouette(res_km_7)
 PCA plot using all gene expression data for individual samples, now with new cluster labels applied
 ```{r}
 # Get cluster assignments for each condition and add to phenodata
+# Flip cluster 1 and 2 labels to better match established conventions (C1 close to M1 and M2 close to C2)
 myclust <- enframe(res_km_7$cluster) %>%
   dplyr::rename(treatment = name, 
-                mycluster = value)
+                mycluster = value) %>% 
+  mutate(mycluster = as.factor(mycluster),
+         mycluster = fct_recode(mycluster, "1" = "2",
+                                "2" = "1",
+                                "3" = "3",
+                                "4" = "4",
+                                "5" = "5",
+                                "6" = "6",
+                                "7" = "7"),
+         mycluster = as.factor(mycluster))
+
+summary(as.factor(res_km_7$cluster))
+summary(as.factor(myclust$mycluster))
+
 
 pheno_tbl_clust <- pheno_tbl %>% 
   left_join(myclust, by = "treatment") %>%
@@ -415,6 +431,109 @@ pca3 <- fviz_pca_ind(pca_clust,
   labs(subtitle = "By treatment-level cluster")
 print(pca3)
 
+```
+
+Plot for paper
+```{r}
+set.seed(818)
+
+res_km_7  <- eclust(res_dist_tx_m, "kmeans", k = 7)
+res_km_7$clust_plot
+
+# get coordinates, names, and group assignments from plot filter
+dat_x <- res_km_7$clust_plot$data$x
+dat_y <- res_km_7$clust_plot$data$y
+dat_name <- res_km_7$clust_plot$data$name
+dat_coord <- res_km_7$clust_plot$data$coord
+dat_cluster <- res_km_7$clust_plot$data$cluster
+
+res_km_7$clust_plot$labels
+
+# rejigger the plot labels
+labels <- list(
+                                   label = "name")
+# gather data into tibble
+pl_data <- bind_cols(list(x = dat_x, 
+                          y = dat_y, 
+                          name = dat_name, 
+                          coord = dat_coord, 
+                          cluster = dat_cluster)) %>%
+# rename cluster 1 into 2 and vice versa  
+  mutate(cluster = as.factor(cluster),
+         new_cluster = fct_recode(cluster, "1" = "2",
+                                "2" = "1",
+                                "3" = "3",
+                                "4" = "4",
+                                "5" = "5",
+                                "6" = "6",
+                                "7" = "7"),
+         new_cluster = as.character(new_cluster)) 
+
+
+  
+library(viridis)
+library(wesanderson)
+library(ggConvexHull)
+library(ggrepel)
+
+# plot clusters
+plotclust <- ggplot(data = pl_data, aes(x = x, 
+                                        y = y, 
+                                        label = name, 
+                                        group = new_cluster, 
+                                        color = new_cluster, 
+                                        fill = new_cluster)) +
+  geom_point(size = 3.3) +
+  theme_classic2() +
+  expand_limits(x = c(-6, 8.5)) +
+  scale_color_manual(values = wes_palette("Darjeeling1", n = 7, type = "continuous")) +
+  scale_fill_manual(values = wes_palette("Darjeeling1", n = 7, type = "continuous")) + 
+  geom_text_repel(data = pl_data[pl_data$new_cluster %in% c("2", "3", "4", "6"), ],
+                  point.padding = 0.1, 
+                  box.padding = 0.5,
+                  nudge_x = -1.2,
+                  nudge_y = 0.4,
+                  size = 4.5,
+                  segment.color = "grey",
+                  show.legend = FALSE) +
+  geom_text_repel(data = pl_data[pl_data$new_cluster %in% c("1"), ],
+                  point.padding = 0.1, 
+                  box.padding = 0.5,
+                  nudge_x = -2,
+                  nudge_y = 0,
+                  size = 4.5,
+                  segment.color = "grey",
+                  show.legend = FALSE) +
+  geom_text_repel(data = pl_data[pl_data$new_cluster %in% c("5"), ],
+                  point.padding = 0.2, 
+                  box.padding = 0.2,
+                  nudge_x = -2.6,
+                  nudge_y = 0,
+                  size = 4.5,
+                  segment.color = "grey",
+                  show.legend = FALSE) +
+  geom_text_repel(data = pl_data[pl_data$new_cluster %in% c("7"), ],
+                  point.padding = 0.1, 
+                  box.padding = 0.5,
+                  nudge_x = 2.4,
+                  nudge_y = 0,
+                  size = 4.5,
+                  segment.color = "grey",
+                  show.legend = FALSE) +
+  geom_convexhull(alpha = 0.7, 
+                  aes(fill = new_cluster),
+                  show.legend = FALSE,
+                  colour = "black") +
+  labs(y = "PC2 (24.9% of variance)", 
+       x = "PC1 (54.3% of variance)",
+       color = "Macrophage\nCluster",
+       shape = "Macrophage\nCluster",
+       fill = "Macrophage\nCluster") +
+  theme(legend.position = "bottom")
+  
+plotclust
+
+# 6 x 6 is a good size
 ```
 
 ## Remake expression set for export
