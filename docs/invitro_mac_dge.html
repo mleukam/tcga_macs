@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="mleukam" />
@@ -90,7 +91,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -251,48 +251,9 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -427,7 +388,7 @@ div.section {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -436,7 +397,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -445,22 +406,22 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-06-07
+<strong>Last updated:</strong> 2019-11-09
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>tcga_macs/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.3.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.5.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
 <div id="checks" class="tab-pane fade">
-<div id="workflowr-checks" class="panel-group">
+<div class="panel-group" id="workflowr-checks">
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
@@ -524,10 +485,62 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree7effb485d0c38c7d99ff512ccf0c621d811e5b6dtargetblank7effb48a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/7effb485d0c38c7d99ff512ccf0c621d811e5b6d" target="_blank">7effb48</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree7effb485d0c38c7d99ff512ccf0c621d811e5b6dtargetblank7effb48a" class="panel-collapse collapse">
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it difficult for you and others to run your code on a different machine. Change the absolute path(s) below to the suggested relative path(s) to make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+~/tcga_macs/output/mac_eset_w_clusters.rds
+</td>
+<td style="text-align:left;">
+output/mac_eset_w_clusters.rds
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+~/tcga_macs/output/normalized_probe_intensities.Rds
+</td>
+<td style="text-align:left;">
+output/normalized_probe_intensities.Rds
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+~/tcga_macs/output/
+</td>
+<td style="text-align:left;">
+output
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreee196ab1cea5a05b8e4ff292aa979b6c5dd701ac3targetblanke196ab1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/e196ab1cea5a05b8e4ff292aa979b6c5dd701ac3" target="_blank">e196ab1</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreee196ab1cea5a05b8e4ff292aa979b6c5dd701ac3targetblanke196ab1a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -537,37 +550,132 @@ Ignored files:
     Ignored:    .DS_Store
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    all.pdf
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
+    Ignored:    data/160genes_ensembl.gencode28.txt
     Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
     Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
     Ignored:    data/GSE46903_RAW.tar
     Ignored:    data/GSE46903_non-normalized.txt
-    Ignored:    data/GSE46903_nonnormalized copy.tsv
+    Ignored:    data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
     Ignored:    data/gse_46903.rds
+    Ignored:    data/htseq_counts/
+    Ignored:    data/kyle.gdc_tcga_bam_metadata.txt
+    Ignored:    output/AUC_comparison.pdf
+    Ignored:    output/Combined_down_plots.pdf
+    Ignored:    output/Combined_up_plots.pdf
+    Ignored:    output/Fig1.png
+    Ignored:    output/PFS_CoxPH.pdf
+    Ignored:    output/Rplot.pdf
+    Ignored:    output/arrange.pdf
+    Ignored:    output/ave_scores_gsva_by_tumor.rds
+    Ignored:    output/beeswarm_plot.pdf
+    Ignored:    output/beeswarm_pub.pdf
+    Ignored:    output/boxplot_total_pub.pdf
+    Ignored:    output/combined_boxplots.pdf
+    Ignored:    output/combined_up_plot.pdf
+    Ignored:    output/coxph_pfs.pdf
+    Ignored:    output/cpxph_os.pdf
+    Ignored:    output/cv.lasso.merck.rds
+    Ignored:    output/cv.lasso.rds
     Ignored:    output/dge_frame.csv
+    Ignored:    output/downreg_c1.csv
+    Ignored:    output/downreg_c2.csv
+    Ignored:    output/downreg_c3.csv
+    Ignored:    output/downreg_c4.csv
+    Ignored:    output/downreg_c5.csv
+    Ignored:    output/downreg_c6.csv
+    Ignored:    output/downreg_c7.csv
+    Ignored:    output/expr_matrix.csv
+    Ignored:    output/expr_matrix.rds
     Ignored:    output/expression_set.rds
+    Ignored:    output/figures/
+    Ignored:    output/filtered.total.phenodata.csv
+    Ignored:    output/filtered.total.phenodata.rds
+    Ignored:    output/flat_total_counts.rds
+    Ignored:    output/flat_total_pheno.rds
+    Ignored:    output/gset_ids_complete.rds
+    Ignored:    output/gset_ids_plusnew.rds
+    Ignored:    output/heatmaps_fig3.pdf
+    Ignored:    output/hm_chol.pdf
+    Ignored:    output/imtx_expressionset.rds
+    Ignored:    output/imtx_gsva_17geneset_results.rds
+    Ignored:    output/imtx_matrix.csv
+    Ignored:    output/km_cluster_assignments.csv
+    Ignored:    output/lasso.min.model.merck.rds
+    Ignored:    output/lasso.min.model.rds
+    Ignored:    output/lasso.test.data.merck.rds
+    Ignored:    output/lasso.test.data.rds
+    Ignored:    output/lasso.train.data.merck.rds
+    Ignored:    output/lasso.train.data.rds
     Ignored:    output/mac_eset.rds
     Ignored:    output/mac_eset_w_clusters.rds
+    Ignored:    output/nested_list_dge_top50_updown.rds
     Ignored:    output/normalized_probe_intensities.Rds
+    Ignored:    output/os_km_curves.pdf
+    Ignored:    output/os_km_plots.pdf
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/pub_boxplot.pdf
+    Ignored:    output/score_matrix.csv
+    Ignored:    output/selected.total.counts.csv
+    Ignored:    output/summary heatmap.pdf
+    Ignored:    output/table_c1.csv
+    Ignored:    output/table_c2.csv
+    Ignored:    output/table_c3.csv
+    Ignored:    output/table_c4.csv
+    Ignored:    output/table_c5.csv
+    Ignored:    output/table_c6.csv
+    Ignored:    output/table_c7.csv
+    Ignored:    output/tcga_counts_dataframe_list.rds
+    Ignored:    output/tcga_counts_list.rds
+    Ignored:    output/tcga_gdc_manifest.rds
+    Ignored:    output/tcga_gsva_17geneset_results.rds
+    Ignored:    output/tcga_metadata_list.rds
+    Ignored:    output/tcga_total_counts.csv
+    Ignored:    output/univariate_p_values.pdf
+    Ignored:    output/upreg_c1.csv
+    Ignored:    output/upreg_c2.csv
+    Ignored:    output/upreg_c3.csv
+    Ignored:    output/upreg_c4.csv
+    Ignored:    output/upreg_c5.csv
+    Ignored:    output/upreg_c6.csv
+    Ignored:    output/upreg_c7.csv
 
 Untracked files:
-    Untracked:  output/PCA_with_km7cluster_labels.pdf
-    Untracked:  output/i
-    Untracked:  output/km_cluster_assignments.csv
-    Untracked:  output/table_c1.csv
-    Untracked:  output/table_c2.csv
-    Untracked:  output/table_c3.csv
-    Untracked:  output/table_c4.csv
-    Untracked:  output/table_c5.csv
-    Untracked:  output/table_c6.csv
-    Untracked:  output/table_c7.csv
+    Untracked:  analysis/expanded_gsva.Rmd
+    Untracked:  analysis/expanded_gsva_analysis.Rmd
+    Untracked:  analysis/gsva_results_exploration.Rmd
+    Untracked:  analysis/survival.Rmd
+    Untracked:  data/IMTX_datasets/
+    Untracked:  data/xcel_signatures.xlsx
+    Untracked:  output/PFS_CoxPH-concordance.tex
+    Untracked:  output/PFS_CoxPH.Rnw
+    Untracked:  output/PFS_CoxPH.log
+    Untracked:  output/PFS_CoxPH.synctex.gz
+    Untracked:  output/PFS_CoxPH.tex
+    Untracked:  output/Rplot01.png
+    Untracked:  output/coxph_pfs-concordance.tex
+    Untracked:  output/coxph_pfs.Rnw
+    Untracked:  output/coxph_pfs.log
+    Untracked:  output/coxph_pfs.synctex.gz
+    Untracked:  output/coxph_pfs.tex
+    Untracked:  output/cpxph_os-concordance.tex
+    Untracked:  output/cpxph_os.Rnw
+    Untracked:  output/cpxph_os.log
+    Untracked:  output/cpxph_os.synctex.gz
+    Untracked:  output/cpxph_os.tex
+    Untracked:  output/univariate_p_values-concordance.tex
+    Untracked:  output/univariate_p_values.Rnw
+    Untracked:  output/univariate_p_values.log
+    Untracked:  output/univariate_p_values.synctex.gz
+    Untracked:  output/univariate_p_values.tex
 
 Unstaged changes:
-    Modified:   analysis/preprocessing.Rmd
+    Modified:   .gitignore
+    Modified:   analysis/tcga_format.Rmd
 
 </code></pre>
 <p>
@@ -606,6 +714,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/e196ab1cea5a05b8e4ff292aa979b6c5dd701ac3/analysis/invitro_mac_dge.Rmd" target="_blank">e196ab1</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-11-09
+</td>
+<td>
+patially done updating all the new mac groups
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/64eaee846100fcfc638c0c2218400034aa71e7f9/analysis/invitro_mac_dge.Rmd" target="_blank">64eaee8</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-10
+</td>
+<td>
+multiple updates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/9419db67693e027ca0186272658c3b394b1c0c04/docs/invitro_mac_dge.html" target="_blank">9419db6</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-06-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -761,6 +920,23 @@ Build site.
 </tr>
 <tr>
 <td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/d8458b9403f9ab5c62e498efb87bcbd28c3caef0/analysis/invitro_mac_dge.Rmd" target="_blank">d8458b9</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-11
+</td>
+<td>
+major updates to mac dge including subsets, updates to index
+</td>
+</tr>
+<tr>
+<td>
 html
 </td>
 <td>
@@ -791,6 +967,23 @@ mleukam
 </td>
 <td>
 updated download and data cleaning from GEO
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/mleukam/tcga_macs/blob/65a4fa44eb069b1d02b19cafd57e7ae382cca4c0/analysis/invitro_mac_dge.Rmd" target="_blank">65a4fa4</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-04-10
+</td>
+<td>
+updated download of raw data and normalization from GEO
 </td>
 </tr>
 <tr>
@@ -1171,7 +1364,7 @@ str(pheno_data)</code></pre>
  $ time:ch1                   : chr  &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; &quot;72h&quot; ...
  $ sample_cluster             : Factor w/ 10 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 6 1 8 9 5 7 10 5 9 7 ...
  $ orig_cluster               : Factor w/ 9 levels &quot;0&quot;,&quot;1&quot;,&quot;6&quot;,&quot;2&quot;,..: 1 4 9 3 7 4 2 7 3 4 ...
- $ treatment_cluster          : Factor w/ 7 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 6 1 5 2 7 1 6 5 2 1 ...
+ $ treatment_cluster          : Factor w/ 7 levels &quot;2&quot;,&quot;1&quot;,&quot;3&quot;,&quot;4&quot;,..: 6 1 5 2 7 1 6 5 2 1 ...
  $ adj_cluster                : Factor w/ 8 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 1 2 6 3 8 2 7 6 3 2 ...</code></pre>
 <pre class="r"><code># create table with groups as factors
 pheno_tbl &lt;- pheno_data %&gt;%
@@ -1182,47 +1375,47 @@ pheno_tbl &lt;- pheno_data %&gt;%
   print()</code></pre>
 <pre><code>           rawID     treatment adj_cluster treatment_cluster
 1   4487653414_E       control           0                 6
-2   4487653415_E           IL4           1                 1
+2   4487653415_E           IL4           1                 2
 3   4487653415_G           TPP           5                 5
-4   4487653415_H          IFNg           2                 2
+4   4487653415_H          IFNg           2                 1
 5   4676163025_B       sLPS_IC           7                 7
-6   4676163025_C          IL13           1                 1
+6   4676163025_C          IL13           1                 2
 7   4676163025_D          IL10           6                 6
 8   4676163025_G          sLPS           5                 5
-9   4676163025_H          IFNg           2                 2
-10  4676163025_J           IL4           1                 1
+9   4676163025_H          IFNg           2                 1
+10  4676163025_J           IL4           1                 2
 11  4676163025_K       sLPS_IC           7                 7
 12  4676163025_L            GC           6                 6
 13  4676163030_A       control           0                 6
 14  4676163030_B           TPP           5                 5
-15  4676163030_C           IL4           1                 1
-16  4676163030_D          IFNg           2                 2
+15  4676163030_C           IL4           1                 2
+16  4676163030_D          IFNg           2                 1
 17  4676163030_E       control           0                 6
 18  4676163030_F           TPP           5                 5
-19  4676163030_G           IL4           1                 1
-20  4676163030_H          IFNg           2                 2
+19  4676163030_G           IL4           1                 2
+20  4676163030_H          IFNg           2                 1
 21  4676163030_I       control           0                 6
 22  4676163030_J           TPP           5                 5
-23  4676163030_K           IL4           1                 1
-24  4676163030_L          IFNg           2                 2
-25  4676163034_B          IFNg           2                 2
+23  4676163030_K           IL4           1                 2
+24  4676163030_L          IFNg           2                 1
+25  4676163034_B          IFNg           2                 1
 26  4676163034_G           TPP           5                 5
 27  4676163034_H       control           0                 6
 28  4676163034_K           TPP           5                 5
-29  4950679013_A          IL13           1                 1
-30  4950679013_C           IL4           1                 1
+29  4950679013_A          IL13           1                 2
+30  4950679013_C           IL4           1                 2
 31  4950679013_D          sLPS           5                 5
 32  4950679013_E       control           0                 6
-33  4950679013_F          IL13           1                 1
+33  4950679013_F          IL13           1                 2
 34  4950679013_G          IL10           6                 6
 35  4950679013_J            GC           6                 6
 36  4950679045_A          IL10           6                 6
 37  4950679045_B            GC           6                 6
 38  4950679045_C       control           0                 6
 39  4950679045_F       sLPS_IC           7                 7
-40  4950679045_G           IL4           1                 1
+40  4950679045_G           IL4           1                 2
 41  4950679045_I           TPP           5                 5
-42  4950679045_K          IFNg           2                 2
+42  4950679045_K          IFNg           2                 1
 43  4958478013_A         upLPS           4                 4
 44  4958478013_C      upLPS_IC           3                 3
 45  4958478013_D      upLPS_IC           3                 3
@@ -1235,21 +1428,21 @@ pheno_tbl &lt;- pheno_data %&gt;%
 52  4958478044_E          sLPS           5                 5
 53  4958478044_I          sLPS           5                 5
 54  4958478044_L          sLPS           5                 5
-55  4958478053_A          TNFa           2                 2
-56  4958478053_B          TNFa           2                 2
-57  4958478053_F          TNFa           2                 2
+55  4958478053_A          TNFa           2                 1
+56  4958478053_B          TNFa           2                 1
+57  4958478053_F          TNFa           2                 1
 58  5342595001_A     sLPS_IFNg           7                 7
-59  5342595001_C     IFNg_TNFa           2                 2
-60  5342595001_F     IFNg_TNFa           2                 2
+59  5342595001_C     IFNg_TNFa           2                 1
+60  5342595001_F     IFNg_TNFa           2                 1
 61  5342595020_G     sLPS_IFNg           7                 7
 62  5342595020_I     sLPS_IFNg           7                 7
-63  5342595020_J     IFNg_TNFa           2                 2
-64  5376074023_A           IL4           1                 1
+63  5342595020_J     IFNg_TNFa           2                 1
+64  5376074023_A           IL4           1                 2
 65  5376074023_C         upLPS           4                 4
 66  5376074023_D     IL4_upLPS           3                 3
 67  5376074023_E     IL4_upLPS           3                 3
-68  5376074023_F           IL4           1                 1
-69  5376074023_G           IL4           1                 1
+68  5376074023_F           IL4           1                 2
+69  5376074023_G           IL4           1                 2
 70  5376074023_I         upLPS           4                 4
 71  5376074023_K     IL4_upLPS           3                 3
 72  5376074032_A           P3C           4                 4
@@ -1258,8 +1451,8 @@ pheno_tbl &lt;- pheno_data %&gt;%
 75  5376074032_E      TNFa_P3C           5                 5
 76  5376074032_F      P3C_PGE2           4                 4
 77  5376074032_G      TNFa_P3C           5                 5
-78  5376074032_H          TNFa           2                 2
-79  5376074032_I          TNFa           2                 2
+78  5376074032_H          TNFa           2                 1
+79  5376074032_I          TNFa           2                 1
 80  5376074032_J           P3C           4                 4
 81  5376074032_K      TNFa_P3C           5                 5
 82  5376074032_L      P3C_PGE2           4                 4
@@ -1272,7 +1465,7 @@ pheno_tbl &lt;- pheno_data %&gt;%
 89  5376074033_I          PGE2           4                 4
 90  5376074033_J           TPP           5                 5
 91  5376074033_K     TNFa_PGE2           5                 5
-92  5376074033_L          TNFa           2                 2
+92  5376074033_L          TNFa           2                 1
 93  5376074038_C TPP_IFNb_IFNg           7                 7
 94  5376074038_D TPP_IFNb_IFNg           7                 7
 95  5376074038_E          IFNb           3                 3
@@ -1288,9 +1481,9 @@ pheno_tbl &lt;- pheno_data %&gt;%
 105 5376074056_F         upLPS           4                 4
 106 5376074056_G         upLPS           4                 4
 107 5376074056_H     IL4_upLPS           3                 3
-108 5376074056_I           IL4           1                 1
-109 5376074056_J           IL4           1                 1
-110 5376074056_K           IL4           1                 1
+108 5376074056_I           IL4           1                 2
+109 5376074056_J           IL4           1                 2
+110 5376074056_K           IL4           1                 2
 111 5376074056_L     IL4_upLPS           3                 3
     sample_cluster orig_cluster
 1                6            0
@@ -2079,7 +2272,7 @@ table_c3      &lt;- topTable(fit2,
                             adjust.method = &quot;BH&quot;, 
                             sort.by = &quot;none&quot;,
                             number = Inf)
-table_c4 &lt;- topTable(fit2, 
+table_c4      &lt;- topTable(fit2, 
                             coef = 4, 
                             adjust.method = &quot;BH&quot;, 
                             sort.by = &quot;none&quot;,
@@ -2156,8 +2349,8 @@ dge_tval_by_gene &lt;- map(subt_list, subleftjoin)</code></pre>
 df_list = mget(ls(pattern = &quot;^table_c[1-7]&quot;))
 
 # define function
-# top 50 greatest differentially expressed genes for each cluster
-top50dge &lt;- function(df){
+# top 50 highest positive fold change
+top50dge_up &lt;- function(df){
   df %&gt;%
   rownames_to_column(var = &quot;gene&quot;) %&gt;%
   top_n(50, logFC) %&gt;%
@@ -2165,8 +2358,30 @@ top50dge &lt;- function(df){
   return()
 }
 
-# apply top 50 function to each table in list
-top50_list &lt;- map(df_list, top50dge)
+# top 50 highest negative fold change
+top50dge_down &lt;- function(df){
+  df %&gt;%
+  rownames_to_column(var = &quot;gene&quot;) %&gt;%
+  top_n(-50, logFC) %&gt;%
+  arrange(logFC) %&gt;%
+  return()
+}
+
+# apply top 50 functions to each table in list
+top50_up_list &lt;- map(df_list, top50dge_up)
+top50_down_list &lt;- map(df_list, top50dge_down)
+
+# rename list elements
+uplist_names &lt;- sub(&quot;^table_&quot;, &quot;upreg_&quot;, names(top50_up_list))
+top50_up_list &lt;- top50_up_list %&gt;% 
+  set_names(uplist_names)
+
+downlist_names &lt;- sub(&quot;^table_&quot;, &quot;downreg_&quot;, names(top50_down_list))
+top50_down_list &lt;- top50_down_list %&gt;% 
+  set_names(downlist_names)
+
+# combine lists
+top50_list &lt;- c(top50_up_list, top50_down_list)
 
 # write each table in the list to a csv
 filenames &lt;- paste0(&quot;~/tcga_macs/output/&quot;, 
@@ -2174,7 +2389,7 @@ filenames &lt;- paste0(&quot;~/tcga_macs/output/&quot;,
                     &quot;.csv&quot;)
 
 map2(top50_list, filenames, write_csv)</code></pre>
-<pre><code>$table_c1
+<pre><code>$upreg_c1
        gene    logFC   AveExpr         t      P.Value    adj.P.Val
 1     FOXQ1 5.553645  7.708557 11.552663 1.565753e-20 2.953010e-16
 2     PALLD 3.823804  7.733252 10.339053 8.661041e-18 5.444908e-14
@@ -2278,7 +2493,7 @@ map2(top50_list, filenames, write_csv)</code></pre>
 49 14.30010114
 50  8.99061995
 
-$table_c2
+$upreg_c2
        gene    logFC   AveExpr        t      P.Value    adj.P.Val
 1      GBP5 3.673006  8.929766 5.490181 2.724122e-07 4.110155e-05
 2      CCL5 3.528160 10.327853 5.589117 1.756489e-07 3.067351e-05
@@ -2382,7 +2597,7 @@ $table_c2
 49 -0.96812779
 50  0.54657155
 
-$table_c3
+$upreg_c3
        gene    logFC   AveExpr        t      P.Value    adj.P.Val
 1     CCL26 3.610691  7.046701 4.943346 2.858288e-06 1.885523e-04
 2     PALLD 3.231193  7.733252 8.324645 3.018143e-13 2.846109e-09
@@ -2486,7 +2701,7 @@ $table_c3
 49  5.24407627
 50  0.93415378
 
-$table_c4
+$upreg_c4
        gene    logFC   AveExpr         t      P.Value    adj.P.Val
 1      VMO1 3.132819  8.834327 5.2584030 7.496615e-07 7.104832e-05
 2   OLFML2B 2.890999 10.168971 4.4772054 1.897345e-05 5.930402e-04
@@ -2590,7 +2805,7 @@ $table_c4
 49  1.697916083
 50 -2.978552294
 
-$table_c5
+$upreg_c5
        gene    logFC   AveExpr         t      P.Value    adj.P.Val
 1      IL1B 4.826388 12.060692 10.276501 1.200531e-17 4.528404e-14
 2     ACKR3 4.745887  8.296150  8.807428 2.514320e-14 1.823849e-11
@@ -2694,7 +2909,7 @@ $table_c5
 49 14.312253
 50  6.563694
 
-$table_c6
+$upreg_c6
        gene    logFC   AveExpr        t      P.Value   adj.P.Val
 1      GLDN 2.425369  6.563885 5.599146 1.679700e-07 0.001637959
 2  SIGLEC10 2.279126  9.487828 3.294561 1.337101e-03 0.198151231
@@ -2798,7 +3013,7 @@ $table_c6
 49 -3.8530354
 50  3.7034238
 
-$table_c7
+$upreg_c7
        gene    logFC   AveExpr         t      P.Value    adj.P.Val
 1     PTGES 5.386563  7.471551 10.267710 1.256906e-17 5.926310e-14
 2      GBP5 5.184128  8.929766  6.967965 2.733854e-10 5.553132e-08
@@ -2900,10 +3115,812 @@ $table_c7
 47  4.8204509
 48  3.0862490
 49  6.3533206
-50 11.2178490</code></pre>
+50 11.2178490
+
+$downreg_c1
+       gene     logFC   AveExpr         t      P.Value    adj.P.Val
+1    S100A8 -5.230119 11.546302 -9.780666 1.597057e-16 7.530126e-13
+2    S100A9 -4.688330 11.278941 -9.732286 2.055510e-16 7.753383e-13
+3     CXCL5 -4.449090 10.797150 -7.936458 2.184078e-12 2.574481e-09
+4      CYBB -3.666216 11.116870 -8.198526 5.753346e-13 7.750579e-10
+5    MCEMP1 -3.622906 10.806652 -5.063435 1.725322e-06 2.259693e-04
+6      PIM1 -3.254750 10.678727 -6.807068 5.982665e-10 2.969291e-07
+7      CCL2 -2.902205  9.710158 -3.219589 1.699895e-03 3.734901e-02
+8     CXCL2 -2.892333  9.583086 -5.182210 1.040423e-06 1.521114e-04
+9     VSIG4 -2.889065  9.032306 -4.369184 2.895217e-05 2.052774e-03
+10   CLEC5A -2.867088  9.982074 -4.756332 6.188449e-06 6.343160e-04
+11  TMEM173 -2.788789  9.769380 -8.049711 1.228575e-12 1.544728e-09
+12     CTSD -2.764152  9.541467 -6.179141 1.188784e-08 3.297127e-06
+13     FCN1 -2.759128 11.884670 -3.934793 1.482991e-04 6.838436e-03
+14  CYP27A1 -2.712756 10.611771 -5.394980 4.139873e-07 6.971250e-05
+15     PPBP -2.633100  8.003655 -5.387517 4.277268e-07 7.138873e-05
+16     IL7R -2.608248 10.932396 -5.098929 1.484289e-06 2.002634e-04
+17   FCGR1A -2.560533  7.689347 -6.367025 4.919505e-09 1.656819e-06
+18    HBEGF -2.517198 11.035040 -6.452350 3.283632e-09 1.168477e-06
+19    CD163 -2.502453 11.333890 -3.927808 1.521098e-04 6.963084e-03
+20     CD14 -2.379836 13.977015 -7.591130 1.247002e-11 9.799355e-09
+21     APOE -2.322969 10.376494 -3.579810 5.184150e-04 1.691576e-02
+22   FCGR1B -2.303443  7.765117 -5.614992 1.565036e-07 2.865687e-05
+23     IL1B -2.264987 12.060692 -4.513801 1.641929e-05 1.346382e-03
+24    C5AR1 -2.257391 10.401333 -7.824835 3.843596e-12 3.624511e-09
+25    FOLR3 -2.243128  7.420412 -5.412580 3.832714e-07 6.512162e-05
+26  ALDH1A1 -2.236234  9.538138 -4.954870 2.723916e-06 3.335913e-04
+27 ADAMDEC1 -2.204328 11.270423 -3.799791 2.408996e-04 9.770679e-03
+28     FPR1 -2.198159  9.406632 -5.174843 1.073777e-06 1.545911e-04
+29    CXCL8 -2.165258 14.127415 -4.878056 3.750253e-06 4.393153e-04
+30    MARCO -2.162893  9.309780 -2.990128 3.460411e-03 6.065367e-02
+31     OLR1 -2.146827 12.710206 -4.295909 3.842465e-05 2.456572e-03
+32   AKR1C3 -2.122715  8.040347 -4.304659 3.715336e-05 2.407946e-03
+33    SNTB1 -2.114228  9.504851 -6.238940 8.988095e-09 2.648679e-06
+34    ENPP4 -2.081151  9.388206 -6.855013 4.740622e-10 2.483559e-07
+35    S100P -2.051763  6.651329 -6.088503 1.812195e-08 4.813801e-06
+36     RBP1 -2.042399  8.227820 -4.337291 3.275999e-05 2.230518e-03
+37     PID1 -1.995067  8.879843 -3.536669 6.003315e-04 1.871447e-02
+38     MT1G -1.939457 11.955890 -2.990440 3.457155e-03 6.065297e-02
+39   TCF7L2 -1.934163  7.651560 -6.713380 9.410992e-10 4.365233e-07
+40     CD37 -1.926593  8.536721 -6.321536 6.097203e-09 1.949038e-06
+41    DUSP6 -1.902803  8.096704 -5.012459 2.139383e-06 2.707971e-04
+42    SPARC -1.884432  7.927296 -4.133938 7.107530e-05 3.919533e-03
+43    LTA4H -1.816756 12.406405 -6.296518 6.859267e-09 2.056575e-06
+44    NUPR1 -1.778398  7.030321 -5.900245 4.311809e-08 9.917161e-06
+45  ANKRD33 -1.756697 10.533707 -3.526739 6.208442e-04 1.913255e-02
+46      LYZ -1.755787 13.358699 -5.887606 4.568156e-08 1.019168e-05
+47    APOC1 -1.715795  9.259559 -3.217901 1.709033e-03 3.743597e-02
+48     GAPT -1.699853  7.603180 -3.967437 1.316661e-04 6.223617e-03
+49    TOP2A -1.686516  6.454996 -5.596685 1.698232e-07 3.021570e-05
+50   BCL2A1 -1.678549  7.018725 -3.394926 9.639039e-04 2.586859e-02
+            B
+1  26.7860808
+2  26.5467586
+3  17.7372516
+4  19.0062643
+5   4.8535337
+6  12.3986086
+7  -1.5407148
+8   5.3298938
+9   2.2100082
+10  3.6533191
+11 18.2845875
+12  9.5599050
+13  0.6926483
+14  6.1991555
+15  6.1683318
+16  4.9951982
+17 10.3971679
+18 10.7809808
+19  0.6691916
+20 16.0798242
+21 -0.4594045
+22  7.1183219
+23  2.7395968
+24 17.1995242
+25  6.2719440
+26  4.4239464
+27  0.2447988
+28  5.3001584
+29  4.1234554
+30 -2.1805178
+31  1.9461969
+32  1.9775368
+33  9.8251770
+34 12.6197949
+35  9.1600532
+36  2.0948045
+37 -0.5936902
+38 -2.1796750
+39 11.9680752
+40 10.1934470
+41  4.6511188
+42  1.3741896
+43 10.0816731
+44  8.3385101
+45 -0.6244185
+46  8.2838031
+47 -1.5455639
+48  0.8026820
+49  7.0410867
+50 -1.0258327
+
+$downreg_c2
+      gene     logFC   AveExpr          t      P.Value    adj.P.Val
+1    F13A1 -4.722049  9.264402  -7.873975 2.997615e-12 8.076431e-09
+2   RNASE1 -4.628252 10.193738  -7.653041 9.138037e-12 1.807318e-08
+3   MS4A6A -4.282550 10.766782  -9.899453 8.592960e-17 8.103161e-13
+4  SLCO2B1 -3.525108 10.955464  -7.098492 1.441719e-10 1.599460e-07
+5    FOLR2 -3.467679  8.349086  -5.696683 1.085286e-07 2.120719e-05
+6    CCL13 -3.399631  9.183968  -4.363453 2.960332e-05 1.500856e-03
+7    STAB1 -3.233691  8.435715  -4.815018 4.865230e-06 3.989488e-04
+8      CFD -3.183679 10.305391  -6.572289 1.853568e-09 1.127687e-06
+9    FUCA1 -3.180314 10.972770  -6.157760 1.313412e-08 4.345779e-06
+10    RBP1 -2.801330  8.227820  -5.948977 3.449248e-08 9.162368e-06
+11    CPVL -2.557217 11.370066  -6.695843 1.024121e-09 6.660318e-07
+12  S100A8 -2.496987 11.546302  -4.669530 8.805399e-06 6.411963e-04
+13    PPBP -2.416511  8.003655  -4.944359 2.846224e-06 2.657415e-04
+14   CD163 -2.367781 11.333890  -3.716429 3.232329e-04 8.964959e-03
+15   PDGFC -2.343828  8.312500  -7.607553 1.148364e-11 1.968921e-08
+16 CD163L1 -2.325928  8.305296  -4.094601 8.234004e-05 3.263570e-03
+17    CCL2 -2.230790  9.710158  -2.474748 1.490255e-02 1.349314e-01
+18    FCN1 -2.224896 11.884670  -3.172924 1.970052e-03 3.282260e-02
+19  CYBRD1 -2.206392  9.748558  -4.828825 4.596381e-06 3.835741e-04
+20    PON2 -2.100754  8.436143  -6.434521 3.573696e-09 1.684998e-06
+21 PCOLCE2 -2.092311  7.904839  -5.648960 1.344484e-07 2.535696e-05
+22    NRGN -2.089219  6.707183 -10.227059 1.554037e-17 2.930915e-13
+23 SELENOP -2.076413  7.143166  -5.143408 1.228214e-06 1.412446e-04
+24  S100A9 -2.070424 11.278941  -4.297896 3.813221e-05 1.797934e-03
+25  FCER1A -2.064274  7.519794  -3.415486 9.006545e-04 1.868685e-02
+26    CD36 -2.059695  8.177003  -6.408240 4.047927e-09 1.837778e-06
+27  CHST13 -2.057874  8.953076  -4.436303 2.228240e-05 1.232393e-03
+28 OLFML2B -2.048431 10.168971  -3.118244 2.337294e-03 3.726236e-02
+29  S100A4 -2.040574  9.644888  -5.643185 1.379699e-07 2.576349e-05
+30   CCL23 -2.029735 10.793038  -3.034860 3.021279e-03 4.486718e-02
+31    C1QC -2.014543 11.252201  -3.352044 1.109472e-03 2.179650e-02
+32    NREP -1.995477  7.978761  -6.582560 1.764648e-09 1.109375e-06
+33 RAB3IL1 -1.984217  8.245290  -4.608547 1.125552e-05 7.683464e-04
+34 ANKRD33 -1.978960 10.533707  -3.972953 1.290382e-04 4.583164e-03
+35  PCED1B -1.970499  7.574271  -4.950227 2.777301e-06 2.618994e-04
+36    APOE -1.967933 10.376494  -3.032682 3.041412e-03 4.497216e-02
+37 TMEM236 -1.946419  8.602268  -4.059037 9.398097e-05 3.617308e-03
+38   GFRA2 -1.941505  8.390456  -5.815888 6.332717e-08 1.421846e-05
+39   RGS18 -1.941078  8.286384  -5.695573 1.090720e-07 2.120719e-05
+40 PLA2G15 -1.916746  8.086168  -9.214394 3.049109e-15 1.916873e-11
+41    PLAU -1.901052 10.498720  -5.508915 2.507667e-07 3.876606e-05
+42    CTSD -1.900529  9.541467  -4.248550 4.606528e-05 2.060321e-03
+43   CXCL2 -1.890884  9.583086  -3.387909 9.864268e-04 1.993999e-02
+44 ANXA2P1 -1.888050 10.119471  -3.637001 4.260092e-04 1.100621e-02
+45    GAPT -1.862578  7.603180  -4.347236 3.152357e-05 1.560458e-03
+46     ID3 -1.861310  8.746966  -4.541828 1.469114e-05 9.235833e-04
+47    NFE2 -1.860842  8.633132  -4.025726 1.063019e-04 3.954348e-03
+48 CYP27A1 -1.846359 10.611771  -3.671937 3.774781e-04 1.010566e-02
+49    ACP5 -1.840068  9.517096  -4.182269 5.925031e-05 2.546033e-03
+50   APOC1 -1.832306  9.259559  -3.436413 8.403002e-04 1.780681e-02
+              B
+1  17.406153960
+2  16.349460152
+3  27.304942557
+4  13.734381374
+5   7.467198966
+6   2.206792826
+7   3.891949777
+8  11.314820473
+9   9.461900783
+10  8.549335394
+11 11.876674855
+12  3.337154415
+13  4.394154339
+14 -0.002473736
+15 16.132850799
+16  1.257698871
+17 -3.437350745
+18 -1.646430752
+19  3.945162303
+20 10.693318446
+21  7.265193260
+22 28.918098165
+23  5.182820103
+24  1.971472322
+25 -0.938246563
+26 10.575383079
+27  2.471155709
+28 -1.800178329
+29  7.240809879
+30 -2.030357884
+31 -1.127536009
+32 11.361371374
+33  3.107886315
+34  0.842500076
+35  4.417134923
+36 -2.036302256
+37  1.135375919
+38  7.975568000
+39  7.462487919
+40 23.932524890
+41  6.677606170
+42  1.795976418
+43 -1.020877202
+44 -0.255415223
+45  2.148351013
+46  2.859330113
+47  1.021500888
+48 -0.144676044
+49  1.562497133
+50 -0.875188337
+
+$downreg_c3
+        gene     logFC   AveExpr          t      P.Value    adj.P.Val
+1      CXCL5 -4.052575 10.797150  -6.888177 4.034450e-10 6.917249e-07
+2      CXCL2 -3.603583  9.583086  -6.152037 1.348898e-08 5.412814e-06
+3       PPBP -3.125844  8.003655  -6.094054 1.766139e-08 6.531251e-06
+4       PTMA -3.043404  9.014459  -4.490306 1.801784e-05 6.423753e-04
+5        A2M -2.932776  8.635162  -4.780817 5.598612e-06 2.908810e-04
+6      GPR68 -2.904818  9.532128  -5.917513 3.984304e-08 1.089043e-05
+7     LGALS3 -2.846425  9.716415  -4.224367 5.051065e-05 1.290828e-03
+8    SLC2A14 -2.796321  8.089295  -5.896472 4.386829e-08 1.164539e-05
+9    ANXA2P1 -2.795051 10.119471  -5.130238 1.299170e-06 1.104059e-04
+10    CLEC5A -2.777054  9.982074  -4.389683 2.673383e-05 8.334315e-04
+11    S100A8 -2.753959 11.546302  -4.907181 3.323167e-06 2.051571e-04
+12   FTH1P11 -2.624341 10.601017  -5.445437 3.317827e-07 4.256749e-05
+13    FTH1P3 -2.596051 11.452825  -5.984126 2.934824e-08 8.648560e-06
+14       LPL -2.584602  8.770455  -4.295062 3.854985e-05 1.073929e-03
+15      CD1B -2.536061  9.434632  -3.183760 1.903973e-03 1.702652e-02
+16 RPL23AP64 -2.511440  8.605690  -4.607071 1.132232e-05 4.612072e-04
+17      NCF2 -2.504245  9.638965  -5.282008 6.769272e-07 7.172385e-05
+18      CD69 -2.495657  8.539711  -4.604037 1.146084e-05 4.626473e-04
+19    PTGER4 -2.468061 10.215790  -7.029455 2.023367e-10 3.816071e-07
+20       HK2 -2.421868  9.923597  -5.498437 2.626561e-07 3.579387e-05
+21      FCN1 -2.405787 11.884670  -3.269075 1.451414e-03 1.399472e-02
+22    FTH1P2 -2.390209  9.484396  -5.481195 2.834338e-07 3.791178e-05
+23      FRG1 -2.384384  9.374693  -4.680902 8.409598e-06 3.897245e-04
+24   FTH1P12 -2.376242 12.532770  -6.614847 1.511694e-09 1.140422e-06
+25     HACD4 -2.354606  8.968359  -4.659325 9.175866e-06 4.052853e-04
+26   PIK3AP1 -2.348035  8.860253  -4.447015 2.136565e-05 7.170037e-04
+27     DUSP6 -2.340086  8.096704  -5.873630 4.869090e-08 1.255179e-05
+28      FOSB -2.331045  8.848184  -2.670336 8.759460e-03 5.197171e-02
+29    NBPF10 -2.303962 11.565742  -5.540780 2.177555e-07 3.172619e-05
+30     RPL23 -2.252397 10.335366  -4.402220 2.545898e-05 8.069853e-04
+31      LMO2 -2.232949  9.609257  -4.853549 4.150573e-06 2.379325e-04
+32      NRGN -2.224265  6.707183 -10.374593 7.194617e-18 1.356905e-13
+33    SLC2A1 -2.221416  9.113717  -4.158358 6.484271e-05 1.538281e-03
+34      CD37 -2.196538  8.536721  -6.867349 4.464689e-10 7.002825e-07
+35      PYGL -2.196002  9.545848  -6.035500 2.315945e-08 7.662932e-06
+36   FAM102B -2.177799  8.390025  -6.758497 7.568601e-10 7.537329e-07
+37      GMFG -2.175100 10.234773  -5.495323 2.662954e-07 3.587379e-05
+38      EAF1 -2.164262  8.035644  -4.665268 8.958324e-06 4.008097e-04
+39      CYBB -2.159881 11.116870  -4.602198 1.154562e-05 4.642865e-04
+40   TMEM236 -2.142707  8.602268  -4.257623 4.449649e-05 1.190360e-03
+41      KLF4 -2.142025  8.111546  -6.163075 1.281278e-08 5.253241e-06
+42      SPP1 -2.134273 11.972147  -2.943836 3.976274e-03 2.921407e-02
+43   EIF3FP2 -2.125981  8.117826  -5.019687 2.075271e-06 1.547020e-04
+44     ACTR3 -2.120895  9.696351  -3.954159 1.382047e-04 2.648923e-03
+45     MARCO -2.117086  9.309780  -2.788759 6.263687e-03 4.066545e-02
+46     CD164 -2.106203  7.952931  -4.271817 4.214488e-05 1.145320e-03
+47     NDRG1 -2.096745  9.807487  -4.824432 4.680304e-06 2.569908e-04
+48   TACSTD2 -2.090220  8.751027  -2.922331 4.239242e-03 3.063609e-02
+49      TLR1 -2.087609  8.784585  -4.413058 2.440429e-05 7.844573e-04
+50    TCF7L2 -2.071605  7.651560  -6.851297 4.826974e-10 7.002825e-07
+           B
+1  12.752247
+2   9.434343
+3   9.179880
+4   2.675216
+5   3.765427
+6   8.412126
+7   1.717791
+8   8.321345
+9   5.133265
+10  2.308243
+11  4.253234
+12  6.415488
+13  8.700552
+14  1.968361
+15 -1.604654
+16  3.108025
+17  5.745223
+18  3.096687
+19 13.405278
+20  6.635275
+21 -1.359992
+22  6.563645
+23  3.385457
+24 11.502706
+25  3.304081
+26  2.516641
+27  8.222976
+28 -2.961725
+29  6.811697
+30  2.353655
+31  4.045222
+32 29.608733
+33  1.486476
+34 12.656373
+35  8.924051
+36 12.157034
+37  6.622328
+38  3.326469
+39  3.089816
+40  1.835301
+41  9.482909
+42 -2.263892
+43  4.694149
+44  0.787544
+45 -2.666741
+46  1.885652
+47  3.932893
+48 -2.320863
+49  2.392985
+50 12.582555
+
+$downreg_c4
+        gene     logFC   AveExpr         t      P.Value    adj.P.Val
+1        A2M -3.500534  8.635162 -6.092703 1.777237e-08 8.804535e-06
+2       PTMA -3.212458  9.014459 -5.060649 1.745776e-06 1.223990e-04
+3        LPL -3.093566  8.770455 -5.488929 2.739226e-07 3.720429e-05
+4     LGALS3 -3.050741  9.716415 -4.834144 4.496696e-06 2.323498e-04
+5    ANXA2P1 -3.007728 10.119471 -5.894388 4.428795e-08 1.398591e-05
+6  RPL23AP64 -2.769376  8.605690 -5.424210 3.642108e-07 4.489553e-05
+7      ACTR3 -2.470600  9.696351 -4.918015 3.176692e-06 1.914134e-04
+8      RPL23 -2.469703 10.335366 -5.153756 1.175122e-06 9.635999e-05
+9   HLA-DQB1 -2.447800  9.268366 -2.938118 4.044693e-03 3.012753e-02
+10    CCL4L2 -2.420278  8.331477 -3.508088 6.611719e-04 7.902219e-03
+11   EIF3FP2 -2.413167  8.117826 -6.083550 1.854284e-08 8.804535e-06
+12   SLC2A14 -2.410240  8.089295 -5.426476 3.606058e-07 4.474359e-05
+13      FRG1 -2.347510  9.374693 -4.920547 3.143374e-06 1.904651e-04
+14     CD164 -2.328718  7.952931 -5.042917 1.881631e-06 1.281139e-04
+15     MARCO -2.227416  9.309780 -3.132754 2.234094e-03 1.940695e-02
+16   PIK3AP1 -2.223664  8.860253 -4.496614 1.757448e-05 5.685330e-04
+17     RPS28 -2.218907 11.718820 -5.171773 1.087985e-06 9.160448e-05
+18      LDHB -2.204228  8.976840 -7.055305 1.782439e-10 4.202099e-07
+19  ARHGAP18 -2.201572  7.941169 -4.543825 1.457496e-05 4.988817e-04
+20   TMEM236 -2.187193  8.602268 -4.640277 9.908204e-06 3.893099e-04
+21   FAM162A -2.164244  9.069224 -4.994205 2.310006e-06 1.518004e-04
+22    BCL2A1 -2.140232  7.018725 -4.403799 2.530262e-05 7.254590e-04
+23     ALCAM -2.097364  9.126083 -3.882934 1.789132e-04 2.946989e-03
+24      CD1B -2.086602  9.434632 -2.796873 6.119133e-03 4.077980e-02
+25   PDIA3P1 -2.083673  7.720825 -5.378309 4.452946e-07 5.137655e-05
+26    PTGES3 -2.077787 10.162894 -4.381184 2.763289e-05 7.759404e-04
+27      WSB2 -2.072521  8.048063 -4.847037 4.263732e-06 2.265183e-04
+28 ITPK1-AS1 -2.058682  9.554031 -4.167814 6.257310e-05 1.386704e-03
+29   CYP51A1 -2.055875  7.352834 -5.837273 5.746175e-08 1.630225e-05
+30    UQCRC2 -2.052255  9.046014 -5.646555 1.359041e-07 2.449715e-05
+31      KLF4 -2.045220  8.111546 -6.282977 7.310127e-09 5.192934e-06
+32      NCF2 -2.034443  9.638965 -4.581633 1.253585e-05 4.529238e-04
+33      RPL7 -1.998892  8.344189 -5.648813 1.345366e-07 2.449715e-05
+34   HMGB1P1 -1.979473  8.044362 -5.604683 1.638726e-07 2.687510e-05
+35       ID2 -1.979129  9.898092 -4.296802 3.829293e-05 9.785972e-04
+36     AMY1C -1.978779 11.517119 -4.208014 5.374743e-05 1.251452e-03
+37     RPLP1 -1.974959 11.275912 -5.821653 6.169049e-08 1.649570e-05
+38      EGR2 -1.974019 11.676539 -3.975865 1.276709e-04 2.291634e-03
+39      EAF1 -1.969081  8.035644 -4.531926 1.528060e-05 5.155637e-04
+40     SPRY2 -1.963282  7.824337 -4.459932 2.030850e-05 6.221295e-04
+41      SPP1 -1.961903 11.972147 -2.889307 4.674342e-03 3.342866e-02
+42      CD52 -1.957517  8.635295 -4.078069 8.756834e-05 1.770138e-03
+43  C18orf32 -1.949290  7.412984 -4.764608 5.982620e-06 2.806433e-04
+44      CLTC -1.946024  7.801506 -5.577214 1.852095e-07 2.935338e-05
+45    FAM49B -1.932367  8.596999 -4.595016 1.188253e-05 4.378726e-04
+46      RPN2 -1.926506  8.985301 -4.696797 7.885173e-06 3.403074e-04
+47     SAP30 -1.919127  8.999098 -5.557802 2.019067e-07 3.095902e-05
+48    B3GNT5 -1.919076  7.179474 -4.919976 3.150853e-06 1.904651e-04
+49     SNX10 -1.914414  9.678849 -4.837087 4.442460e-06 2.301836e-04
+50      TLR1 -1.896177  8.784585 -4.279783 4.087806e-05 1.033459e-03
+            B
+1   9.1705951
+2   4.8600990
+3   6.5968046
+4   3.9756486
+5   8.3104937
+6   6.3292796
+7   4.3002395
+8   5.2307195
+9  -2.2643349
+10 -0.6345186
+11  9.1306016
+12  6.3386186
+13  4.3100927
+14  4.7899689
+15 -1.7344074
+16  2.7057450
+17  5.3028950
+18 13.5139379
+19  2.8797429
+20  3.2389468
+21  4.5980868
+22  2.3672453
+23  0.5604470
+24 -2.6308666
+25  6.1406038
+26  2.2854964
+27  4.0253189
+28  1.5286068
+29  8.0653423
+30  7.2554897
+31 10.0081168
+32  3.0199558
+33  7.2649985
+34  7.0795539
+35  1.9830227
+36  1.6691827
+37  7.9985046
+38  0.8707716
+39  2.8357738
+40  2.5713945
+41 -2.3927384
+42  1.2182546
+43  3.7091965
+44  6.9645085
+45  3.0697690
+46  3.4517256
+47  6.8833890
+48  4.3078716
+49  3.9869778
+50  1.9225097
+
+$downreg_c5
+       gene     logFC   AveExpr          t      P.Value    adj.P.Val
+1      CD1B -4.380366  9.434632  -6.166230 1.262572e-08 1.063041e-06
+2    RNASE1 -4.171832 10.193738  -7.370385 3.756595e-11 8.143607e-09
+3       LPL -3.945259  8.770455  -7.351566 4.125113e-11 8.840867e-09
+4      C1QB -3.860601 10.166711  -5.739177 8.962100e-08 4.850275e-06
+5      SPP1 -3.511535 11.972147  -5.431117 3.533321e-07 1.517960e-05
+6     APOC1 -3.448752  9.259559  -6.910597 3.617100e-10 5.288256e-08
+7     F13A1 -3.431242  9.264402  -6.113096 1.616738e-08 1.297518e-06
+8       CFD -3.407826 10.305391  -7.516421 1.812992e-11 4.440654e-09
+9       A2M -3.346866  8.635162  -6.117728 1.582317e-08 1.280794e-06
+10     LIPA -3.247347 12.039020  -7.620830 1.074321e-11 2.814125e-09
+11     CD52 -3.227030  8.635295  -7.060382 1.738578e-10 2.767680e-08
+12     APOE -3.157559 10.376494  -5.198935 9.684109e-07 3.515136e-05
+13   S100A4 -2.998354  9.644888  -8.859334 1.922369e-14 1.510662e-11
+14     CST3 -2.918141 12.601744  -9.086961 5.909827e-15 5.572967e-12
+15    FOLR2 -2.898389  8.349086  -5.087287 1.559482e-06 5.088553e-05
+16  TMEM236 -2.823300  8.602268  -6.290570 7.053841e-09 6.585913e-07
+17    CAMK1 -2.814778  7.979019  -8.770773 3.038749e-14 2.122622e-11
+18    CCL13 -2.762028  9.183968  -3.787679 2.514800e-04 3.059944e-03
+19     ACP5 -2.621583  9.517096  -6.366315 4.936028e-09 4.978056e-07
+20    DDIAS -2.593097  7.286360  -7.237299 7.270094e-11 1.413546e-08
+21    MARCO -2.582603  9.309780  -3.814685 2.284688e-04 2.838552e-03
+22   MS4A6A -2.558774 10.766782  -6.319562 6.154163e-09 5.891752e-07
+23   LGALS3 -2.554928  9.716415  -4.251763 4.550377e-05 7.787669e-04
+24     NFE2 -2.533568  8.633132  -5.856169 5.272546e-08 3.239095e-06
+25     CCL2 -2.529929  9.710158  -2.998658 3.372375e-03 2.451927e-02
+26  ANXA2P1 -2.514080 10.119471  -5.174345 1.076071e-06 3.758278e-05
+27    STAB1 -2.474885  8.435715  -3.937320 1.469432e-04 1.985207e-03
+28     CTSD -2.417907  9.541467  -5.775002 7.622428e-08 4.265846e-06
+29    NUPR1 -2.371705  7.030321  -8.407136 1.977176e-13 1.065416e-10
+30    GPNMB -2.342314 11.913564  -7.129231 1.239346e-10 2.184492e-08
+31     NRGN -2.340949  6.707183 -12.243487 4.440482e-22 8.374749e-18
+32    FUCA1 -2.340404 10.972770  -4.841611 4.360317e-06 1.191820e-04
+33      ME1 -2.319218  8.302776  -7.428501 2.812514e-11 6.548644e-09
+34     FCN1 -2.216791 11.884670  -3.377700 1.020080e-03 9.500593e-03
+35      EVL -2.198591 11.787663  -6.140645 1.422375e-08 1.171441e-06
+36  DCSTAMP -2.176625  8.346324  -4.271628 4.217549e-05 7.284155e-04
+37  ANKRD33 -2.158989 10.533707  -4.630984 1.028574e-05 2.320443e-04
+38   CHST13 -2.145151  8.953076  -4.940907 2.887542e-06 8.417162e-05
+39     PTMA -2.097158  9.014459  -3.469575 7.523890e-04 7.441037e-03
+40     MNDA -2.092490  9.330695  -5.668737 1.230426e-07 6.390623e-06
+41    FABP5 -2.070426  7.627182  -9.958137 6.325989e-17 1.491352e-13
+42  PLA2G15 -2.053154  8.086168 -10.545574 2.947986e-18 1.853300e-14
+43    DPEP2 -2.052402  9.217755  -6.046789 2.198236e-08 1.674047e-06
+44 ARHGAP18 -2.044311  7.941169  -4.431102 2.274110e-05 4.421620e-04
+45     NREP -2.040433  7.978761  -7.191457 9.118852e-11 1.686094e-08
+46    TREM2 -2.004561  7.286884  -8.618365 6.671903e-14 4.339037e-11
+47    GFRA2 -1.994480  8.390456  -6.383423 4.552530e-09 4.666343e-07
+48    PTPRO -1.975603  9.461501  -7.031104 2.007076e-10 3.128384e-08
+49     CD1A -1.971576  8.454642  -2.296919 2.356956e-02 1.129122e-01
+50     C1QC -1.964048 11.252201  -3.491656 6.987351e-04 7.005924e-03
+            B
+1   9.4733241
+2  15.0774967
+3  14.9871872
+4   7.5923923
+5   6.2792168
+6  12.8930574
+7   9.2357557
+8  15.7806795
+9   9.2564297
+10 16.2858720
+11 13.5993984
+12  5.3163289
+13 22.3967540
+14 23.5363105
+15  4.8620919
+16 10.0329343
+17 21.9543576
+18  0.0640823
+19 10.3762864
+20 14.4403966
+21  0.1534959
+22 10.1641426
+23  1.6653189
+24  8.1010141
+25 -2.3239583
+26  5.2157829
+27  0.5655083
+28  7.7475833
+29 20.1448762
+30 13.9258469
+31 39.3454340
+32  3.8838183
+33 15.3568358
+34 -1.2324317
+35  9.3588098
+36  1.7368234
+37  3.0696556
+38  4.2756031
+39 -0.9520475
+40  7.2887195
+41 27.9177775
+42 30.8758416
+43  8.9406522
+44  2.3192470
+45 14.2218123
+46 21.1944902
+47 10.4540869
+48 13.4609116
+49 -4.0482981
+50 -0.8837661
+
+$downreg_c6
+       gene     logFC   AveExpr         t      P.Value  adj.P.Val
+1      CD1B -2.533095  9.434632 -2.718456 7.652937e-03 0.43971637
+2  HLA-DRB1 -2.421867 11.068351 -1.488076 1.396712e-01 0.99990171
+3      CD1A -2.288096  8.454642 -2.032207 4.460900e-02 0.82080561
+4  HLA-DRB5 -2.023109  9.228606 -1.077142 2.838386e-01 0.99990171
+5     MMP12 -1.996898  9.076374 -1.955698 5.310725e-02 0.86715587
+6   ZNF385A -1.978264  8.542659 -4.375966 2.819924e-05 0.05086407
+7     CCL22 -1.868870  9.979516 -1.805833 7.375505e-02 0.97680876
+8      SPP1 -1.809137 11.972147 -2.133169 3.519591e-02 0.76562274
+9     CCL17 -1.757918  8.589476 -1.606026 1.112145e-01 0.99990171
+10    CAMK1 -1.742065  7.979019 -4.138278 6.992725e-05 0.07313074
+11  MID1IP1 -1.642759  8.727925 -4.210085 5.332676e-05 0.06450768
+12    LAMP3 -1.622721  9.893924 -1.427231 1.564242e-01 0.99990171
+13     MMP9 -1.609440 14.197172 -3.531138 6.116777e-04 0.13865192
+14     IFI6 -1.592547 10.001807 -2.242550 2.698692e-02 0.70992455
+15    GPAT3 -1.499153  8.354724 -2.365119 1.982522e-02 0.62840953
+16   HSPA1B -1.496246 11.220016 -2.058347 4.198552e-02 0.80732188
+17      PKM -1.475073  9.703611 -3.482504 7.205209e-04 0.14645562
+18   FCER1A -1.448303  7.519794 -1.951877 5.356540e-02 0.86940053
+19   COL9A2 -1.438337  7.650638 -3.202887 1.792347e-03 0.22386537
+20     XAB2 -1.437875  8.350140 -3.621855 4.488345e-04 0.12737824
+21     ENO2 -1.416713  8.773428 -2.808701 5.913852e-03 0.39411747
+22   STXBP2 -1.394063  9.492129 -2.792018 6.205263e-03 0.39557796
+23     LY6E -1.382334  8.729205 -2.019210 4.596482e-02 0.83115682
+24      CA2 -1.372680 10.510604 -2.504453 1.377217e-02 0.54785999
+25     EGR1 -1.369172 10.108181 -1.463111 1.463673e-01 0.99990171
+26 SERPINE1 -1.341634  7.832374 -2.138659 3.473743e-02 0.76128161
+27    CENPT -1.328529  7.570427 -3.938720 1.461966e-04 0.07877909
+28     CTSD -1.293573  9.541467 -2.355402 2.032431e-02 0.63149328
+29    TAOK1 -1.272467  8.429550 -2.996578 3.393645e-03 0.30181519
+30      SCD -1.268145 10.769979 -2.466698 1.522285e-02 0.57154575
+31     CD1C -1.265545  7.838472 -1.832529 6.965250e-02 0.95303772
+32  ADORA2B -1.263137  8.140439 -3.009943 3.259079e-03 0.29551072
+33   CLPTM1 -1.259140  9.170356 -2.702111 8.013682e-03 0.44322009
+34     CD69 -1.252722  8.539711 -1.975599 5.077428e-02 0.84847132
+35  TACSTD2 -1.251442  8.751027 -1.495679 1.376800e-01 0.99990171
+36     TPM4 -1.243051  7.848490 -3.535198 6.033298e-04 0.13865192
+37     CCL5 -1.238103 10.327853 -1.597569 1.130870e-01 0.99990171
+38     RGCC -1.236808 11.871495 -2.231701 2.771855e-02 0.71122319
+39 SH3BGRL3 -1.219081 10.411101 -3.044776 2.931194e-03 0.28383384
+40    ADAM8 -1.208542 10.150497 -2.242521 2.698887e-02 0.70992455
+41  SLC28A3 -1.203035  7.217973 -3.150170 2.115816e-03 0.24184417
+42    ITGB7 -1.202128  7.871391 -2.172890 3.199386e-02 0.73765798
+43     CD1E -1.201720  7.334127 -2.269873 2.521883e-02 0.68732250
+44     CST3 -1.201674 12.601744 -2.852730 5.203832e-03 0.37317212
+45  DCSTAMP -1.190901  8.346324 -1.781751 7.762566e-02 0.98647827
+46    MOB3B -1.189161  9.346134 -2.637997 9.582532e-03 0.47236290
+47      HK2 -1.182822  9.923597 -2.295611 2.364712e-02 0.66268155
+48    PARM1 -1.182146  7.332850 -2.440643 1.630204e-02 0.59014485
+49  GATAD2B -1.162041  7.625934 -3.957641 1.364604e-04 0.07665887
+50  SLC2A14 -1.158427  8.089295 -2.088161 3.915597e-02 0.79779023
+            B
+1  -2.5146118
+2  -4.7604985
+3  -3.9158952
+4  -5.2322769
+5  -4.0493520
+6   2.1959249
+7  -4.2969913
+8  -3.7326091
+9  -4.5983304
+10  1.4208502
+11  1.6518988
+12 -4.8395346
+13 -0.4171336
+14 -3.5249340
+15 -3.2811379
+16 -3.8692214
+17 -0.5548840
+18 -4.0558930
+19 -1.3176395
+20 -0.1562800
+21 -2.3041069
+22 -2.3434635
+23 -3.9388984
+24 -2.9900182
+25 -4.7933089
+26 -3.7224101
+27  0.7934168
+28 -3.3008881
+29 -1.8473057
+30 -3.0703548
+31 -4.2542225
+32 -1.8138714
+33 -2.5521096
+34 -4.0150920
+35 -4.7504003
+36 -0.4055670
+37 -4.6103483
+38 -3.5459522
+39 -1.7261565
+40 -3.5249909
+41 -1.4557160
+42 -3.6582821
+43 -3.4715963
+44 -2.1992870
+45 -4.3350664
+46 -2.6973125
+47 -3.4208209
+48 -3.1251684
+49  0.8519605
+50 -3.8153202
+
+$downreg_c7
+       gene     logFC   AveExpr          t      P.Value    adj.P.Val
+1    RNASE1 -5.470815 10.193738  -8.134563 7.974282e-13 5.013165e-10
+2      CD1B -5.425652  9.434632  -6.428062 3.684891e-09 4.454054e-07
+3      SPP1 -5.232441 11.972147  -6.811070 5.867699e-10 9.793345e-08
+4     F13A1 -4.819237  9.264402  -7.226152 7.682188e-11 2.040649e-08
+5       LPL -4.374972  8.770455  -6.861175 4.600731e-10 8.343249e-08
+6      APOE -4.365895 10.376494  -6.049995 2.165891e-08 1.716332e-06
+7      CST3 -4.073405 12.601744 -10.675514 1.496921e-18 9.410645e-15
+8    MS4A6A -3.876420 10.766782  -8.057582 1.180339e-12 6.849700e-10
+9       A2M -3.758334  8.635162  -5.781841 7.390045e-08 4.554779e-06
+10    APOC1 -3.755416  9.259559  -6.333306 5.768189e-09 6.236781e-07
+11     CD52 -3.676474  8.635295  -6.769794 7.166168e-10 1.185561e-07
+12    FOLR2 -3.666362  8.349086  -5.416064 3.774609e-07 1.711277e-05
+13 HLA-DRB1 -3.634876 11.068351  -2.465595 1.526722e-02 7.794798e-02
+14  TMEM236 -3.560114  8.602268  -6.675991 1.126866e-09 1.727861e-07
+15   S100A4 -3.538090  9.644888  -8.798445 2.633829e-14 3.104626e-11
+16     LIPA -3.476672 12.039020  -6.866826 4.476065e-10 8.195978e-08
+17      CFD -3.476387 10.305391  -6.453283 3.269113e-09 4.083144e-07
+18     FCN1 -3.365245 11.884670  -4.315507 3.563337e-05 6.850615e-04
+19  ANXA2P1 -3.020682 10.119471  -5.232391 8.386601e-07 3.315960e-05
+20    CAMK1 -3.003647  7.979019  -7.877011 2.951890e-12 1.391816e-09
+21    STAB1 -2.950017  8.435715  -3.949928 1.403524e-04 2.020646e-03
+22     ACP5 -2.912218  9.517096  -5.952058 3.400806e-08 2.525165e-06
+23    CRIP1 -2.890115 10.121551  -5.777844 7.524982e-08 4.622839e-06
+24   LGALS3 -2.863803  9.716415  -4.010998 1.122287e-04 1.699831e-03
+25  PPIAP29 -2.791349 10.355577  -7.170136 1.013066e-10 2.547524e-08
+26     C1QB -2.773015 10.166711  -3.469491 7.526001e-04 7.558061e-03
+27    GPNMB -2.729578 11.913564  -6.992170 2.428693e-10 5.089461e-08
+28    FUCA1 -2.677440 10.972770  -4.661628 9.090962e-06 2.235966e-04
+29     CD1A -2.629008  8.454642  -2.577763 1.130412e-02 6.239266e-02
+30     PTMA -2.628444  9.014459  -3.659844 3.936516e-04 4.554767e-03
+31    DDIAS -2.608899  7.286360  -6.128211 1.507067e-08 1.291968e-06
+32     NRGN -2.564768  6.707183 -11.289639 6.124932e-20 1.048547e-15
+33   TUBA1C -2.537141 12.119334  -5.178729 1.056056e-06 3.920713e-05
+34     CTSD -2.522482  9.541467  -5.070601 1.673770e-06 5.637018e-05
+35     MMP7 -2.500651  7.841467  -3.981243 1.251819e-04 1.843037e-03
+36 ARHGAP18 -2.466202  7.941169  -4.498963 1.741208e-05 3.814074e-04
+37 HLA-DRB3 -2.453945 11.749029  -4.177617 6.030080e-05 1.034825e-03
+38     NFE2 -2.433326  8.633132  -4.733693 6.787134e-06 1.753498e-04
+39    CCL13 -2.429540  9.183968  -2.804064 5.993567e-03 3.877828e-02
+40    SERF2 -2.410855 11.216022  -7.074566 1.621615e-10 3.640913e-08
+41    CCL17 -2.391986  8.589476  -2.412514 1.754320e-02 8.647798e-02
+42   CORO1A -2.388967  8.108846  -6.447878 3.354124e-09 4.134561e-07
+43   PLXDC2 -2.348345  9.948011  -7.427646 2.824517e-11 8.455619e-09
+44    NUPR1 -2.334338  7.030321  -6.964178 2.784911e-10 5.587597e-08
+45    SULF2 -2.327105  9.475375  -4.877198 3.763618e-06 1.088679e-04
+46     CD37 -2.311186  8.536721  -6.819191 5.641117e-10 9.634465e-08
+47   CITED2 -2.307297  9.708892  -6.258207 8.211778e-09 8.162822e-07
+48      ME1 -2.296543  8.302776  -6.190888 1.125349e-08 1.040396e-06
+49  PLA2G15 -2.277427  8.086168  -9.844916 1.142187e-16 3.590273e-13
+50  TACSTD2 -2.276549  8.751027  -3.003736 3.320950e-03 2.441225e-02
+            B
+1  18.7847575
+2  10.6678049
+3  12.4323475
+4  14.3873335
+5  12.6661275
+6   8.9695905
+7  31.4725278
+8  18.4070747
+9   7.7949382
+10 10.2378564
+11 12.2402469
+12  6.2375814
+13 -3.6272416
+14 11.8053689
+15 22.0693119
+16 12.6925315
+17 10.7827027
+18  1.9271797
+19  5.4769263
+20 17.5243479
+21  0.6428482
+22  8.5375404
+23  7.7776350
+24  0.8516652
+25 14.1211890
+26 -0.9145126
+27 13.2802869
+28  3.2153043
+29 -3.3634816
+30 -0.3160474
+31  9.3170525
+32 34.5394257
+33  5.2575638
+34  4.8196276
+35  0.7496293
+36  2.6015766
+37  1.4331961
+38  3.4917712
+39 -2.8001518
+40 13.6687101
+41 -3.7484194
+42 10.7580644
+43 15.3501086
+44 13.1486975
+45  4.0503824
+46 12.4701928
+47  9.8990971
+48  9.5969855
+49 27.3062759
+50 -2.2694062</code></pre>
 </div>
 <div id="volcano-plots" class="section level4">
 <h4>Volcano plots</h4>
+<pre class="r"><code># gather relevant tables into a list for iteration
+df_list = mget(ls(pattern = &quot;^table_c[1-7]&quot;))
+
+# create vector of plot titles
+df_titles &lt;- sub(&quot;^table_c&quot;, &quot;Cluster &quot;, names(df_list)) %&gt;%
+  paste0(., &quot; gene expression vs control&quot;)
+
+# create vector of treatment conditions
+numberlist &lt;- seq(1:7)
+
+gettreat &lt;- function(num){
+  pheno_data %&gt;% 
+    dplyr::filter(adj_cluster == num) %&gt;%
+    dplyr::select(treatment) %&gt;% 
+    pull() %&gt;% 
+    unique()
+}
+
+clust_treat &lt;- map(numberlist, gettreat)
+clust_treat</code></pre>
+<pre><code>[[1]]
+[1] &quot;IL4&quot;  &quot;IL13&quot;
+
+[[2]]
+[1] &quot;IFNg&quot;      &quot;TNFa&quot;      &quot;IFNg_TNFa&quot;
+
+[[3]]
+[1] &quot;upLPS_IC&quot;  &quot;IL4_upLPS&quot; &quot;IFNb&quot;     
+
+[[4]]
+[1] &quot;upLPS&quot;    &quot;P3C&quot;      &quot;P3C_PGE2&quot; &quot;PGE2&quot;    
+
+[[5]]
+[1] &quot;TPP&quot;       &quot;sLPS&quot;      &quot;TNFa_P3C&quot;  &quot;TNFa_PGE2&quot; &quot;TPP_IFNb&quot; 
+
+[[6]]
+[1] &quot;IL10&quot; &quot;GC&quot;  
+
+[[7]]
+[1] &quot;sLPS_IC&quot;       &quot;sLPS_IFNg&quot;     &quot;TPP_IFNb_IFNg&quot;</code></pre>
+<pre class="r"><code># define plot function
+volcanoplot &lt;- function(df, titles){
+  EnhancedVolcano(df,
+                  lab = rownames(df),
+                  x = &#39;logFC&#39;,
+                  y = &#39;P.Value&#39;,
+                  title = titles,
+                  FCcutoff = 1.5,
+                  transcriptPointSize = 2,
+                  transcriptLabSize = 3.0)
+}
+
+# apply plot function to each table in list
+map2(df_list, df_titles, volcanoplot)</code></pre>
+<pre><code>$table_c1</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-1.png" width="288" style="display: block; margin: auto;" /></p>
+<pre><code>
+$table_c2</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-2.png" width="288" style="display: block; margin: auto;" /></p>
+<pre><code>
+$table_c3</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-3.png" width="288" style="display: block; margin: auto;" /></p>
+<pre><code>
+$table_c4</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-4.png" width="288" style="display: block; margin: auto;" /></p>
+<pre><code>
+$table_c5</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-5.png" width="288" style="display: block; margin: auto;" /></p>
+<pre><code>
+$table_c6</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-6.png" width="288" style="display: block; margin: auto;" /></p>
+<pre><code>
+$table_c7</code></pre>
+<p><img src="figure/invitro_mac_dge.Rmd/unnamed-chunk-14-7.png" width="288" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -2929,82 +3946,87 @@ attached base packages:
 
 other attached packages:
  [1] EnhancedVolcano_1.0.1     ggrepel_0.8.1            
- [3] ggpubr_0.2                magrittr_1.5             
- [5] ggsci_2.9                 FactoMineR_1.41          
+ [3] ggpubr_0.2.3              magrittr_1.5             
+ [5] ggsci_2.9                 FactoMineR_1.42          
  [7] factoextra_1.0.5          annotate_1.60.1          
- [9] XML_3.98-1.19             limma_3.38.3             
+ [9] XML_3.98-1.20             limma_3.38.3             
 [11] lumiHumanAll.db_1.22.0    org.Hs.eg.db_3.7.0       
 [13] lumiHumanIDMapping_1.10.1 AnnotationDbi_1.44.0     
 [15] IRanges_2.16.0            S4Vectors_0.20.1         
 [17] lumi_2.34.0               GEOquery_2.50.5          
 [19] Biobase_2.42.0            BiocGenerics_0.28.0      
 [21] forcats_0.4.0             stringr_1.4.0            
-[23] dplyr_0.8.1               purrr_0.3.2              
-[25] readr_1.3.1               tidyr_0.8.3              
-[27] tibble_2.1.1              ggplot2_3.1.1            
+[23] dplyr_0.8.3               purrr_0.3.3              
+[25] readr_1.3.1               tidyr_1.0.0              
+[27] tibble_2.1.3              ggplot2_3.2.1            
 [29] tidyverse_1.2.1          
 
 loaded via a namespace (and not attached):
-  [1] readxl_1.3.1                backports_1.1.4            
-  [3] workflowr_1.3.0             plyr_1.8.4                 
+  [1] readxl_1.3.1                backports_1.1.5            
+  [3] workflowr_1.5.0             plyr_1.8.4                 
   [5] lazyeval_0.2.2              splines_3.5.3              
   [7] BiocParallel_1.16.6         GenomeInfoDb_1.18.2        
-  [9] digest_0.6.19               foreach_1.4.4              
- [11] htmltools_0.3.6             memoise_1.1.0              
- [13] cluster_2.0.9               Biostrings_2.50.2          
- [15] modelr_0.1.4                matrixStats_0.54.0         
+  [9] digest_0.6.21               foreach_1.4.7              
+ [11] htmltools_0.4.0             memoise_1.1.0              
+ [13] cluster_2.1.0               Biostrings_2.50.2          
+ [15] modelr_0.1.5                matrixStats_0.55.0         
  [17] askpass_1.1                 siggenes_1.56.0            
  [19] prettyunits_1.0.2           colorspace_1.4-1           
- [21] blob_1.1.1                  rvest_0.3.4                
- [23] haven_2.1.0                 xfun_0.7                   
+ [21] blob_1.2.0                  rvest_0.3.4                
+ [23] haven_2.1.1                 xfun_0.10                  
  [25] crayon_1.3.4                RCurl_1.95-4.12            
  [27] jsonlite_1.6                genefilter_1.64.0          
- [29] survival_2.44-1.1           iterators_1.0.10           
- [31] glue_1.3.1                  registry_0.5-1             
- [33] gtable_0.3.0                zlibbioc_1.28.0            
- [35] XVector_0.22.0              DelayedArray_0.8.0         
- [37] Rhdf5lib_1.4.3              HDF5Array_1.10.1           
- [39] scales_1.0.0                DBI_1.0.0                  
- [41] rngtools_1.3.1              bibtex_0.4.2               
- [43] Rcpp_1.0.1                  xtable_1.8-4               
- [45] progress_1.2.2              bumphunter_1.24.5          
- [47] flashClust_1.01-2           bit_1.1-14                 
- [49] mclust_5.4.3                preprocessCore_1.44.0      
- [51] httr_1.4.0                  RColorBrewer_1.1-2         
- [53] pkgconfig_2.0.2             reshape_0.8.8              
- [55] locfit_1.5-9.1              tidyselect_0.2.5           
- [57] rlang_0.3.4                 munsell_0.5.0              
- [59] cellranger_1.1.0            tools_3.5.3                
- [61] cli_1.1.0                   generics_0.0.2             
- [63] RSQLite_2.1.1               broom_0.5.2                
- [65] evaluate_0.14               yaml_2.2.0                 
- [67] knitr_1.23                  bit64_0.9-7                
- [69] fs_1.3.1                    beanplot_1.2               
- [71] methylumi_2.28.0            nlme_3.1-140               
- [73] doRNG_1.7.1                 whisker_0.3-2              
- [75] nor1mix_1.2-3               leaps_3.0                  
- [77] xml2_1.2.0                  biomaRt_2.38.0             
- [79] compiler_3.5.3              rstudioapi_0.10            
- [81] affyio_1.52.0               stringi_1.4.3              
- [83] GenomicFeatures_1.34.8      minfi_1.28.4               
- [85] lattice_0.20-38             Matrix_1.2-17              
- [87] multtest_2.38.0             pillar_1.4.1               
- [89] BiocManager_1.30.4          data.table_1.12.2          
- [91] bitops_1.0-6                rtracklayer_1.42.2         
- [93] GenomicRanges_1.34.0        R6_2.4.0                   
- [95] affy_1.60.0                 KernSmooth_2.23-15         
- [97] nleqslv_3.3.2               codetools_0.2-16           
- [99] MASS_7.3-51.4               assertthat_0.2.1           
-[101] rhdf5_2.26.2                SummarizedExperiment_1.12.0
-[103] openssl_1.4                 pkgmaker_0.27              
-[105] rprojroot_1.3-2             withr_2.1.2                
-[107] GenomicAlignments_1.18.1    Rsamtools_1.34.1           
-[109] GenomeInfoDbData_1.2.0      mgcv_1.8-28                
-[111] hms_0.4.2                   quadprog_1.5-7             
-[113] grid_3.5.3                  base64_2.0                 
-[115] rmarkdown_1.13              DelayedMatrixStats_1.4.0   
-[117] illuminaio_0.24.0           git2r_0.25.2               
-[119] scatterplot3d_0.3-41        lubridate_1.7.4            </code></pre>
+ [29] zeallot_0.1.0               survival_2.44-1.1          
+ [31] iterators_1.0.12            glue_1.3.1                 
+ [33] registry_0.5-1              gtable_0.3.0               
+ [35] zlibbioc_1.28.0             XVector_0.22.0             
+ [37] DelayedArray_0.8.0          Rhdf5lib_1.4.3             
+ [39] HDF5Array_1.10.1            scales_1.0.0               
+ [41] DBI_1.0.0                   rngtools_1.4               
+ [43] bibtex_0.4.2                Rcpp_1.0.2                 
+ [45] xtable_1.8-4                progress_1.2.2             
+ [47] bumphunter_1.24.5           flashClust_1.01-2          
+ [49] bit_1.1-14                  mclust_5.4.5               
+ [51] preprocessCore_1.44.0       httr_1.4.1                 
+ [53] RColorBrewer_1.1-2          ellipsis_0.3.0             
+ [55] pkgconfig_2.0.3             reshape_0.8.8              
+ [57] locfit_1.5-9.1              labeling_0.3               
+ [59] tidyselect_0.2.5            rlang_0.4.0                
+ [61] later_1.0.0                 munsell_0.5.0              
+ [63] cellranger_1.1.0            tools_3.5.3                
+ [65] cli_1.1.0                   generics_0.0.2             
+ [67] RSQLite_2.1.2               broom_0.5.2                
+ [69] evaluate_0.14               yaml_2.2.0                 
+ [71] knitr_1.25                  bit64_0.9-7                
+ [73] fs_1.3.1                    beanplot_1.2               
+ [75] methylumi_2.28.0            nlme_3.1-141               
+ [77] doRNG_1.7.1                 whisker_0.4                
+ [79] nor1mix_1.3-0               leaps_3.0                  
+ [81] xml2_1.2.2                  biomaRt_2.38.0             
+ [83] compiler_3.5.3              rstudioapi_0.10            
+ [85] ggsignif_0.6.0              affyio_1.52.0              
+ [87] stringi_1.4.3               highr_0.8                  
+ [89] GenomicFeatures_1.34.8      minfi_1.28.4               
+ [91] lattice_0.20-38             Matrix_1.2-17              
+ [93] multtest_2.38.0             vctrs_0.2.0                
+ [95] pillar_1.4.2                lifecycle_0.1.0            
+ [97] BiocManager_1.30.9          data.table_1.12.6          
+ [99] bitops_1.0-6                httpuv_1.5.2               
+[101] rtracklayer_1.42.2          GenomicRanges_1.34.0       
+[103] affy_1.60.0                 R6_2.4.0                   
+[105] promises_1.1.0              KernSmooth_2.23-16         
+[107] nleqslv_3.3.2               codetools_0.2-16           
+[109] MASS_7.3-51.4               assertthat_0.2.1           
+[111] rhdf5_2.26.2                SummarizedExperiment_1.12.0
+[113] openssl_1.4.1               pkgmaker_0.28              
+[115] rprojroot_1.3-2             withr_2.1.2                
+[117] GenomicAlignments_1.18.1    Rsamtools_1.34.1           
+[119] GenomeInfoDbData_1.2.0      mgcv_1.8-29                
+[121] hms_0.5.2                   quadprog_1.5-7             
+[123] grid_3.5.3                  base64_2.0                 
+[125] rmarkdown_1.16              DelayedMatrixStats_1.4.0   
+[127] illuminaio_0.24.0           git2r_0.26.1               
+[129] scatterplot3d_0.3-41        lubridate_1.7.4            </code></pre>
 </div>
 </div>
 </div>
@@ -3039,6 +4061,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
