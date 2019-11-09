@@ -35,22 +35,23 @@ K-means clustering of treatment groups based on Pearson correlation coefficients
 
 Apply gene lists from above to TCGA pancancer bulk RNAseq counts data 
 
-* [Download counts data from Genomic Data Commons](tcga_download.html)
-* [Format counts data](tcga_format.html)
-* [Gene set variation analysis](ss_gsea.html)
-* [Exploration and analysis of GSVA results](gsva_results_exploration.html)
+ * [Download counts data from Genomic Data Commons](tcga_download.html)
+ * [Format counts data](tcga_format.html)
+ * [Gene set variation analysis](ss_gsea.html)
+ * [Exploration and analysis of GSVA results](gsva_results_exploration.html)
 
 #### Figures:
 
-Beeswarm plots of upregulated macrophage cluster genes applied to TCGA data: 
+Figure 1: derivation of macrophage signatures:
+
+Figure 2: Beeswarm plots of upregulated macrophage cluster genes applied to TCGA data: 
 
 ![](assets/Combined_up_plots.png)
-Beeswarm plots of downregulated macrophage cluster genes applied to TCGA data:
 
-![](assets/Combined_down_plots.png)
-
-Boxplots for each individual tumor type showing GSVA score for each cluster and T-cell inflammation signature:
+Figure 2B: Boxplots for selected tumor types showing GSVA score for each cluster and T-cell inflammation signature:
 
 ![](assets/combined_boxplots.png)
 
+Figure 3: Heatmaps of selected tumor types
 
+Figure 4: IMTX survival/outcomes
