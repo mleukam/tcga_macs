@@ -388,7 +388,8 @@ myclust <- enframe(res_km_7$cluster) %>%
 summary(as.factor(res_km_7$cluster))
 summary(as.factor(myclust$mycluster))
 
-
+# cluster 6 includes IL10, GC, and control (treatment_cluster)
+# in order to make comparisons against control only, control will be moved to it's own group (cluster 0 in adj_cluster)
 pheno_tbl_clust <- pheno_tbl %>% 
   left_join(myclust, by = "treatment") %>%
   mutate(treatment = as.factor(treatment),

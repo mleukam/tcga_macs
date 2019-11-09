@@ -708,7 +708,7 @@ table_c3      <- topTable(fit2,
                             adjust.method = "BH", 
                             sort.by = "none",
                             number = Inf)
-table_c4 <- topTable(fit2, 
+table_c4      <- topTable(fit2, 
                             coef = 4, 
                             adjust.method = "BH", 
                             sort.by = "none",
