@@ -1,0 +1,26 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+% latex table generated in R 3.5.3 by xtable 1.8-4 package
+% Sun Oct 13 21:38:15 2019
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ & coef & exp(coef) & se(coef) & z & p \\
+  \hline
+c1\_quartile & -0.06 & 0.94 & 0.15 & -0.43 & 0.67 \\
+  c2\_quartile & -0.26 & 0.77 & 0.27 & -0.97 & 0.33 \\
+  c3\_quartile & -0.20 & 0.82 & 0.26 & -0.78 & 0.43 \\
+  c4\_quartile & 0.25 & 1.28 & 0.21 & 1.18 & 0.24 \\
+  c5\_quartile & 0.15 & 1.16 & 0.22 & 0.70 & 0.49 \\
+  c6\_quartile & 0.06 & 1.06 & 0.20 & 0.28 & 0.78 \\
+  c7\_quartile & -0.25 & 0.78 & 0.31 & -0.80 & 0.42 \\
+   \hline
+\end{tabular}
+\end{table}
+
+
+\end{document}

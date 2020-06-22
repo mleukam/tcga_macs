@@ -1,0 +1,827 @@
+---
+title: "expanded_gsva_analysis"
+author: "mleukam"
+date: "2019-09-13"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+Load packages
+```{r}
+library(tidyverse)
+library(Biobase)
+library(BiocGenerics)
+library(parallel)
+library(caret)
+library(MASS)
+library(glmnet)
+library(broom)
+library(ggsci)
+library(ROCR)
+library(ggpubr)
+```
+
+## Evaluate gene sets as predictors of IMTX response
+
+Load data
+```{r}
+imtx_gsva_results <- readRDS("output/gsva_imtx_plusuro_results.rds") %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>% 
+  as_tibble() %>%
+  print()
+
+imtx_es <- readRDS("output/imtx_expressionset.rds") 
+```
+
+Clean data
+```{r}
+# get pheno data out of expressionset
+imtx_pdata <- pData(imtx_es) %>% 
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  print()
+summary(as.factor(imtx_pdata$center))
+
+# remove ocular and other types of melanoma (keep only cutaneous, urothelial, or not specified)
+response <- imtx_pdata %>% 
+  dplyr::filter(subtype %in% c("CUTANEOUS", "I", "II", "III", "IV", NA)) %>%
+  dplyr::select(sample_id, response, center) %>%
+  mutate(response = as.factor(response))
+summary(response$response)
+
+# remove missing or not evaluable responses
+response_clean <- response %>% 
+  dplyr::filter(response %in% c("CR", "PD", "PR", "SD")) %>%
+  mutate(response = as.factor(response),
+         response = fct_drop(response))
+summary(response_clean$response)
+
+# collapse categories into three groups
+response_data <- response_clean %>%
+  left_join(imtx_gsva_results) %>%
+  mutate(response = ifelse(response == "CR", "CR_or_PR", 
+                           ifelse(response == "PR", "CR_or_PR",
+                                  ifelse(response == "SD", "SD",
+                                         ifelse(response == "PD", "PD", NA)))),
+         response = as.factor(response),
+         response = fct_drop(response)) %>% 
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+response_data[1:5, 1:5]
+summary(response_data$response)
+
+# different way of collapsing categories - two groups
+response_noSD <- response_data <- response_clean %>%
+  left_join(imtx_gsva_results) %>%
+  mutate(response = ifelse(response == "CR", "CR_or_PR", 
+                           ifelse(response == "PR", "CR_or_PR",
+                                  ifelse(response == "PD", "PD", NA))),
+         response = as.factor(response),
+         response = fct_drop(response)) %>% 
+  dplyr::filter(response %in% c("CR_or_PR", "PD")) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+response_noSD[1:5, 1:5]
+summary(response_noSD$response)
+```
+
+#### Plot relationships as a first step
+```{r}
+# reformat data into tidy format
+tidy_response <- response_data %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  dplyr::select(-starts_with("downreg")) %>%
+  gather(key = "gene_set", value = "gsva_score", -response, -sample_id, -center) %>%
+  mutate(gene_set = fct_recode(gene_set, 
+                               "CXCL9-CXCL10" = "cxcl9_cxcl10",
+                               "Blueprint M1" = "m1_blueprint",
+                               "Blueprint M2" = "m2_blueprint",
+                               "Merck IFN" = "merck_tis_expanded_ifn",
+                               "UChicago TCell" = "tcell_gset",
+                               "C1" = "upreg_c1",
+                               "C2" = "upreg_c2",
+                               "C3" = "upreg_c3",
+                               "C4" = "upreg_c4",
+                               "C5" = "upreg_c5",
+                               "C6" = "upreg_c6",
+                               "C7" = "upreg_c7")) %>%
+  mutate(center = as.factor(center)) %>%
+  print()
+
+boxplots <- ggplot(data = tidy_response, aes(x = gene_set, 
+                                             y = gsva_score, 
+                                             fill = response)) +
+  geom_boxplot() + 
+  geom_hline(yintercept = 0, linetype = 3) +
+  theme_classic() +
+  scale_fill_nejm() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  ylab("GSVA Score") +
+  xlab("") +
+  labs(fill = "Best Response") +
+  ggtitle("Gene set GSVA score and immunotherapy response")
+
+boxplots
+
+boxplot_facet <- boxplots <- ggplot(data = tidy_response, aes(x = response, 
+                                             y = gsva_score, 
+                                             fill = response)) +
+  geom_boxplot() + 
+  geom_hline(yintercept = 0, linetype = 3) +
+  theme_classic() +
+  scale_fill_nejm() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        legend.position = "none") +
+  ylab("GSVA Score") +
+  xlab("") +
+  labs(fill = "Best Response") +
+  ggtitle("Gene set GSVA score and immunotherapy response") +
+  facet_wrap(facets = ~center + gene_set, ncol = 12) +
+  stat_compare_means(
+    comparisons = list(c("CR_or_PR", "PD")),
+    label = "p.signif"
+    )
+boxplot_facet
+
+ggsave("output/imtx_gene_set_resposnes.pdf", plot = boxplot_facet, height = 18, width = 14, units = "in")
+```
+
+#### Univariate logistic regression models
+```{r}
+fit_c1 <- glm(response ~ upreg_c1, family = binomial, data = response_noSD)
+sumc1 <- tidy(fit_c1)
+
+fit_c2 <- glm(response ~ upreg_c2, family = binomial, data = response_noSD)
+sumc2 <- tidy(fit_c2)
+
+fit_c3 <- glm(response ~ upreg_c3, family = binomial, data = response_noSD)
+sumc3 <- tidy(fit_c3)
+
+fit_c4 <- glm(response ~ upreg_c4, family = binomial, data = response_noSD)
+sumc4 <- tidy(fit_c4)
+
+fit_c5 <- glm(response ~ upreg_c5, family = binomial, data = response_noSD)
+sumc5 <- tidy(fit_c5)
+
+fit_c6 <- glm(response ~ upreg_c6, family = binomial, data = response_noSD)
+sumc6 <- tidy(fit_c6)
+
+fit_c7 <- glm(response ~ upreg_c7, family = binomial, data = response_noSD)
+sumc7 <- tidy(fit_c7)
+
+univariate_models <- bind_rows(sumc1, sumc2, sumc3, sumc4, sumc5, sumc6, sumc7) %>%
+  dplyr::filter(term != "(Intercept)") %>% 
+  print()
+```
+
+
+## Penalized regression - separate models
+
+In penalized regression, you need to specify a constant lambda to adjust the amount of the coefficient shrinkage. The best lambda for your data, can be defined as the lambda that minimize the cross-validation prediction error rate. This can be determined automatically using the function cv.glmnet().
+
+This was one site used as a major reference: http://www.sthda.com/english/articles/36-classification-methods-essentials/149-penalized-logistic-regression-essentials-in-r-ridge-lasso-and-elastic-net/#loading-required-r-packages
+
+First we will look at the melanoma data and the urothelial data separately.
+
+```{r}
+# make melanoma-only dataset
+tidy_melanoma <- tidy_response %>%
+  dplyr::filter(center %in% c("GIDE", "HUGO", "RIAZ")) %>%
+  print()
+
+summary(tidy_melanoma$response)
+summary(tidy_melanoma$gene_set)
+
+# restrict to only the gene sets of interest
+tidy_melanoma_subset <- tidy_melanoma %>%
+  dplyr::filter(gene_set %in% c("UChicago TCell", "C1", "C2", "C3", "C4", "C5", "C6", "C7")) %>%
+  mutate(gene_set = fct_drop(gene_set)) %>%
+  print()
+
+summary(tidy_melanoma_subset$gene_set)
+
+# reformat
+mel_response_clean <- tidy_melanoma_subset %>%
+  spread(key = "gene_set", value = "gsva_score") %>%
+  dplyr::select(sample_id, response, Tcell = `UChicago TCell`, C1, C2, C3, C4, C5, C6, C7) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+
+dim(mel_response_clean)
+str(mel_response_clean)
+mel_response_clean[1:5, 1:5]
+
+#----------------------------------------
+
+# make urothelial-only dataset
+tidy_urothelial <- tidy_response %>% 
+  dplyr::filter(center == "urothelial") %>%
+  print()
+
+summary(tidy_urothelial$response)
+summary(tidy_urothelial$gene_set)
+
+# restrict to only the gene sets of interest
+tidy_urothelial_subset <- tidy_urothelial %>%
+  dplyr::filter(gene_set %in% c("UChicago TCell", "C1", "C2", "C3", "C4", "C5", "C6", "C7")) %>%
+  mutate(gene_set = fct_drop(gene_set)) %>%
+  print()
+
+summary(tidy_urothelial_subset$gene_set)
+
+# reformat
+uro_response_clean <- tidy_urothelial_subset %>%
+  spread(key = "gene_set", value = "gsva_score") %>%
+  dplyr::select(sample_id, response, Tcell = `UChicago TCell`, C1, C2, C3, C4, C5, C6, C7) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+
+dim(uro_response_clean)
+str(uro_response_clean)
+uro_response_clean[1:5, 1:5]
+
+```
+
+#### Melanoma-only regression
+```{r}
+set.seed(313)
+# split data into test and training sets
+training.samples <- mel_response_clean$response %>%
+  createDataPartition(p = 0.8, list = FALSE)
+mel.train.data <- mel_response_clean[training.samples, ]
+dim(mel.train.data)
+mel.test.data <- mel_response_clean[-training.samples, ]
+dim(mel.test.data)
+
+saveRDS(mel.train.data, "output/mel.train.data.rds")
+saveRDS(mel.test.data, "output/mel.test.data.rds")
+
+# code predictor variables
+x <- as.matrix(mel.train.data[, -1])
+y <- ifelse(mel.train.data$response == "CR_or_PR", 1, 0)
+
+mel.cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial", type.measure = "auc")
+
+# plot cross-validation AUC per log lambda value
+plot(mel.cv.lasso)
+
+# show minimum lambda, and labda for model one standard deviation away with the fewest predictors (assumption that simplest model that still explains most of the deviance is more likely to be real and less likely to be overfit)
+mel.cv.lasso$lambda.min
+mel.cv.lasso$lambda.1se
+
+saveRDS(mel.cv.lasso, "output/mel.cv.lasso.rds")
+
+# coefficients of minimum lambda model
+coef(mel.cv.lasso, mel.cv.lasso$lambda.min)
+
+# fit minimum lambda model on training data
+mel.min.model <- glmnet(x, 
+                    y, 
+                    alpha = 1, 
+                    family = "binomial", 
+                    lambda = mel.cv.lasso$lambda.min)
+
+# display regression coefficients
+coef(mel.min.model)
+
+# make predictions on the test data
+x.test <- as.matrix(mel.test.data[,-1])
+y.test <- ifelse(mel.test.data$response == "CR_or_PR", 1, 0)
+
+probabilities <- mel.min.model %>% 
+  predict(newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- as.factor(predicted.classes)
+predicted.classes
+
+# model accuracy
+observed.classes <- test.data$response
+names(observed.classes) <- rownames(test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+
+```
+
+
+
+
+## Penalized regression with UChicago Tcell signature
+
+
+
+```{r}
+# set seed
+set.seed(818)
+
+# clean data
+response_noSD_clean <- response_noSD %>%
+  dplyr::select(response, starts_with("upreg"), tcell_gset) %>%
+  print()
+
+# split data into test and training sets
+training.samples <- response_noSD_clean$response %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data <- response_noSD_clean[training.samples, ]
+test.data <- response_noSD_clean[-training.samples, ]
+
+saveRDS(train.data, "output/lasso.train.data.rds")
+saveRDS(test.data, "output/lasso.test.data.rds")
+```
+
+```{r}
+train.data <- readRDS("output/lasso.train.data.rds")
+test.data <- readRDS("output/lasso.test.data.rds")
+
+# code predictor variables
+x <- as.matrix(train.data[, -1])
+y <- ifelse(train.data$response == "CR_or_PR", 1, 0)
+
+# find the best lambda with cross-validation
+set.seed(818)
+cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial", type.measure = "auc")
+
+# plot cross-validation error per log lambda value
+plot(cv.lasso)
+
+# show minimum lambda, and labda for model one standard deviation away with the fewest predictors (assumption that simplest model that still explains most of the deviance is more likely to be real and less likely to be overfit)
+cv.lasso$lambda.min
+cv.lasso$lambda.1se
+
+saveRDS(cv.lasso, "output/cv.lasso.rds")
+```
+
+Minimum lambda model
+```{r}
+set.seed(818)
+
+cv.lasso <- readRDS("output/cv.lasso.rds")
+
+# coefficients of minimum lambda model
+coef(cv.lasso, cv.lasso$lambda.min)
+
+# fit minimum lambda model on training data
+min.model <- glmnet(x, 
+                    y, 
+                    alpha = 1, 
+                    family = "binomial", 
+                    lambda = cv.lasso$lambda.min)
+
+# display regression coefficients
+coef(min.model)
+
+saveRDS(min.model, "output/lasso.min.model.rds")
+```
+
+```{r}
+set.seed(818)
+test.data <- readRDS("output/lasso.test.data.rds")
+train.data <- readRDS("output/lasso.train.data.rds")
+min.model <- readRDS("output/lasso.min.model.rds")
+cv.lasso <- readRDS("output/cv.lasso.rds")
+
+#--------------------------------------------------
+# make predictions on the test data
+x.test <- as.matrix(test.data[,-1])
+y.test <- ifelse(test.data$response == "CR_or_PR", 1, 0)
+
+probabilities <- min.model %>% 
+  predict(newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- as.factor(predicted.classes)
+predicted.classes
+
+# model accuracy
+observed.classes <- test.data$response
+names(observed.classes) <- rownames(test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+#--------------------------------------------------
+# predicting with the training set
+x <- as.matrix(train.data[, -1])
+y <- ifelse(train.data$response == "CR_or_PR", 1, 0)
+pred_train.min <- predict(min.model, x, type = "class", s = cv.lasso$lambda.min)
+confusion_matrix_train <- table(y, pred_train.min)
+confusion_matrix_train
+error_rate_train <- (16 + 19) / 120
+error_rate_train
+
+# roc curve for training set set
+prob.min.train <- predict(min.model, x, type = "response", s = cv.lasso$lambda.min)
+pred.min.train <- prediction(prob.min.train, y)
+perf.min.train <- performance(pred.min.train, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points1.train <- attr(perf.min.train, "y.values")[[1]]
+#false positive rate
+fpr.points1.train <- attr(perf.min.train,"x.values")[[1]]
+#area under the curve using ROCR functions
+auc1.train <- attr(performance(pred.min.train, "auc"), "y.values")[[1]]
+formatted_auc1.train <- signif(auc1.train, digits = 3)
+roc.data1.train <- data.frame(fpr = fpr.points1.train, 
+                              tpr = tpr.points1.train,
+                              model = "GLM")
+
+# plot roc
+ggplot(roc.data1.train, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, Min training data AUC=", formatted_auc1))
+
+#--------------------------------------------------
+# predicting with the test set
+x.test <- as.matrix(test.data[,-1])
+y.test <- ifelse(test.data$response == "CR_or_PR", 1, 0)
+pred_test <- predict(min.model, x.test, type = "class", s = cv.lasso$lambda.min)
+confusion_matrix_test <- table(y.test, pred_test)
+confusion_matrix_test
+error_rate_test <- (4 + 4) / 28
+error_rate_test
+
+# roc curve
+prob_std <- predict(min.model, x.test, type = "response", s = cv.lasso$lambda.min)
+pred_std <- prediction(prob_std, y.test)
+perf_std <- performance(pred_std, measure = "tpr", x.measure = "fpr")
+
+#true positive rate
+tpr.points1 <- attr(perf_std, "y.values")[[1]]
+#tpr.points
+
+#false positive rate
+fpr.points1 <- attr(perf_std,"x.values")[[1]]
+#fpr.points
+
+#area under the curve using ROCR functions
+auc1 <- attr(performance(pred_std, "auc"), "y.values")[[1]]
+formatted_auc1 <- signif(auc1, digits = 3)
+roc.data1 <- data.frame(fpr = fpr.points1, tpr = tpr.points1, model = "GLM")
+
+ggplot(roc.data1, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, AUC=", formatted_auc1))
+```
+
+1se lambda model
+```{r}
+set.seed(818)
+test.data <- readRDS("output/lasso.test.data.rds")
+train.data <- readRDS("output/lasso.train.data.rds")
+min.model <- readRDS("output/lasso.min.model.rds")
+cv.lasso <- readRDS("output/cv.lasso.rds")
+
+# coefficients of 1se lambda model
+coef(cv.lasso, cv.lasso$lambda.1se)
+
+# fit 1se lambda model on training data
+onese.model <- glmnet(x, y, alpha = 1, family = "binomial", lambda = cv.lasso$lambda.1se)
+
+# display regression coefficients
+coef(onese.model)
+
+#--------------------------------------------------
+# make predictions on the test data
+x.test <- as.matrix(test.data[,-1])
+y.test <- ifelse(test.data$response == "CR_or_PR", 1, 0)
+
+probabilities.1se <- onese.model %>% 
+  predict(newx = x.test)
+predicted.classes.1se <- ifelse(probabilities.1se > 0.5, "CR_or_PR", "PD")
+predicted.classes.1se
+
+# model accuracy
+observed.classes.1se <- test.data$response
+names(observed.classes.1se) <- rownames(test.data)
+observed.classes.1se
+mean(predicted.classes.1se == observed.classes.1se)
+
+#--------------------------------------------------
+# predicting with the training set
+x <- as.matrix(train.data[, -1])
+y <- ifelse(train.data$response == "CR_or_PR", 1, 0)
+pred_train.1se <- predict(onese.model, x, type = "class", s = cv.lasso$lambda.1se)
+confusion_matrix_train <- table(y, pred_train.1se)
+confusion_matrix_train
+error_rate_train <- (5 + 36) / 120
+error_rate_train
+
+# roc curve for training set set
+prob.1se.train <- predict(onese.model, x, type = "response", s = cv.lasso$lambda.1se)
+pred.1se.train <- prediction(prob.1se.train, y)
+perf.1se.train <- performance(pred.1se.train, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points2.train <- attr(perf.1se.train, "y.values")[[1]]
+#false positive rate
+fpr.points2.train <- attr(perf.1se.train,"x.values")[[1]]
+#area under the curve using ROCR functions
+auc2.train <- attr(performance(pred.1se.train, "auc"), "y.values")[[1]]
+formatted_auc2.train <- signif(auc2.train, digits = 3)
+roc.data2.train <- data.frame(fpr = fpr.points2.train, 
+                              tpr = tpr.points2.train,
+                              model = "GLM")
+
+# plot roc
+ggplot(roc.data2.train, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, 1se training data AUC=", formatted_auc2.train))
+
+#--------------------------------------------------
+# predicting with the test set
+x.test <- as.matrix(test.data[,-1])
+y.test <- ifelse(test.data$response == "CR_or_PR", 1, 0)
+pred_test.1se <- predict(onese.model, x.test, type = "class", s = cv.lasso$lambda.1se)
+confusion_matrix_test <- table(y.test, pred_test.1se)
+confusion_matrix_test
+error_rate_test <- (9 + 1) / 28
+error_rate_test
+
+# roc curve for test set
+prob.1se <- predict(onese.model, x.test, type = "response", s = cv.lasso$lambda.1se)
+pred.1se <- prediction(prob.1se, y.test)
+perf.1se <- performance(pred.1se, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points2 <- attr(perf.1se, "y.values")[[1]]
+#false positive rate
+fpr.points2 <- attr(perf.1se,"x.values")[[1]]
+#area under the curve using ROCR functions
+auc2 <- attr(performance(pred.1se, "auc"), "y.values")[[1]]
+formatted_auc2 <- signif(auc2, digits = 3)
+roc.data2 <- data.frame(fpr = fpr.points2, tpr = tpr.points2, model = "GLM")
+
+# plot roc
+ggplot(roc.data2, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, AUC=", formatted_auc2))
+```
+
+Comparison Plot
+```{r}
+# training AUC data
+ggplot(data = roc.data1.train, aes(x = fpr, ymin = 0, ymax = tpr)) +
+  geom_line(aes(x = fpr, y = tpr, color = "Macrophage and \nT-cell signatures"), size = 1) +
+  geom_line(data = roc.data2.train, aes(x = fpr, y = tpr, color = "T-cell signature alone"), size = 1) +
+  theme_classic() +
+  scale_color_nejm() +
+  labs(color = "Prediction model",
+       title = "") +
+  xlab("False positive rate") +
+  ylab("True positive rate") +
+  theme(legend.position = "bottom") +
+  geom_text(aes(x = 0.1, y = 0.75, label = paste0("AUC = ", formatted_auc1.train))) +
+  geom_text(aes(x = 0.5, y = 0.5, label = paste0("AUC = ", formatted_auc2.train)))
+
+# 5 x 5
+```
+
+T-cell signature model only
+```{r}
+set.seed(818)
+
+# fit the t-cell gene set regression model for comparison
+model.t <- glm(response ~ tcell_gset, data = train.data, family = binomial)
+
+# get coefficients
+coef(model.t)
+
+# make predictions for full logistic regression model
+probabilities <- model.t %>% 
+  predict(test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- factor(predicted.classes, levels = c("CR_or_PR", "PD"))
+predicted.classes
+
+# model accuracy
+observed.classes <- test.data$response
+names(observed.classes) <- rownames(test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+#--------------------------------------------------
+# predicting with the training set
+x <- as.data.frame(train.data[, -1])
+y <- ifelse(train.data$response == "CR_or_PR", 0, 1)
+pred_train.t <- predict(model.t, x)
+pred_train.t <- ifelse(pred_train.t < 0.5, "CR_or_PR", "PD")
+confusion_matrix_train <- table(y, pred_train.t)
+confusion_matrix_train
+error_rate_train <- (51 + 91) / 307
+error_rate_train
+
+# roc curve for training set set
+prob.t.train <- predict(model.t, x)
+pred.t.train <- prediction(prob.t.train, y)
+perf.t.train <- performance(pred.t.train, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points.t.train <- attr(perf.t.train, "y.values")[[1]]
+#false positive rate
+fpr.points.t.train <- attr(perf.t.train,"x.values")[[1]]
+#area under the curve using ROCR functions
+auc.t.train <- attr(performance(pred.t.train, "auc"), "y.values")[[1]]
+formatted_auc.t.train <- signif(auc.t.train, digits = 3)
+roc.data.t.train <- data.frame(fpr = fpr.points.t.train, 
+                              tpr = tpr.points.t.train,
+                              model = "GLM")
+
+# plot roc
+ggplot(roc.data.t.train, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, T cell inflammed training data AUC=", formatted_auc.t.train))
+
+#--------------------------------------------------
+# predicting with the test set
+x.test <- as.data.frame(test.data[,-1])
+y.test <- ifelse(test.data$response == "CR_or_PR", 0, 1)
+pred_test.t <- predict(model.t, x.test)
+pred_test.t <- ifelse(pred_test.t < 0.5, "CR_or_PR", "PD")
+confusion_matrix_test <- table(y.test, pred_test.t)
+confusion_matrix_test
+error_rate_test <- (18 + 11) / 76
+error_rate_test
+
+# roc curve for test set
+prob.t <- predict(model.t, x.test)
+pred.t <- prediction(prob.t, y.test)
+perf.t <- performance(pred.t, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points3 <- attr(perf.t, "y.values")[[1]]
+#false positive rate
+fpr.points3 <- attr(perf.t,"x.values")[[1]]
+
+#area under the curve using ROCR functions
+auc3 <- attr(performance(pred.t, "auc"), "y.values")[[1]]
+formatted_auc3 <- signif(auc3, digits = 3)
+roc.data3 <- data.frame(fpr = fpr.points3, tpr = tpr.points3, model = "GLM")
+
+# plot roc
+ggplot(roc.data3, aes(x = fpr, 
+                      ymin = 0, 
+                      ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, AUC=", formatted_auc3))
+```
+
+Logistic regression with selected variables in max AUC model
+```{r}
+set.seed(818)
+
+# fit the max auc gene set regression model
+model.max <- glm(response ~ upreg_c2 + upreg_c5 + upreg_c6 + tcell_gset + upreg_c4, data = train.data, family = binomial)
+
+# get coefficients
+coef(model.max)
+
+# make predictions for full logistic regression model
+probabilities <- model.max %>% 
+  predict(test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- factor(predicted.classes, levels = c("CR_or_PR", "PD"))
+predicted.classes
+
+# model accuracy
+observed.classes <- test.data$response
+names(observed.classes) <- rownames(test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+#--------------------------------------------------
+# predicting with the training set
+x <- as.data.frame(train.data[, -1])
+y <- ifelse(train.data$response == "CR_or_PR", 0, 1)
+pred_train.max <- predict(model.max, x)
+pred_train.max <- ifelse(pred_train.max < 0.5, "CR_or_PR", "PD")
+confusion_matrix_train <- table(y, pred_train.max)
+confusion_matrix_train
+error_rate_train <- (42 + 64) / 307
+error_rate_train
+
+# roc curve for training set set
+prob.max.train <- predict(model.max, x)
+pred.max.train <- prediction(prob.max.train, y)
+perf.max.train <- performance(pred.max.train, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points4.train <- attr(perf.max.train, "y.values")[[1]]
+#false positive rate
+fpr.points4.train <- attr(perf.max.train,"x.values")[[1]]
+#area under the curve using ROCR functions
+auc4.train <- attr(performance(pred.max.train, "auc"), "y.values")[[1]]
+formatted_auc4.train <- signif(auc4.train, digits = 3)
+roc.data4.train <- data.frame(fpr = fpr.points4.train, 
+                              tpr = tpr.points4.train,
+                              model = "GLM")
+
+# plot roc
+ggplot(roc.data4.train, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, training data AUC=", formatted_auc4.train))
+
+#--------------------------------------------------
+# predicting with the test set
+x.test <- as.data.frame(test.data[,-1])
+y.test <- ifelse(test.data$response == "CR_or_PR", 0, 1)
+pred_test.max <- predict(model.max, x.test)
+pred_test.max <- ifelse(pred_test.max < 0.5, "CR_or_PR", "PD")
+confusion_matrix_test <- table(y.test, pred_test.max)
+confusion_matrix_test
+error_rate_test <- (15 + 14) / 76
+error_rate_test
+
+# roc curve for test set
+prob.max <- predict(model.max, x.test)
+pred.max <- prediction(prob.max, y.test)
+perf.max <- performance(pred.max, measure = "tpr", x.measure = "fpr")
+#true positive rate
+tpr.points5 <- attr(perf.max, "y.values")[[1]]
+#false positive rate
+fpr.points5 <- attr(perf.max,"x.values")[[1]]
+#area under the curve using ROCR functions
+auc5 <- attr(performance(pred.max, "auc"), "y.values")[[1]]
+formatted_auc5 <- signif(auc5, digits = 3)
+roc.data5 <- data.frame(fpr = fpr.points2, 
+                        tpr = tpr.points2, 
+                        model = "GLM")
+
+# plot roc
+ggplot(roc.data5, aes(x = fpr, ymin = 0, ymax = tpr)) +
+    geom_ribbon(alpha = 0.2) +
+    geom_line(aes(y = tpr)) +
+    ggtitle(paste0("ROC Curve, AUC=", formatted_auc5))
+```
+
+Comparison Plot
+```{r}
+# training AUC data
+comp_plot <- ggplot(data = roc.data4.train, aes(x = fpr, ymin = 0, ymax = tpr)) +
+  geom_line(aes(x = fpr, y = tpr, color = "Macrophage and \nT-cell signatures"), size = 1) +
+  geom_line(data = roc.data.t.train, aes(x = fpr, y = tpr, color = "T-cell signature alone"), size = 1) +
+  theme_classic() +
+  scale_color_nejm() +
+  labs(color = "Prediction model",
+       title = "") +
+  xlab("False positive rate") +
+  ylab("True positive rate") +
+  theme(legend.position = "bottom") +
+  geom_text(aes(x = 0.2, y = 0.75, label = paste0("AUC = ", formatted_auc4.train))) +
+  geom_text(aes(x = 0.6, y = 0.4, label = paste0("AUC = ", formatted_auc.t.train))) +
+  geom_abline(intercept = 0, slope = 1, linetype = 3)
+
+ggsave("output/figures/figure_5_a.pdf", plot = comp_plot, width = 4, height = 5, units = "in")
+# 5 x 5
+```
+
+Find most important variables in max AUC model
+```{r}
+varimp <- varImp(min.model, 
+                     lambda = cv.lasso$lambda.min, 
+                     scale = FALSE) %>%
+  rownames_to_column(var = "rowname") %>%
+  arrange(desc(Overall)) %>%
+  mutate(rowname = fct_reorder(rowname, Overall)) %>%
+  slice(1:10) %>%
+  mutate(rowname = as_factor(rowname)) %>%
+  mutate(rowname = fct_recode(rowname,
+                              "T" = "tcell_gset",
+                              "C4" = "upreg_c4",
+                              "C7" = "upreg_c7",
+                              "C6" = "upreg_c6",
+                              "C2" = "upreg_c2",
+                              "C1" = "upreg_c1",
+                              "C5" = "upreg_c5",
+                              "C3" = "upreg_c3"))
+varimp
+
+varimp_plot <- ggplot(data = varimp, aes(x = rowname, y = Overall)) +
+  geom_segment(aes(x = rowname, 
+                   xend = rowname, y = 0, 
+                   yend = Overall), color = "black", linetype = 3, size = 1) +
+  geom_point(color = "black", size = 5) +
+  labs(title = "") +
+  xlab("") +
+  ylab("Importance") +
+  theme_classic() +
+  coord_flip() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_text(size = 12)
+  ) 
+varimp_plot 
+
+ggsave("output/figures/figure_5_b.pdf", plot = varimp_plot, height = 5, width = 4, units = "in")
+```

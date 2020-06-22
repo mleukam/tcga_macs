@@ -1,0 +1,24 @@
+## Define the shell
+#PBS -S /bin/bash
+
+## Name the job
+#PBS -N gsva_imtx
+
+## Request resources
+#PBS -l walltime=8:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=32G
+
+## Specify the combined output/error log
+#PBS -j oe
+#PBS -o /home/mleukam/logs/gsva_imtx_plusuro.log
+
+# navigate to shell dir
+cd /gpfs/data/kline-lab/tcga_macs/code
+
+# call shell scrpt
+./gsva_imtx.sh && exit 0
+
+# exit code
+echo "an error occurred"
+exit 1

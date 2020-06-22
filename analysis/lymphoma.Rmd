@@ -1,0 +1,582 @@
+---
+title: "lymphoma"
+author: "mleukam"
+date: "2020-01-25"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+All of this is recorded for completeness - this notebook is not intended to be run more than once and the global options for evaluation are set to FALSE. Once this notebook was completed, results were stored in a list of dataframes saved with the saveRDS function. 
+
+Publically-available DLBCL mutation, expression, and phenotype data downloaded from GDC.
+
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+```{r}
+library(GenomicDataCommons)
+library(tidyverse)
+library(edgeR)
+```
+
+#### Test connection
+
+```{r}
+GenomicDataCommons::status()
+
+# how many cases available in NCICCR
+cases() %>% 
+  GenomicDataCommons::filter(~ project.program.name == 'NCICCR') %>%
+  facet('samples.sample_type') %>% 
+  aggregations()
+```
+
+## Download raw count files
+```{r}
+# Get manifest ids for HTSeq raw counts
+nci_manifest <- files() %>%
+  GenomicDataCommons::select(available_fields('files')) %>%
+    GenomicDataCommons::filter(~ cases.project.project_id == 'NCICCR-DLBCL' &
+             data_type=='Gene Expression Quantification' &
+             analysis.workflow_type == 'HTSeq - Counts') %>%
+    GenomicDataCommons::select('file_id') %>%
+    manifest()
+
+# Get uuIDs for each file
+file_ids <- nci_manifest %>%
+  pull(id)
+```
+
+```{r}
+# download all selected files
+library(BiocParallel)
+register(MulticoreParam())
+destdir = "data/dlbcl_htse"
+fnames = gdcdata(file_ids)
+
+
+```
+
+Move files out of folders and unzip
+```{bash}
+## done in command line, stored here for documentation only - not part of notebook
+## get files out of subfolders and move to parent
+# cd ~/Library/Caches/GenomicDataCommons
+# find . -mindepth 2 -type f -print -exec mv {} . \;
+
+## create a folder for counts
+# mkdir htseq_counts
+
+## move all sequence files into a folder
+# find . -name '*.htseq_counts.txt.gz' -exec mv {} ~/Library/Caches/GenomicDataCommons/htseq_counts \;
+
+## unzip
+# find . -name '*.htseq_counts.txt.gz' -exec gunzip {} \;
+
+## move to local repo data folder
+# mv *.htseq_counts.txt ~/tcga_macs/data/dlbcl_htseq_counts
+
+```
+
+Check for missing files 
+```{r}
+# get filenames that were downloaded
+downloaded_fnames <- list.files("data/dlbcl_htseq_counts/", all.files = FALSE) 
+
+# get filenames from manifest
+manifest_fnames <- nci_manifest %>% pull(filename) %>% str_replace(".gz", "")
+
+# find the difference
+missing_files <- setdiff(manifest_fnames, downloaded_fnames)
+missing_files
+# no missing files
+```
+
+## Initial processing
+
+Combine files into dataframe
+```{r}
+# get a vector of filepaths
+filepaths <- nci_manifest %>% dplyr::select(filename) %>% 
+    mutate(filename = (str_replace(filename, ".gz", ""))) %>%
+    mutate(filepath = (str_c("data/dlbcl_htseq_counts/", filename))) %>%
+  pull(filepath)
+```
+
+```{r}
+# read in files
+nci_dlbcl_df <- map(filepaths, function(x){read_tsv(x, col_names = FALSE)}) %>% 
+  reduce(left_join, by = "X1")
+
+# set column names
+cols <- paste0("nci_dlbcl_", seq(1, (ncol(nci_dlbcl_df) - 1)))
+allcols <- c("gene", cols)
+colnames(nci_dlbcl_df) <- allcols
+
+# start metadata with manifest
+enframe(cols) 
+nci_dlbcl_pheno <- add_column(nci_manifest, cols, .before = 1)
+nci_dlbcl_pheno <- dplyr::rename(nci_dlbcl_pheno, sample = cols)
+
+# review results
+nci_dlbcl_pheno
+nci_dlbcl_df
+```
+
+Get additional metadata
+```{r}
+# build query
+qfiles = files() %>% GenomicDataCommons::filter( ~ cases.project.project_id == 'NCICCR-DLBCL' & type == 'gene_expression' & analysis.workflow_type == 'HTSeq - Counts')
+
+# get results
+extended_metadata <- results_all(qfiles)
+extended_metadata <- extended_metadata %>% as_tibble() %>%
+  dplyr::select(-state, -acl)
+
+# combine with existing phenodata
+nci_dlbcl_annotation <- nci_dlbcl_pheno %>%
+  left_join(extended_metadata, by = "id") %>%
+  print()
+```
+
+## Phenotype data
+
+Get phenotype data from GenomicDataCommons
+```{r}
+# get linked htseq count filenames / caseID from GDC web portal as JSON
+# saved as "data/gdc_files_and_case_ids.json"
+library(jsonlite)
+filescases <- fromJSON("data/gdc_files_and_case_ids.json", 
+                       flatten = TRUE) %>%
+  as_tibble() %>%
+  print()
+
+# get case ids out of nested table structure
+casefiles <- filescases$cases %>% 
+  bind_rows() %>% 
+  dplyr::select(case_id) %>%
+  bind_cols(filescases) %>%
+  as_tibble() %>%
+  dplyr::select(case_id, file_name) %>%
+  print()
+
+# get linked case IDs and case uuIDs from GDC here: https://portal.gdc.cancer.gov/repository?facetTab=cases&filters=%7B%22op%22%3A%22and%22%2C%22content%22%3A%5B%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.project.program.name%22%2C%22value%22%3A%5B%22NCICCR%22%5D%7D%7D%5D%7D&searchTableTab=cases
+# exported as TSV (two tables, aliquot.tsv and sample.tsv)
+# moved files to data folder
+sample_ids <- read_tsv("data/sample.tsv")
+str(sample_ids)
+
+phenodata <- casefiles %>%
+  left_join(sample_ids) %>%
+  dplyr::select(case_submitter_id, everything()) %>%
+  print()
+
+# download clinical data from GDC as JSON and import
+clinicaldata <- fromJSON("data/gdc_clinical_data.json", 
+                       flatten = TRUE) %>%
+  as_tibble() %>%
+  print()
+
+diag_df <- clinicaldata$diagnoses %>%
+  bind_rows() %>%
+  as_tibble() %>%
+  mutate(case_submitter_id = str_replace(submitter_id,
+                                         "-diagnosis",
+                                         "")) %>%
+  dplyr::select(case_submitter_id, everything()) %>%
+  print()
+
+demo_df <- clinicaldata %>%
+  dplyr::select(-diagnoses) %>%
+  mutate(case_submitter_id = str_replace(demographic.submitter_id,
+                                         "-demographic",
+                                         "")) %>%
+  dplyr::select(case_submitter_id, everything()) %>%
+  print()
+
+pheno_data <- phenodata %>%
+  left_join(diag_df) %>%
+  left_join(demo_df) %>%
+  print()
+
+# remove columns with all NA
+not_all_na <- function(x) {!all(is.na(x))}
+pheno_data <- pheno_data %>% dplyr::select_if(not_all_na)
+pheno_data
+
+# pull in temporary sample names
+nci_dlbcl_pheno
+
+pheno_data_samples <- pheno_data %>%
+  rename(filename = file_name) %>%
+  left_join(nci_dlbcl_pheno, by = "filename") %>%
+  dplyr::select(case_submitter_id, sample, everything()) %>%
+  print()
+
+```
+
+```{r}
+# rename the expression matrix columns with meaningful sample names
+pheno_data_ids <- pheno_data_samples %>%
+  dplyr::select(case_submitter_id, sample)
+id_frame <- (colnames(nci_dlbcl_df)) %>%
+  enframe() %>%
+  dplyr::select(sample = value) %>%
+  left_join(pheno_data_ids) %>%
+  print()
+id_frame$case_submitter_id[1] <- "gene"
+id_frame
+cnames <- id_frame %>% pull(case_submitter_id)
+
+colnames(nci_dlbcl_df) <- cnames
+```
+
+## Save for later use
+```{r}
+write_csv(nci_dlbcl_df, "output/nci_dlbcl_unprocessed_counts.csv")
+write_csv(pheno_data_samples, "output/nci_dlbcl_annotation.csv")
+```
+
+## Clean prepare for merge
+
+#### Possible start point for notebook if you want to skip the download
+
+```{r}
+nci_dlbcl_expr <- read_csv("output/nci_dlbcl_unprocessed_counts.csv") %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "gene") %>%
+  as.matrix()
+
+nci_dlbcl_expr[1:5, 1:5]
+dim(nci_dlbcl_expr)
+summary(as.factor(is.na(nci_dlbcl_expr)))
+summary(as.factor(nci_dlbcl_expr < 0))
+
+pheno_data_samples <- read_csv("output/nci_dlbcl_annotation.csv")
+
+# read in conversion table for gene IDs
+gencode_gtf <- read_tsv("data/gencode.v22.primary_assembly.annotation.gtf.geneinfo")
+
+# filter for protein coding genes only
+nci_dlbcl_prot <- nci_dlbcl_expr %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_id") %>%
+  left_join(gencode_gtf) %>%
+  dplyr::filter(gene_type == "protein_coding") %>%
+  dplyr::select(-gene_type, -gene_status, -gene_name, -level, -havana_gene) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "gene_id") %>%
+  as.matrix()
+
+nci_dlbcl_prot[1:5, 1:5]
+dim(nci_dlbcl_prot)
+
+# correct for library size with cpm using EdgeR
+expr_dlbcl_cpm <- cpm(nci_dlbcl_prot, log = FALSE)
+str(expr_dlbcl_cpm)
+expr_dlbcl_cpm[1:5, 1:5]
+```
+
+```{r}
+# Density plots
+# tidy data
+tidy_cpm <- t(expr_dlbcl_cpm) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  gather(key = "gene_id", value = "intensity", -sample_id) %>%
+  print()
+
+# plots
+dplot_dlbcl <- ggplot(tidy_cpm, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_dlbcl +
+  xlim(-5, 20)
+
+# plot with log and small offset
+dplot_dlbcl_log <- ggplot(tidy_cpm, aes(log(intensity + 0.5))) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_dlbcl_log +
+  xlim(-10, 10)
+
+```
+
+```{r}
+# apply hard cutoffs
+# cpm expression cutoff: 0.5
+cutoff <- 0.5
+# must be expressed in at least: half
+min_sm_frac <- 0.5
+filter_frac <- min_sm_frac * ncol(expr_dlbcl_cpm )
+filter_frac
+total_cpm_stats <- data.frame(
+  total = apply(expr_dlbcl_cpm, 1, function(x){
+    sum(x > cutoff, na.rm = TRUE)
+    } ))
+keep <- which(total_cpm_stats$total >= filter_frac)
+
+# convert to data frame for subsetting
+expr_dlbcl_cpm_df <- expr_dlbcl_cpm %>% as.data.frame()
+
+# check results
+dim(expr_dlbcl_cpm_df)
+expr_dlbcl_cpm_filtered <- expr_dlbcl_cpm_df[keep,]
+dim(expr_dlbcl_cpm_filtered)
+expr_dlbcl_cpm_unfiltered <- expr_dlbcl_cpm
+dim(expr_dlbcl_cpm_unfiltered)
+```
+
+```{r}
+# Density plots
+# tidy data
+tidy_dlbcl_filtered <- t(expr_dlbcl_cpm_filtered) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  gather(key = "gene_id", value = "intensity", -sample_id) %>%
+  print()
+
+# plots
+dplot_dlbcl_2 <- ggplot(tidy_dlbcl_filtered, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_dlbcl_2 +
+  xlim(-5, 20)
+
+# plot with log and small offset
+dplot_dlbcl_log_2 <- ggplot(tidy_dlbcl_filtered, aes(log(intensity + 0.5))) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_dlbcl_log_2 +
+  xlim(-10, 10)
+```
+
+Normalize gene expression distributions
+
+Normalization by the method of trimmed mean of M-values (TMM) is performed using the calcNormFactors function in edgeR. The normalisation factors calculated here are used as a scaling factor for the library sizes. 
+
+```{r}
+# get normalization factors
+norm_factors <- calcNormFactors(expr_dlbcl_cpm_filtered, method = "TMM")
+
+# convert expression matrix to dataframe
+expr_dlbcl_cpm_df <- as.data.frame(expr_dlbcl_cpm_filtered)
+
+# apply factor to each column
+dlbcl_cpm_norm <- map2_dfc(expr_dlbcl_cpm_df, norm_factors, `*`)
+dlbcl_cpm_norm <- as.data.frame(dlbcl_cpm_norm)
+rownames(dlbcl_cpm_norm) <- rownames(expr_dlbcl_cpm_filtered)
+dlbcl_cpm_norm[1:5, 1:5]
+```
+
+#### Log transformation
+
+```{r}
+# introduce offset to prevent -Inf
+offset_dlbcl_cpm_norm <- dlbcl_cpm_norm + 0.5
+offset_dlbcl_cpm_norm[1:5, 1:5]
+
+# log transformation
+dlbcl_matrix <- log2(offset_dlbcl_cpm_norm) %>% as.matrix()
+dlbcl_matrix[1:5, 1:5]
+
+# unfiltered transformation
+offset_dlbcl_cpm_unfilt <- expr_dlbcl_cpm_unfiltered + 1
+offset_dlbcl_cpm_unfilt[1:5, 1:5]
+
+# log transformation
+dlbcl_matrix_unfilt <- log2(offset_dlbcl_cpm_unfilt) %>% as.matrix()
+dlbcl_matrix_unfilt[1:5, 1:5]
+
+```
+
+#### Final density plot
+```{r}
+dlbcl_log_cpm_filtered_tbl <- dlbcl_matrix %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene") %>%
+  as_tibble()
+
+tidy_log_cpm <- dlbcl_log_cpm_filtered_tbl %>% 
+  gather(key = "sampleID", value = "intensity", -gene)
+
+dplot3 <- ggplot(tidy_log_cpm, aes(intensity)) +
+  geom_density() +
+  theme(legend.position = "none") +
+  xlim(-20, 20) +
+  ggtitle("Final density plot of log(CPM) for DLBCL")
+dplot3
+```
+
+## GSVA
+
+```{r}
+# read in gene sets from ss_GSEA.Rmd
+gset_ids_complete <- readRDS("output/gset_ids_complete.rds")
+
+head(gset_ids_complete)
+names(gset_ids_complete)
+
+# get gvsa scores
+library(GSVA)
+dlbcl_es <- gsva(expr = dlbcl_matrix, 
+                gset.idx.list = gset_ids_complete, 
+                annotation = NULL,
+                mx.diff = TRUE,
+                abs.ranking = FALSE,
+                method = "gsva", 
+                verbose = TRUE,
+                ssgsea.norm = FALSE)
+
+# write out results
+saveRDS(dlbcl_es, "output/gsva_dlbcl_results.rds")
+
+# read in gene sets from ss_GSEA.Rmd
+gset_ids_complete <- readRDS("output/gset_ids_complete.rds")
+
+head(gset_ids_complete)
+names(gset_ids_complete)
+
+#-----------------------------------------------------
+# Unfiltered data
+# get gvsa scores
+library(GSVA)
+dlbcl_es_unfilt <- gsva(expr = dlbcl_matrix_unfilt, 
+                gset.idx.list = gset_ids_complete, 
+                annotation = NULL,
+                mx.diff = TRUE,
+                abs.ranking = FALSE,
+                method = "gsva", 
+                verbose = TRUE)
+
+# write out results
+saveRDS(dlbcl_es_unfilt, "output/gsva_dlbcl_unfilt_results.rds")
+```
+
+Quick boxplots
+```{r}
+dlbcl_es_unfilt_cleaned <- readRDS("output/gsva_dlbcl_unfilt_results.rds") %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_set") %>%
+  as_tibble() %>%
+  dplyr::filter(gene_set %in% c("upreg_c1", "upreg_c2", "upreg_c3", "upreg_c4", "upreg_c5", "upreg_c6", "upreg_c7", "tcell_gset")) %>%
+  dplyr::mutate(gene_set = ifelse(gene_set == "upreg_c1", "C1",
+                                  ifelse(gene_set == "upreg_c2", "C2",
+                                         ifelse(gene_set == "upreg_c3", "C3",
+                                                ifelse(gene_set == "upreg_c4", "C4",
+                                                       ifelse(gene_set == "upreg_c5", "C5",
+                                                              ifelse(gene_set == "upreg_c6", "C6",
+                                                                     ifelse(gene_set == "upreg_c7", "C7",
+                                                                            ifelse(gene_set == "tcell_gset", "T", NA))))))))) %>%
+  gather(key = "sampleID", value = "score", -gene_set) %>%
+  bind_cols(group = rep("DLBCL", 3848)) %>%
+  print()
+
+dlbcl_es_unfilt_cleaned %>%
+    mutate(cluster = fct_relevel(gene_set, c("C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7",
+                                            "T"))) %>%
+    group_by(cluster) %>%
+  ggplot(aes(y = score, x = cluster, fill = cluster)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set") +
+    theme_classic2() +
+    scale_fill_d3() +
+    ggtitle("DLBCL - not filtered by expression") +
+    theme(legend.position = "none") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_d3() +
+    xlab("") +
+    ylab("GSVA score") +
+    stat_compare_means(label = "p.signif", 
+                       method = "t.test",
+                       ref.group = "T")
+
+dlbcl_es_cleaned <- readRDS("output/gsva_dlbcl_results.rds") %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_set") %>%
+  as_tibble() %>%
+  dplyr::filter(gene_set %in% c("upreg_c1", "upreg_c2", "upreg_c3", "upreg_c4", "upreg_c5", "upreg_c6", "upreg_c7", "tcell_gset")) %>%
+  dplyr::mutate(gene_set = ifelse(gene_set == "upreg_c1", "C1",
+                                  ifelse(gene_set == "upreg_c2", "C2",
+                                         ifelse(gene_set == "upreg_c3", "C3",
+                                                ifelse(gene_set == "upreg_c4", "C4",
+                                                       ifelse(gene_set == "upreg_c5", "C5",
+                                                              ifelse(gene_set == "upreg_c6", "C6",
+                                                                     ifelse(gene_set == "upreg_c7", "C7",
+                                                                            ifelse(gene_set == "tcell_gset", "T", NA))))))))) %>%
+  gather(key = "sampleID", value = "score", -gene_set) %>%
+  bind_cols(group = rep("DLBCL", 3848)) %>%
+  print()
+
+dlbcl_es_cleaned %>%
+    mutate(cluster = fct_relevel(gene_set, c("C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7",
+                                            "T"))) %>%
+    group_by(cluster) %>%
+  ggplot(aes(y = score, x = cluster, fill = cluster)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set") +
+    theme_classic2() +
+    scale_fill_d3() +
+    ggtitle("DLBCL") +
+    theme(legend.position = "none") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_d3() +
+    xlab("") +
+    ylab("GSVA score") +
+    stat_compare_means(label = "p.signif", 
+                       method = "t.test",
+                       ref.group = "T")
+
+dlbcl_es_cleaned %>%
+    mutate(cluster = fct_relevel(gene_set, c("C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7",
+                                            "T"))) %>%
+    group_by(cluster) %>%
+  ggplot(aes(y = score, x = cluster, fill = cluster)) +
+    geom_jitter(alpha = 0.3) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set") +
+    theme_classic2() +
+    scale_fill_d3() +
+    ggtitle("DLBCL") +
+    theme(legend.position = "none") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_d3() +
+    xlab("") +
+    ylab("GSVA score") +
+    stat_compare_means(label = "p.signif", 
+                       method = "t.test",
+                       ref.group = "T")
+```
+
+No real difference in effect by filtering and normalizing the lymphoma data. Will use the filtered and normalized data to match the analysis in the TCGA.

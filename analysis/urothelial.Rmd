@@ -1,0 +1,218 @@
+---
+title: "Download and preprocess urothelial cancer immunotherapy data from Mariathasan et al"
+author: "mleukam"
+date: "2019-11-12"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Data sources for GU IMTX cohorts
+  
+* Urothelial cancer / TGF-b / bladder
+  * Paper https://www.ncbi.nlm.nih.gov/pubmed/29443960  
+  * Datasets http://research-pub.gene.com/IMvigor210CoreBiologies/ 
+  
+* RCC (Van Allen)
+  * Paper https://www.ncbi.nlm.nih.gov/pubmed/29301960  
+  * TPM downloaded from table S8 [here](https://science.sciencemag.org/content/359/6377/801/tab-figures-data)
+  
+## Setup
+
+Following vignette here: http://research-pub.gene.com/IMvigor210CoreBiologies/
+
+Install dependencies
+```{r eval=FALSE}
+BiocManager::install(c("biomaRt",
+  "circlize",
+  "ComplexHeatmap",
+  "corrplot",
+  "DESeq",
+  "DESeq2",
+  "dplyr",
+  "DT",
+  "edgeR",
+  "ggplot2",
+  "limma",
+  "lsmeans",
+  "reshape2",
+  "spatstat",
+  "survival",
+  "plyr"))
+```
+
+```{r eval=FALSE}
+install.packages("code/IMvigor210CoreBiologies_1.0.0.tar.gz", 
+  repos = NULL)
+```
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+#### Load packages
+```{r}
+library(IMvigor210CoreBiologies)
+library(readxl)
+library(tidyverse)
+library(biomaRt)
+```
+
+#### Load bladder cancer data
+```{r}
+# load raw data from Mariathasan et al
+data(cds)
+
+# review elements
+head(counts(cds))
+head(fData(cds))
+head(pData(cds))
+
+# review raw counts
+# has entrez gene names for rownames
+expr_blad <- counts(cds)
+expr_blad[1:5, 1:5]
+```
+
+#### Load RCC data
+```{r}
+tpm_rcc <- read_excel("data/IMTX_datasets/aan5951_TableS8.xlsx", 
+    skip = 1) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "gene_id") %>%
+  as.matrix()
+
+tpm_rcc[1:5, 1:5]
+
+# there is no way to convert TPM to raw counts from the provided information. Will request dbGAP access for future projects, but will drop this for now (limited number of patients, would hold up work on the rest of the paper)
+rm(tpm_rcc)
+```
+
+## Data cleaning
+
+Convert gene names to GENCODE v22 gene ids to match GDC standard
+```{r}
+# get vector of all entrez gene names to be recoded
+entrez_genes <- rownames(expr_blad)
+head(entrez_genes, n = 15)
+
+# make connection to biomart
+mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+
+# find entrez variable name
+listAttributes(mart) %>% 
+  as_tibble() %>% 
+  dplyr::filter(grepl("entrez", name)) %>% 
+  print()
+
+# find hgnc variable name
+listAttributes(mart) %>% 
+  as_tibble() %>% 
+  dplyr::filter(grepl("hgnc", name)) %>% 
+  print()
+```
+
+```{r eval=FALSE}
+# make query to biomart
+# will save results as a local cache and not re-run this chunk
+genes <- getBM(
+  filters = "entrezgene_id",
+  attributes = c("entrezgene_id", "ensembl_gene_id", "hgnc_symbol"),
+  values = entrez_genes,
+  mart = mart)
+
+head(genes)
+saveRDS(genes, "output/entrez_lookuptable.rds")
+```
+
+Convert to Gencode v22 gene ids
+Filter for protein coding genes only
+```{r}
+# read in biomart query results
+entrez_lookup <- readRDS("output/entrez_lookuptable.rds")
+head(entrez_lookup)
+dim(entrez_lookup)
+
+# read in conversion table for gene IDs
+gencode_gtf <- read_tsv("data/gencode.v22.primary_assembly.annotation.gtf.geneinfo")
+
+# gencode gene IDS without decimal version numbers are given for count identifiers
+# GDC standard is gencode v22, which is source of NCI data
+# will convert to gencode v22 to match rows of NCI data
+# add entrez IDs to gencode GTF
+gencode_gtf_entrez <- gencode_gtf %>%
+  separate(gene_id, into = c("ensembl_gene_id", NA), remove = FALSE, sep = "\\.") %>%
+  left_join(entrez_lookup, by = "ensembl_gene_id") %>%
+  dplyr::select(gene_id_v22 = gene_id, ensembl_gene_id, entrezgene_id, everything()) %>%
+  mutate(entrezgene_id = as.character(entrezgene_id)) %>%
+  separate(gene_id_v22, into = c("geneID_split", NA), sep = "\\.", remove = FALSE) %>%
+  print()
+
+# Define function to convert gene names to gencode v22
+# Filter for protein-coding genes only
+# Remove any features that do not have a corresponding v22 gene ID
+translate_andfilter_geneids <- function(df){
+  df_filt <- left_join(df, gencode_gtf_entrez, by = "entrezgene_id") %>%
+    dplyr::select(gene_id_v22, geneID_split, gene_type, everything()) %>%
+    dplyr::select(-gene_status, -gene_name, -level, -havana_gene, -entrezgene_id, -ensembl_gene_id, -hgnc_symbol) %>%
+    dplyr::filter(gene_type == "protein_coding") %>%
+    dplyr::select(-gene_type, -geneID_split)
+  rnames_expr_mat <- df_filt %>% pull(gene_id_v22)
+  expr_mat_filt <- df_filt %>%
+    dplyr::select(-gene_id_v22) %>%
+    as.matrix() %>%
+    as.numeric()
+  rownames(expr_mat_filt) <- rnames_expr_mat
+  expr_mat_filt
+}
+
+# convert expr matrix to dataframe
+expr_blad[1:5, 1:5]
+expr_blad_df <- expr_blad %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "entrezgene_id") %>%
+  as_tibble() %>%
+  print()
+
+blad_expr_matrix <- translate_andfilter_geneids(expr_blad_df)
+dim(blad_expr_matrix)
+blad_expr_matrix[1:5, 1:5]
+str(blad_expr_matrix)
+```
+
+Write out for use in the expanded immotherapy GSVA analysis - [see notebook](expanded_gsva_analysis.html)
+
+```{r}
+saveRDS(blad_expr_matrix, "output/blad_expr_matrix.rds")
+
+```
+
+## Pheno Data
+
+```{r}
+
+pheno_blad <- pData(cds)
+str(pheno_blad)
+head(rownames(pheno_blad))
+
+# review os time
+pheno_blad[,21]
+
+# review os censor
+pheno_blad[,22]
+
+# review best response
+pheno_blad[,1]
+
+# convert to data frame
+pheno_blad_df <- pheno_blad %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample") %>%
+  as_tibble() %>%
+  print()
+
+# save for use in expanded_gsva_analysis.Rmd
+saveRDS(pheno_blad_df, "output/pheno_blad_df.rds")
+
+```

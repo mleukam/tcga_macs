@@ -314,7 +314,7 @@ div.section {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -323,7 +323,7 @@ div.section {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -332,10 +332,10 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2019-11-09
+<strong>Last updated:</strong> 2019-11-17
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>tcga_macs/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -351,22 +351,22 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreee196ab1cea5a05b8e4ff292aa979b6c5dd701ac3targetblanke196ab1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/e196ab1cea5a05b8e4ff292aa979b6c5dd701ac3" target="_blank">e196ab1</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree966141e92db1b85dc131794712cdd861baf1ed26targetblank966141ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/966141e92db1b85dc131794712cdd861baf1ed26" target="_blank">966141e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstreee196ab1cea5a05b8e4ff292aa979b6c5dd701ac3targetblanke196ab1a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree966141e92db1b85dc131794712cdd861baf1ed26targetblank966141ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -378,6 +378,7 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    all.pdf
     Ignored:    analysis/.DS_Store
+    Ignored:    code/.DS_Store
     Ignored:    data/.DS_Store
     Ignored:    data/160genes_ensembl.gencode28.txt
     Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
@@ -388,6 +389,7 @@ Ignored files:
     Ignored:    data/gse_46903.rds
     Ignored:    data/htseq_counts/
     Ignored:    data/kyle.gdc_tcga_bam_metadata.txt
+    Ignored:    output/.DS_Store
     Ignored:    output/AUC_comparison.pdf
     Ignored:    output/Combined_down_plots.pdf
     Ignored:    output/Combined_up_plots.pdf
@@ -398,9 +400,11 @@ Ignored files:
     Ignored:    output/ave_scores_gsva_by_tumor.rds
     Ignored:    output/beeswarm_plot.pdf
     Ignored:    output/beeswarm_pub.pdf
+    Ignored:    output/blad_expr_matrix.rds
     Ignored:    output/boxplot_total_pub.pdf
     Ignored:    output/combined_boxplots.pdf
     Ignored:    output/combined_up_plot.pdf
+    Ignored:    output/comp_plot.pdf
     Ignored:    output/coxph_pfs.pdf
     Ignored:    output/cpxph_os.pdf
     Ignored:    output/cv.lasso.merck.rds
@@ -413,6 +417,7 @@ Ignored files:
     Ignored:    output/downreg_c5.csv
     Ignored:    output/downreg_c6.csv
     Ignored:    output/downreg_c7.csv
+    Ignored:    output/entrez_lookuptable.rds
     Ignored:    output/expr_matrix.rds
     Ignored:    output/expression_set.rds
     Ignored:    output/figures/
@@ -422,9 +427,11 @@ Ignored files:
     Ignored:    output/flat_total_pheno.rds
     Ignored:    output/gset_ids_complete.rds
     Ignored:    output/gset_ids_plusnew.rds
+    Ignored:    output/gsva_imtx_plusuro_results.rds
     Ignored:    output/heatmaps_fig3.pdf
     Ignored:    output/hm_chol.pdf
     Ignored:    output/imtx_expressionset.rds
+    Ignored:    output/imtx_gene_set_resposnes.pdf
     Ignored:    output/imtx_gsva_17geneset_results.rds
     Ignored:    output/imtx_matrix.csv
     Ignored:    output/km_cluster_assignments.csv
@@ -440,6 +447,7 @@ Ignored files:
     Ignored:    output/normalized_probe_intensities.Rds
     Ignored:    output/os_km_curves.pdf
     Ignored:    output/os_km_plots.pdf
+    Ignored:    output/pheno_blad_df.rds
     Ignored:    output/processed_lumi_46903.Rds
     Ignored:    output/processed_lumi_46903.tsv
     Ignored:    output/processed_lumi_exprs.txt
@@ -458,6 +466,7 @@ Ignored files:
     Ignored:    output/tcga_counts_list.rds
     Ignored:    output/tcga_gdc_manifest.rds
     Ignored:    output/tcga_gsva_17geneset_results.rds
+    Ignored:    output/tcga_gsva_new_clust_geneset_results.rds
     Ignored:    output/tcga_metadata_list.rds
     Ignored:    output/tcga_total_counts.csv
     Ignored:    output/univariate_p_values.pdf
@@ -470,10 +479,13 @@ Ignored files:
     Ignored:    output/upreg_c7.csv
 
 Untracked files:
+    Untracked:  Figure1.html
     Untracked:  analysis/expanded_gsva.Rmd
     Untracked:  analysis/expanded_gsva_analysis.Rmd
     Untracked:  analysis/gsva_results_exploration.Rmd
     Untracked:  analysis/survival.Rmd
+    Untracked:  analysis/urothelial.Rmd
+    Untracked:  code/IMvigor210CoreBiologies_1.0.0.tar.gz
     Untracked:  data/IMTX_datasets/
     Untracked:  data/xcel_signatures.xlsx
     Untracked:  output/PFS_CoxPH-concordance.tex
@@ -500,6 +512,7 @@ Untracked files:
 
 Unstaged changes:
     Modified:   .gitignore
+    Modified:   analysis/index.Rmd
     Modified:   analysis/tcga_format.Rmd
 
 </code></pre>
@@ -539,6 +552,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/mleukam/tcga_macs/966141e92db1b85dc131794712cdd861baf1ed26/docs/index.html" target="_blank">966141e</a>
+</td>
+<td>
+mleukam
+</td>
+<td>
+2019-11-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1104,8 +1134,41 @@ Start workflowr project.
 <li><a href="ss_gsea.html">Gene set variation analysis</a></li>
 <li><a href="gsva_results_exploration.html">Exploration and analysis of GSVA results</a></li>
 </ul>
-<div id="figures-1" class="section level4">
-<h4>Figures:</h4>
+</div>
+<div id="applying-macrophage-clusters-to-imtx-data" class="section level2">
+<h2>Applying macrophage clusters to IMTX data</h2>
+<p>Apply gene lists from above to datasets of tumor gene expression linked to clinical response to immunotherapy in several cancer types</p>
+<div id="urothelial-imtx-cohort" class="section level5">
+<h5>Urothelial IMTX cohort</h5>
+<ul>
+<li>Urothelial cancer / TGF-b / bladder
+<ul>
+<li>Paper <a href="https://www.ncbi.nlm.nih.gov/pubmed/29443960" class="uri">https://www.ncbi.nlm.nih.gov/pubmed/29443960</a><br />
+</li>
+<li>Datasets <a href="http://research-pub.gene.com/IMvigor210CoreBiologies/" class="uri">http://research-pub.gene.com/IMvigor210CoreBiologies/</a></li>
+</ul></li>
+</ul>
+<p><a href="urothelial.html">Notebook for import and cleaning</a></p>
+</div>
+<div id="melanoma-imtx-cohorts" class="section level5">
+<h5>Melanoma IMTX cohorts</h5>
+<ul>
+<li>hugo</li>
+<li>riaz</li>
+<li>gide</li>
+</ul>
+<p><a href="expanded_gsva.Rmd">Notebook for import and cleaning</a></p>
+</div>
+<div id="results-and-analysis" class="section level4">
+<h4>Results and analysis</h4>
+<ul>
+<li><a href="expanded_gsva_analysis.html">Logistic model for best response</a></li>
+<li><a href="survival.html">Survival analysis</a></li>
+</ul>
+</div>
+</div>
+<div id="figures-1" class="section level2">
+<h2>Figures:</h2>
 <p>Figure 1: derivation of macrophage signatures:</p>
 <p>Figure 2: Beeswarm plots of upregulated macrophage cluster genes applied to TCGA data:</p>
 <p><img src="assets/Combined_up_plots.png" /></p>
@@ -1114,6 +1177,17 @@ Start workflowr project.
 <p>Figure 3: Heatmaps of selected tumor types</p>
 <p>Figure 4: IMTX survival/outcomes</p>
 </div>
+<div id="other-datasets" class="section level2">
+<h2>Other datasets:</h2>
+<ol style="list-style-type: decimal">
+<li><p>Macrophage results that Lei previously generated around CSF1R in the original macrophage project we did. The question we had was how your work overlaps with his work. I think it will not correlate well but this is an important point to make in his paper in that it emphasizes that CSF1R is not a good “biomarker” for the pleotropic macrophage states in cancer. Array Update Comp Files 2018.01.11.zip 13 MB Zip — Click to download please also keep content from this doc confidential especially the gene names</p></li>
+<li><p>IMTX single cell RNAseq cohorts (both melanoma)</p></li>
+</ol>
+<p><a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120575" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120575</a> <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE115978" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE115978</a></p>
+<ol start="3" style="list-style-type: decimal">
+<li>the CXCL9/CXCL10 gene expression signature (macrophage)</li>
+</ol>
+<p>The question we had was whether this signature falls into one of your 6 macrophage clusters?</p>
 </div>
 
 

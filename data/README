@@ -1,0 +1,68 @@
+## three sets of IMTX datasets, published
+ - Hugo: https://www.ncbi.nlm.nih.gov/pubmed/26997480
+ - Riaz: https://www.ncbi.nlm.nih.gov/pubmed/29033130
+ - Gide: https://www.ncbi.nlm.nih.gov/pubmed/30753825
+
+## same sets of files provided 
+
+# -------------------------------------------------
+
+## rnaseq 
+### count-based quantification 
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.txt
+ - all genes, raw counts
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.txt
+ - protein-coding genes, raw counts
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.countTotal.sm109.csv
+ - protein-coding genes, total read counts per sample 
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.CPM.sm109.csv
+ - protein-coding genes, counts per million mapped reads
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.logCPM.sm109.csv
+ - protein-coding genes, counts per million mapped reads, log2 transformation
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.logCPM.sm109.density.pdf
+ - protein-coding genes, counts per million mapped reads, log2 transformation, density plot
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.TMM.CPM.sm109.csv
+ - protein-coding genes, counts per million mapped reads, TMM norm
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.TMM.logCPM.sm109.csv
+ - protein-coding genes, counts per million mapped reads, TMM norm, log2 transformation
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.cpm1.TMM.CPM.sm109.csv
+ - protein-coding genes, counts per million mapped reads, removing lowly expressed genes (those of CPM<1 in more than 50% of all samples), TMM norm
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.cpm1.TMM.logCPM.sm109.csv
+ - protein-coding genes, counts per million mapped reads, removing lowly expressed genes (those of CPM<1 in more than 50% of all samples), TMM norm, log2 transformation
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.voom.sm109.txt
+ - protein-coding genes, counts per million mapped reads, removing lowly expressed genes (those of CPM<1 in more than 50% of all samples), TMM norm, limma voom transformation 
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.coding.voom.sm109.meanvar.pdf
+ - limma voom plot
+
+### TPM-based quantification 
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.tpm.txt
+ - all genes, TPM values 
+
+riaz/Riaz.rnaseq.kallisto.raw.txi.tpm.coding.txt
+ - protein-coding genes, TPM values 
+
+# -------------------------------------------------
+
+## clinical 
+riaz/Riaz.rnaseq.metadata.txt.wClinical.txt
+ - merged RNAseq sample metadata and clinical table 
+
+riaz/Riaz.rnaseq.metadata.txt.wClinical.txt.pt28.pre_post.csv
+ - subset of previous table, pairing pre and post samples for the same patient
+
+# -------------------------------------------------
+
+## END

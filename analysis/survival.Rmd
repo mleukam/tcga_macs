@@ -1,0 +1,588 @@
+---
+title: "survival"
+author: "mleukam"
+date: "2019-10-10"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+Load packages
+```{r}
+library(tidyverse)
+library(survival)
+library(survminer)
+library(ggsci)
+library(ggpubr)
+library(viridis)
+library(broom)
+library(Biobase)
+```
+
+Load data
+```{r}
+imtx_gsva_results <- readRDS("output/gsva_imtx_plusuro_results.rds") %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>% 
+  as_tibble() %>%
+  print()
+
+imtx_es <- readRDS("output/imtx_expressionset.rds") 
+```
+
+## PFS
+Clean data
+
+https://www.datacamp.com/community/tutorials/survival-analysis-R
+https://dplyr.tidyverse.org/articles/window-functions.html
+
+```{r}
+# get pheno data out of expressionset
+# remove ocular and other types of melanoma (keep only cutaneous or not specified)
+imtx_pdata <- pData(imtx_es) %>% 
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  dplyr::filter(subtype %in% c("CUTANEOUS", "I", "II", "III", "IV", NA)) %>%
+  print()
+
+# get cases with PFS data, merge with gsva results
+pfs_data <- imtx_pdata %>%
+  drop_na(pfs_status) %>%
+  left_join(imtx_gsva_results) %>%
+  print()
+
+# divide into quartiles by cluster expression
+# 4 is highest quartile and 1 is lowest
+pfs_data_rank <- pfs_data %>%
+  mutate(c1_quartile = ntile(upreg_c1, 4)) %>%
+  mutate(c2_quartile = ntile(upreg_c2, 4)) %>%
+  mutate(c3_quartile = ntile(upreg_c3, 4)) %>%
+  mutate(c4_quartile = ntile(upreg_c4, 4)) %>%
+  mutate(c5_quartile = ntile(upreg_c5, 4)) %>%
+  mutate(c6_quartile = ntile(upreg_c6, 4)) %>%
+  mutate(c7_quartile = ntile(upreg_c7, 4)) %>%
+  mutate(tcell_quartile = ntile(tcell_gset, 4)) %>%
+  print()
+```
+
+PFS analysis
+```{r}
+# cluster 1
+c1_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c1_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c1_pfs_data$pfs_days, event = c1_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c1_quartile, data = c1_pfs_data)
+survdiff(pfs_surv_obj ~ c1_quartile, data = c1_pfs_data)
+c1_plot <- ggsurvplot(fit_pfs, 
+                      data = c1_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 1")
+
+c1_plot
+
+# cluster 2
+c2_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c2_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c2_pfs_data$pfs_days, event = c2_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c2_quartile, data = c2_pfs_data)
+survdiff(pfs_surv_obj ~ c2_quartile, data = c2_pfs_data)
+c2_plot <- ggsurvplot(fit_pfs, 
+                      data = c2_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 2",
+                      risk.table = FALSE)
+c2_plot
+
+# cluster 3
+c3_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c3_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c3_pfs_data$pfs_days, event = c3_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c3_quartile, data = c3_pfs_data)
+survdiff(pfs_surv_obj ~ c3_quartile, data = c3_pfs_data)
+c3_plot <- ggsurvplot(fit_pfs, 
+                      data = c3_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 3")
+c3_plot
+
+# cluster 4
+c4_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c4_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c4_pfs_data$pfs_days, event = c4_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c4_quartile, data = c4_pfs_data)
+survdiff(pfs_surv_obj ~ c4_quartile, data = c4_pfs_data)
+c4_plot <- ggsurvplot(fit_pfs, 
+                      data = c4_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 4")
+c4_plot
+
+# cluster 5
+c5_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c5_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c5_pfs_data$pfs_days, event = c5_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c5_quartile, data = c5_pfs_data)
+survdiff(pfs_surv_obj ~ c5_quartile, data = c5_pfs_data)
+c5_plot <- ggsurvplot(fit_pfs, 
+                      data = c5_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 5")
+c5_plot
+
+# cluster 6
+c6_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c6_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c6_pfs_data$pfs_days, event = c6_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c6_quartile, data = c6_pfs_data)
+survdiff(pfs_surv_obj ~ c6_quartile, data = c6_pfs_data)
+c6_plot <- ggsurvplot(fit_pfs, 
+                      data = c6_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 6")
+c6_plot
+
+# cluster 7
+c7_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(c7_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = c7_pfs_data$pfs_days, event = c7_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ c7_quartile, data = c7_pfs_data)
+survdiff(pfs_surv_obj ~ c7_quartile, data = c7_pfs_data)
+c7_plot <- ggsurvplot(fit_pfs, 
+                      data = c7_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "right",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "PFS, Cluster 7")
+c7_plot
+
+# t-cell
+tcell_pfs_data <- pfs_data_rank %>%
+  dplyr::filter(tcell_quartile %in% c("1", "4"))
+pfs_surv_obj <- Surv(time = tcell_pfs_data$pfs_days, event = tcell_pfs_data$pfs_status)
+fit_pfs <- survfit(pfs_surv_obj ~ tcell_quartile, data = tcell_pfs_data)
+survdiff(pfs_surv_obj ~ tcell_quartile, data = tcell_pfs_data)
+tcell_plot <- ggsurvplot(fit_pfs, 
+                      data = tcell_pfs_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "right",
+                      legend.title = "Tcell \nexpression quartile",
+                      title = "PFS, Tcell")
+tcell_plot
+
+ggarrange(c1_plot$plot, c2_plot$plot, c3_plot$plot, c4_plot$plot, c5_plot$plot, c6_plot$plot, c7_plot$plot,
+          labels = c("A", "B", "C", "D", "E", "F", "G"),
+                     ncol = 4, nrow = 2)
+
+```
+
+#### Cox PH
+```{r}
+pfs_surv_obj <- Surv(time = pfs_data$pfs_days, event = pfs_data$pfs_status)
+fit_pfs_cox <- coxph(pfs_surv_obj ~ c1_quartile + 
+                       c2_quartile +
+                       c3_quartile +
+                       c4_quartile +
+                       c5_quartile +
+                       c6_quartile +
+                       c7_quartile,
+                     data = pfs_data_rank)
+summary(fit_pfs_cox)
+tidy(fit_pfs_cox)
+```
+
+## OS
+
+Clean data
+```{r}
+# get pheno data out of expressionset
+# remove ocular and other types of melanoma (keep only cutaneous or not specified)
+uro_pdata <- pData(imtx_es) %>% 
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  dplyr::filter(subtype %in% c("I", "II", "III", "IV")) %>%
+  print()
+
+melanoma_pdata <- pData(imtx_es) %>% 
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  dplyr::filter(subtype %in% c("CUTANEOUS", NA)) %>%
+  print()
+
+# get cases with PFS data, merge with gsva results
+uro_os_data <- uro_pdata %>%
+  drop_na(os_status) %>%
+  left_join(imtx_gsva_results) %>%
+  dplyr::select(os_status, os_days, response, everything()) %>%
+  print()
+
+melanoma_os_data <- melanoma_pdata %>%
+  drop_na(os_status) %>%
+  left_join(imtx_gsva_results) %>%
+  dplyr::select(os_status, os_days, response, everything()) %>%
+  print()
+
+# divide into quartiles by cluster expression
+# 4 is highest quartile and 1 is lowest
+uro_os_data_rank <- uro_os_data %>%
+  mutate(c1_quartile = ntile(upreg_c1, 4)) %>%
+  mutate(c2_quartile = ntile(upreg_c2, 4)) %>%
+  mutate(c3_quartile = ntile(upreg_c3, 4)) %>%
+  mutate(c4_quartile = ntile(upreg_c4, 4)) %>%
+  mutate(c5_quartile = ntile(upreg_c5, 4)) %>%
+  mutate(c6_quartile = ntile(upreg_c6, 4)) %>%
+  mutate(c7_quartile = ntile(upreg_c7, 4)) %>%
+  mutate(tcell_quartile = ntile(tcell_gset, 4)) %>%
+  dplyr::select(os_days, os_status, c1_quartile, c2_quartile, c3_quartile, c4_quartile, c5_quartile, c6_quartile, c7_quartile, tcell_quartile) %>%
+  print()
+
+melanoma_os_data_rank <- melanoma_os_data %>%
+  mutate(c1_quartile = ntile(upreg_c1, 4)) %>%
+  mutate(c2_quartile = ntile(upreg_c2, 4)) %>%
+  mutate(c3_quartile = ntile(upreg_c3, 4)) %>%
+  mutate(c4_quartile = ntile(upreg_c4, 4)) %>%
+  mutate(c5_quartile = ntile(upreg_c5, 4)) %>%
+  mutate(c6_quartile = ntile(upreg_c6, 4)) %>%
+  mutate(c7_quartile = ntile(upreg_c7, 4)) %>%
+  mutate(tcell_quartile = ntile(tcell_gset, 4)) %>%
+  dplyr::select(os_days, os_status, c1_quartile, c2_quartile, c3_quartile, c4_quartile, c5_quartile, c6_quartile, c7_quartile, tcell_quartile) %>%
+  print()
+```
+
+#### KM OS plots 
+
+Urothelial plots
+```{r}
+# cluster 1
+uro_c1_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c1_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c1_os_data$os_days, event = uro_c1_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c1_quartile, data = uro_c1_os_data)
+survdiff(uro_os_surv_obj ~ c1_quartile, data = uro_c1_os_data)
+uro_c1_plot <- ggsurvplot(fit_os, 
+                      data = uro_c1_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C1") 
+uro_c1_plot
+
+# cluster 2
+uro_c2_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c2_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c2_os_data$os_days, event = uro_c2_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c2_quartile, data = uro_c2_os_data)
+survdiff(uro_os_surv_obj ~ c2_quartile, data = uro_c2_os_data)
+uro_c2_plot <- ggsurvplot(fit_os, 
+                      data = uro_c2_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "bottom",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C2",
+                      risk.table = FALSE)
+uro_c2_plot
+
+# cluster 3
+uro_c3_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c3_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c3_os_data$os_days, event = uro_c3_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c3_quartile, data = uro_c3_os_data)
+survdiff(uro_os_surv_obj ~ c3_quartile, data = uro_c3_os_data)
+uro_c3_plot <- ggsurvplot(fit_os, 
+                      data = uro_c3_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C3")
+uro_c3_plot
+
+# cluster 4
+uro_c4_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c4_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c4_os_data$os_days, 
+                        event = uro_c4_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c4_quartile, data = uro_c4_os_data)
+survdiff(uro_os_surv_obj ~ c4_quartile, data = uro_c4_os_data)
+uro_c4_plot <- ggsurvplot(fit_os, 
+                      data = uro_c4_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C4")
+uro_c4_plot
+
+# cluster 5
+uro_c5_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c5_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c5_os_data$os_days, event = uro_c5_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c5_quartile, data = uro_c5_os_data)
+survdiff(uro_os_surv_obj ~ c5_quartile, data = uro_c5_os_data)
+uro_c5_plot <- ggsurvplot(fit_os, 
+                      data = uro_c5_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C5")
+uro_c5_plot
+
+# cluster 6
+uro_c6_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c6_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c6_os_data$os_days, event = uro_c6_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c6_quartile, data = uro_c6_os_data)
+survdiff(uro_os_surv_obj ~ c6_quartile, data = uro_c6_os_data)
+uro_c6_plot <- ggsurvplot(fit_os, 
+                      data = uro_c6_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C6")
+uro_c6_plot
+
+# cluster 7
+uro_c7_os_data <- uro_os_data_rank %>%
+  dplyr::filter(c7_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_c7_os_data$os_days, event = uro_c7_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ c7_quartile, data = uro_c7_os_data)
+survdiff(uro_os_surv_obj ~ c7_quartile, data = uro_c7_os_data)
+uro_c7_plot <- ggsurvplot(fit_os, 
+                      data = uro_c7_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "right",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C7")
+uro_c7_plot
+
+# t-cell
+uro_tcell_os_data <- uro_os_data_rank %>%
+  dplyr::filter(tcell_quartile %in% c("1", "4"))
+uro_os_surv_obj <- Surv(time = uro_tcell_os_data$os_days, event = uro_tcell_os_data$os_status)
+fit_os <- survfit(uro_os_surv_obj ~ tcell_quartile, data = uro_tcell_os_data)
+survdiff(uro_os_surv_obj ~ tcell_quartile, data = uro_tcell_os_data)
+uro_tcell_plot <- ggsurvplot(fit_os, 
+                      data = uro_tcell_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "right",
+                      legend.title = "Tcell \nexpression quartile",
+                      title = "T cell inflamed")
+uro_tcell_plot
+
+uro_plots <- ggarrange(uro_c1_plot$plot, uro_c2_plot$plot, uro_c3_plot$plot, uro_c4_plot$plot, uro_c5_plot$plot, uro_c6_plot$plot, uro_c7_plot$plot,
+          labels = c("", "", "", "", "", "", ""),
+                     ncol = 7, nrow = 1,
+          common.legend = TRUE,
+          legend = "bottom")
+uro_plots
+
+ggsave("output/figures/figure_4_b.pdf", 
+       plot = uro_plots, 
+       width = 20, 
+       height = 3.5, 
+       unit = "in")
+```
+
+Melanoma plots
+```{r}
+# cluster 1
+c1_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c1_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c1_os_data$os_days, event = c1_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c1_quartile, data = c1_os_data)
+survdiff(os_surv_obj ~ c1_quartile, data = c1_os_data)
+c1_plot <- ggsurvplot(fit_os, 
+                      data = c1_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C1") 
+c1_plot
+
+# cluster 2
+c2_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c2_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c2_os_data$os_days, event = c2_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c2_quartile, data = c2_os_data)
+survdiff(os_surv_obj ~ c2_quartile, data = c2_os_data)
+c2_plot <- ggsurvplot(fit_os, 
+                      data = c2_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C2",
+                      risk.table = FALSE)
+c2_plot
+
+# cluster 3
+c3_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c3_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c3_os_data$os_days, event = c3_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c3_quartile, data = c3_os_data)
+survdiff(os_surv_obj ~ c3_quartile, data = c3_os_data)
+c3_plot <- ggsurvplot(fit_os, 
+                      data = c3_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C3")
+c3_plot
+
+# cluster 4
+c4_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c4_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c4_os_data$os_days, event = c4_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c4_quartile, data = c4_os_data)
+survdiff(os_surv_obj ~ c4_quartile, data = c4_os_data)
+c4_plot <- ggsurvplot(fit_os, 
+                      data = c4_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C4")
+c4_plot
+
+# cluster 5
+c5_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c5_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c5_os_data$os_days, event = c5_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c5_quartile, data = c5_os_data)
+survdiff(os_surv_obj ~ c5_quartile, data = c5_os_data)
+c5_plot <- ggsurvplot(fit_os, 
+                      data = c5_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C5")
+c5_plot
+
+# cluster 6
+c6_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c6_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c6_os_data$os_days, event = c6_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c6_quartile, data = c6_os_data)
+survdiff(os_surv_obj ~ c6_quartile, data = c6_os_data)
+c6_plot <- ggsurvplot(fit_os, 
+                      data = c6_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "none",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C6")
+c6_plot
+
+# cluster 7
+c7_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(c7_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = c7_os_data$os_days, event = c7_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ c7_quartile, data = c7_os_data)
+survdiff(os_surv_obj ~ c7_quartile, data = c7_os_data)
+c7_plot <- ggsurvplot(fit_os, 
+                      data = c7_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "right",
+                      legend.title = "Macrophage cluster \nexpression quartile",
+                      title = "C7")
+c7_plot
+
+# t-cell
+tcell_os_data <- melanoma_os_data_rank %>%
+  dplyr::filter(tcell_quartile %in% c("1", "4"))
+os_surv_obj <- Surv(time = tcell_os_data$os_days, event = tcell_os_data$os_status)
+fit_os <- survfit(os_surv_obj ~ tcell_quartile, data = tcell_os_data)
+survdiff(os_surv_obj ~ tcell_quartile, data = tcell_os_data)
+tcell_plot <- ggsurvplot(fit_os, 
+                      data = tcell_os_data, 
+                      pval = TRUE, 
+                      palette = "nejm",
+                      legend = "right",
+                      legend.title = "Tcell \nexpression quartile",
+                      title = "T cell inflamed")
+tcell_plot
+
+
+melanoma_plots <- ggarrange(c1_plot$plot, c2_plot$plot, c3_plot$plot, c4_plot$plot, c5_plot$plot, c6_plot$plot, c7_plot$plot,
+          labels = c("", "", "", "", "", "", ""),
+                     ncol = 7, nrow = 1,
+          common.legend = TRUE,
+          legend = "bottom")
+
+ggsave("output/figures/figure_4_a.pdf", 
+       plot = melanoma_plots, 
+       width = 20, 
+       height = 3.5, 
+       unit = "in")
+
+```
+
+#### Cox PH for OS
+```{r}
+melanoma_os_surv_obj <- Surv(time = melanoma_os_data$os_days, 
+                    event = melanoma_os_data$os_status)
+melanoma_fit_os_cox <- coxph(melanoma_os_surv_obj ~ c1_quartile + 
+                       c2_quartile +
+                       c3_quartile +
+                       c4_quartile +
+                       c5_quartile +
+                       c6_quartile +
+                       c7_quartile,
+                     data = melanoma_os_data_rank)
+summary(melanoma_fit_os_cox)
+tidy(melanoma_fit_os_cox)
+
+uro_os_surv_obj <- Surv(time = uro_os_data$os_days, 
+                    event = uro_os_data$os_status)
+uro_fit_os_cox <- coxph(os_surv_obj ~ c1_quartile + 
+                       c2_quartile +
+                       c3_quartile +
+                       c4_quartile +
+                       c5_quartile +
+                       c6_quartile +
+                       c7_quartile,
+                     data = uro_os_data_rank)
+summary(uro_fit_os_cox)
+tidy(uro_fit_os_cox)
+```
+
+
+
+

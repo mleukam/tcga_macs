@@ -1,0 +1,26 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+% latex table generated in R 3.5.3 by xtable 1.8-4 package
+% Thu Oct 10 14:15:37 2019
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrrrrr}
+  \hline
+ & term & estimate & std.error & statistic & p.value & conf.low & conf.high \\
+  \hline
+1 & c1\_quartile & 0.31 & 0.18 & 1.73 & 0.08 & -0.04 & 0.67 \\
+  2 & c2\_quartile & -1.30 & 0.36 & -3.61 & 0.00 & -2.01 & -0.59 \\
+  3 & c3\_quartile & -0.03 & 0.30 & -0.09 & 0.93 & -0.61 & 0.55 \\
+  4 & c4\_quartile & -0.09 & 0.25 & -0.35 & 0.72 & -0.58 & 0.40 \\
+  5 & c5\_quartile & -0.05 & 0.24 & -0.21 & 0.84 & -0.53 & 0.43 \\
+  6 & c6\_quartile & 0.70 & 0.26 & 2.63 & 0.01 & 0.18 & 1.21 \\
+  7 & c7\_quartile & 0.10 & 0.39 & 0.25 & 0.80 & -0.67 & 0.87 \\
+   \hline
+\end{tabular}
+\end{table}
+
+
+\end{document}

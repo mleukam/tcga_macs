@@ -533,6 +533,9 @@ fit2$genes <- data.frame(ID = probeList,
                          geneName = geneName, 
                          stringsAsFactors = FALSE)
 
+# write out to give to R Bao for further downstream analysis
+saveRDS(fit2, "output/limma_fit_for_clusters_compared_to_time0.rds")
+
 # store matrix of significant results
 results <- decideTests(fit2)
 

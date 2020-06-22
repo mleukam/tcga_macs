@@ -29,3 +29,11 @@ data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
 data/kyle.gdc_tcga_bam_metadata.txt
 docs/assets/corrmatrix.tiff
 *.pdf
+output/Fig1.png
+*.txt
+*.tsv
+*.maf
+*.geneinfo
+*.json
+*.gz
+*.gct

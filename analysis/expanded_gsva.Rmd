@@ -1,0 +1,684 @@
+---
+title: "expanded_gsva"
+author: "mleukam"
+date: "2019-07-10"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear the workspace
+```{r}
+rm(list = ls())
+```
+
+Load packages
+```{r}
+library("sva")
+library("tidyverse")
+library("edgeR")
+library("limma")
+library("Biobase")
+library("parallel")
+library("GSVA")
+```
+
+## Clean, normalize, transform count data
+
+Read in data
+```{r}
+# Will import raw counts and metadata only
+# Datasets provided by R. Bao. Downloaded 7/1/2019.
+
+# Riaz
+riaz_counts <- read_tsv("data/IMTX_datasets/riaz/Riaz.rnaseq.kallisto.raw.txi.txt") %>%
+  tidyr::separate(X1, sep = "!", into = c("gene_symbol", "geneID_split")) %>%
+  dplyr::select(-gene_symbol) %>%
+  print()
+
+# Hugo
+hugo_counts <- read_tsv("data/IMTX_datasets/hugo/Hugo.rnaseq.kallisto.raw.txi.txt") %>%
+  tidyr::separate(X1, sep = "!", into = c("gene_symbol", "geneID_split")) %>%
+  dplyr::select(-gene_symbol) %>%
+  print()
+
+# Gide
+gide_counts <- read_tsv("data/IMTX_datasets/gide/Gide.rnaseq.kallisto.raw.txi.txt") %>%
+  tidyr::separate(X1, sep = "!", into = c("gene_symbol", "geneID_split")) %>%
+  dplyr::select(-gene_symbol) %>%
+  print()
+
+countlist <- list(riaz_counts, hugo_counts, gide_counts)
+names(countlist) <- c("riaz_counts", "hugo_counts", "gide_counts")
+str(countlist)
+# list of three tibbles with similar structure (different samples)
+# one column containing gene_ids, multiple columns containing raw read counts, rows are genes
+
+```
+
+Convert gene names to GENCODE v22 gene ids to match GDC standard
+```{r}
+# read in conversion table for gene IDs
+gencode_gtf <- read_tsv("data/gencode.v22.primary_assembly.annotation.gtf.geneinfo")
+
+# gencode gene IDS without decimal version numbers are given for count identifiers
+# GDC standard is gencode v22, which is source of NCI data
+# will convert to gencode v22 to match rows of NCI data
+geneID_split <- str_split(gencode_gtf$gene_id, pattern = "\\.", simplify = TRUE) %>% 
+  as_tibble() %>%
+  dplyr::select(geneID_split = V1)
+
+gencode_gtf_split <- gencode_gtf %>% 
+  bind_cols(geneID_split) %>%
+  dplyr::select(gene_id_v22 = gene_id, geneID_split, everything()) %>%
+  print()
+
+# Define function to convert gene names to gencode v22
+# Filter for protein-coding genes only
+# Remove any features that do not have a corresponding v22 gene ID
+translate_geneids <- function(df){
+  df_filt <- left_join(df, gencode_gtf_split) %>%
+    dplyr::select(gene_id_v22, geneID_split, gene_type, everything()) %>%
+    dplyr::select(-gene_status, -gene_name, -level, -havana_gene) %>%
+    dplyr::filter(gene_type == "protein_coding") %>%
+    dplyr::select(-gene_type, -geneID_split)
+  df_filt
+}
+
+countlist_protcode_gencodev22 <- map(countlist, translate_geneids)
+str(countlist_protcode_gencodev22)
+
+```
+
+#### Convert to a single matrix
+
+Add in urothelial data from bladder cancer TGF-beta expression immunotherapy cohort study ([see notebook](urothelial.html))
+
+```{r}
+# prepare urothelial data for joining
+blad_expr_matrix <- readRDS("output/blad_expr_matrix.rds")
+dim(blad_expr_matrix)
+blad_expr_matrix[1:5, 1:5]
+str(blad_expr_matrix)
+
+blad_expr <- blad_expr_matrix %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_id_v22") %>%
+  as_tibble() %>%
+  print()
+
+# prepare melanoma expression counts for joining
+list2env(countlist_protcode_gencodev22, envir = .GlobalEnv)
+
+# join tables
+combined_counts <- riaz_counts %>%
+  left_join(hugo_counts) %>%
+  left_join(gide_counts) %>%
+  left_join(blad_expr)
+str(combined_counts) 
+
+# convert to matrix
+expr_imtx <- combined_counts %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "gene_id_v22") %>%
+  as.matrix()
+
+str(expr_imtx)
+expr_imtx[1:5, 1:5]
+summary(as.factor(is.na(expr_imtx)))
+summary(as.factor(expr_imtx < 0))
+
+# replace nas with 0
+expr_imtx[is.na(expr_imtx)] <- 0
+summary(as.factor(is.na(expr_imtx)))
+summary(as.factor(expr_imtx < 0))
+
+```
+
+#### Convert to CPM
+```{r}
+# correct for library size with cpm using EdgeR
+expr_imtx_cpm <- cpm(expr_imtx, log = FALSE)
+str(expr_imtx_cpm)
+expr_imtx_cpm[1:5, 1:5]
+```
+
+#### Initial density plots
+```{r}
+# Density plots
+# tidy data
+tidy_cpm <- t(expr_imtx_cpm) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  gather(key = "gene_id", value = "intensity", -sample_id) %>%
+  print()
+
+# plots
+dplot_imtx <- ggplot(tidy_cpm, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_imtx +
+  xlim(-5, 20)
+
+# plot with log and small offset
+dplot_imtx_log <- ggplot(tidy_cpm, aes(log(intensity + 0.5))) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_imtx_log +
+  xlim(-10, 10)
+
+```
+
+#### Filtering by expression
+```{r}
+# apply hard cutoffs
+# cpm expression cutoff: 1
+cutoff <- 1
+# must be expressed in at least: half
+min_sm_frac <- 0.5
+filter_frac <- min_sm_frac * ncol(expr_imtx_cpm)
+filter_frac
+total_cpm_stats <- data.frame(
+  total = apply(expr_imtx_cpm, 1, function(x){
+    sum(x > cutoff, na.rm = TRUE)
+    } ))
+keep <- which(total_cpm_stats$total >= filter_frac)
+
+# convert to data frame for subsetting
+expr_imtx_cpm_df <- expr_imtx_cpm %>% as.data.frame()
+
+# check results
+dim(expr_imtx_cpm_df)
+expr_imtx_cpm_filtered <- expr_imtx_cpm_df[keep,]
+dim(expr_imtx_cpm_filtered)
+```
+
+#### Post-filtering density plots
+
+```{r}
+# Density plots
+# tidy data
+tidy_cpm_filtered <- t(expr_imtx_cpm_filtered) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  gather(key = "gene_id", value = "intensity", -sample_id) %>%
+  print()
+
+# plots
+dplot_imtx_2 <- ggplot(tidy_cpm_filtered, aes(intensity)) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_imtx_2 +
+  xlim(-5, 20)
+
+# plot with log and small offset
+dplot_imtx_log_2 <- ggplot(tidy_cpm_filtered, aes(log(intensity + 0.5))) +
+  geom_density() + 
+  theme(legend.position = "none")
+dplot_imtx_log_2 +
+  xlim(-10, 10)
+```
+
+#### Normalize gene expression distributions
+
+Normalization by the method of trimmed mean of M-values (TMM) is performed using the calcNormFactors function in edgeR. The normalisation factors calculated here are used as a scaling factor for the library sizes. 
+
+```{r}
+# get normalization factors
+norm_factors <- calcNormFactors(expr_imtx_cpm_filtered, method = "TMM")
+
+# convert expression matrix to dataframe
+expr_imtx_cpm_df <- as.data.frame(expr_imtx_cpm_filtered)
+
+# apply factor to each column
+imtx_cpm_norm <- map2_dfc(expr_imtx_cpm_df, norm_factors, `*`)
+imtx_cpm_norm <- as.data.frame(imtx_cpm_norm)
+rownames(imtx_cpm_norm) <- rownames(expr_imtx_cpm_filtered)
+imtx_cpm_norm[1:5, 1:5]
+```
+
+#### Log transformation
+
+```{r}
+# introduce offset to prevent -Inf
+offset_imtx_cpm_norm <- imtx_cpm_norm + 0.5
+offset_imtx_cpm_norm[1:5, 1:5]
+
+# log transformation
+imtx_log_cpm_filtered_norm <- log2(offset_imtx_cpm_norm)
+imtx_log_cpm_filtered_norm[1:5, 1:5]
+```
+
+#### Final density plot
+```{r}
+imtx_log_cpm_filtered_tbl <- imtx_log_cpm_filtered_norm %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene") %>%
+  as_tibble()
+
+tidy_log_cpm <- imtx_log_cpm_filtered_tbl %>% 
+  gather(key = "sampleID", value = "intensity", -gene)
+
+dplot3 <- ggplot(tidy_log_cpm, aes(intensity)) +
+  geom_density() +
+  theme(legend.position = "none") +
+  xlim(-20, 20) +
+  ggtitle("Final density plot of log(CPM) for imtx DLBCL")
+dplot3
+```
+
+## Prepare phenotype data
+
+Read in data
+```{r}
+riaz_metadata <- read_tsv("data/IMTX_datasets/riaz/Riaz.rnaseq.metadata.txt.wClinical.txt") %>%
+  print()
+  
+hugo_metadata <- read_csv("data/IMTX_datasets/hugo/Hugo.rnaseq.metadata.txt.wGroup.exSRR3184292_SRR3184299.csv.sm26.csv") %>%
+  print()
+
+gide_metadata <- read_tsv("data/IMTX_datasets/gide/Gide.rnaseq.metadata.txt.wClinical.txt") %>%
+  print()
+
+uro_metadata <- readRDS("output/pheno_blad_df.rds")
+uro_metadata
+
+# format to match critical variables
+# every table should have:
+### Patient
+### Sample
+### OS Status (vital_status, Dead.Alive..Dead...True, Last.Followup.Status)
+### OS Time (Time.to.Death..weeks.)
+### BestResponse
+### SequencingCenter
+
+# all the melanoma tables should have:
+### Library
+### ReadGroup
+### Platform
+### Date
+### Lane
+### Run
+### Flavor
+### Genome
+
+# individual tables may have
+### Time of Biopsy (pretreatment, etc) -- GIDE AND UROTHELIAL
+### Subtype (cutaneous, ocular) -- RIAS ONLY
+### Cytolytic score -- RIAZ ONLY
+### PFS -- GIDE ONLY
+### Immune phenotype -- URO ONLY
+
+# format urothelial metadata
+u_pheno <- uro_metadata %>%
+  mutate(patient = paste0("uro_", 1:348)) %>%
+  mutate(os_days = os * 30.44) %>%
+  mutate(center = rep("urothelial", length = nrow(.))) %>%
+  dplyr::select(sample,
+                patient,
+                os_days,
+                os_status = censOS,
+                center,
+                response = `Best Confirmed Overall Response`,
+                subtype = `TCGA Subtype`,
+                immune_phenotype = `Immune phenotype`) %>%
+  print()
+
+# format Riaz metadata
+r_pheno <- riaz_metadata %>%
+  mutate(patient = paste0("riaz_", Patient)) %>%
+  mutate(os_days = (Time.to.Death..weeks. / 7)) %>%
+  mutate(os_status = ifelse(Dead.Alive..Dead...True. == TRUE, 1, 
+                           ifelse(Dead.Alive..Dead...True. == FALSE, 0, NA))) %>%
+  mutate(unit = as.character(Unit)) %>%
+  dplyr::select(sample = Sample,
+                patient,
+                library = Library,
+                read_group = ReadGroup,
+                platform = Platform,
+                center = SequencingCenter,
+                date = Date,
+                lane = Lane,
+                run = Run,
+                flavor = Flavor,
+                genome = Genome,
+                os_days,
+                os_status, 
+                response = Response,
+                subtype = Subtype,
+                cyt = Cytolytic.Score) %>%
+  print()
+
+# format Hugo metadata
+h_pheno <- hugo_metadata %>%
+  mutate(patient = paste0("hugo_", patient_id)) %>%
+  mutate(os_status = ifelse(vital_status == "Alive", 0,
+                            ifelse(vital_status == "Dead", 1, NA))) %>%
+  mutate(os_days = NA) %>%
+  mutate(os_days = as.numeric(os_days)) %>%
+  mutate(response = as.factor(anti_pd_1_response)) %>%
+  mutate(response = fct_recode(response,
+                               "CR" = "Complete Response",
+                               "PR" = "Partial Response",
+                               "PD" = "Progressive Disease")) %>%
+  mutate(unit = as.character(Unit)) %>%
+  dplyr::select(sample = Sample, 
+                patient,
+                library = Library,
+                read_group = ReadGroup,
+                platform = Platform.x,
+                center = SequencingCenter,
+                date = Date,
+                lane = Lane,
+                run = Run.x,
+                flavor = Flavor,
+                genome = Genome,
+                os_days,
+                os_status, 
+                response) %>%
+  print()
+
+# format gide metadata
+g_pheno <- gide_metadata %>%
+  mutate(patient = paste0("gide_", Patient)) %>%
+  mutate(os_status = ifelse(Last.Followup.Status == "Alive", 0, 1)) %>%
+  mutate(os_days = as.numeric(Overall.Survival..Days.)) %>%
+  mutate(pfs_days = as.numeric(Progression.Free.Survival..Days.)) %>%
+  mutate(pfs_status = ifelse(pfs_days == os_days, 0, 1)) %>%
+  mutate(unit = as.character(Unit)) %>%
+  dplyr::select(sample = Sample,
+                patient,
+                library = Library,
+                read_group = ReadGroup,
+                platform = Platform,
+                center = SequencingCenter,
+                date = Date,
+                lane = Lane,
+                run = Run,
+                flavor = Flavor,
+                genome = Genome,
+                os_days,
+                os_status, 
+                pfs_days,
+                pfs_status,
+                response = Best.RECIST.response) %>%
+  print()
+
+# join tables by stacking rows
+combined_pheno <- r_pheno %>%
+  bind_rows(h_pheno) %>%
+  bind_rows(g_pheno) %>%
+  bind_rows(u_pheno) %>%
+  arrange(sample) %>%
+  print()
+str(combined_pheno)
+
+# ensure that rownames match column names of expression matrix
+imtx_samples <- colnames(imtx_log_cpm_filtered_norm) %>% str_sort()
+pheno_samples <- combined_pheno$sample %>% str_sort()
+imtx_df <- list("samples" = imtx_samples) %>% as_tibble() %>% print()
+pheno_df <- list("samples" = pheno_samples) %>% as_tibble() %>% print()
+missing_cases <- anti_join(imtx_df, pheno_df) %>% print()
+
+# two samples are missing from pheno data!
+included_samples <- combined_pheno %>% pull(sample)
+
+imtx_exprs_trans <- t(imtx_log_cpm_filtered_norm) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample") %>%
+  as_tibble() %>%
+  dplyr::filter(sample %in% included_samples) %>%
+  arrange(sample) %>%
+  print()
+
+nrow(imtx_exprs_trans)
+nrow(combined_pheno)
+
+imtx_exprs <- imtx_exprs_trans %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample") %>%
+  as.matrix() %>%
+  t()
+imtx_exprs[1:5, 1:5]
+str(imtx_exprs)
+
+# ensure that rownames match column names of expression matrix
+identical(combined_pheno$sample, colnames(imtx_exprs))
+```
+
+#### Make expression set
+
+Following ExpressionSet vignette in Biobase package
+
+```{r}
+# make expression set
+# make annotated phenoData
+pheno_data_df <- as.data.frame(combined_pheno) %>%
+  column_to_rownames(var = "sample")
+
+# need variable annotation
+v_metadata <- data.frame(
+  labelDescription = colnames(pheno_data_df),
+  row.names = colnames(pheno_data_df))
+  
+phenoData <- new("AnnotatedDataFrame", 
+                 data = pheno_data_df, 
+                 varMetadata = v_metadata)
+phenoData
+
+# create global annotation
+annotation <- as.character("RNAseq counts derived from three immunotherapy experiments in melanoma patients and one urothelial cancer dataset. Counts filtered for protein coding genes, filtered for expression, TMM normalized, and log-transformed. All four datasets have best response data and vital status. Hugo et al lacks survival time. Additional metadata stored in tcga/macs/data/IMTX_datasets. Note that Riaz dataset includes ocular melanoma and the Gide dataset includes pre-tx and on-tx biopsies. The urothelial dataset includes an immune phenotype.")
+
+# assemble expressionset
+imtx_es <- ExpressionSet(
+  assayData = imtx_exprs,
+  phenoData = phenoData,
+  annotation = annotation)
+imtx_es
+```
+
+## Batch correction
+```{r}
+pheno_df <- pData(imtx_es)
+# define center as source marker
+batch = as.factor(pheno_df$center)
+summary(batch)
+
+# boxplot by data source
+# plot the before
+batch_df <- enframe(batch) %>%
+  dplyr::select(center = value)
+edata_df <- as.data.frame(t(exprs(imtx_es))) %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  bind_cols(batch_df) %>%
+  dplyr::select(sample_id, center, everything()) %>%
+  gather(key = "gene_id", value = "intensity", -sample_id, -center) %>%
+  group_by(center) %>%
+  print()
+before_box <- ggplot(edata_df, aes(x = center, y = intensity, group = center)) +
+  geom_boxplot()
+before_box
+# small but appreciable differences in mean and distribution
+
+# Note that adjustment variables will be treated as given to the ComBat function. This means if you are trying to adjust for a categorical variable with p different levels, you will need to give ComBat p-1 indicator variables for this covariate.
+modcenter <- model.matrix(~ center, data = pheno_df)
+
+# We need to create a model matrix for the adjustment variables, including the variable of interest. Note that you do not include batch in creating this model matrix - it will be included later in the ComBat function. In this case there are no other adjustment variables so we simply fit an intercept term.
+modcombat <- model.matrix(~ 1, data = pheno_df)
+
+# apply batch correction
+combined_combat_edata <- ComBat(dat = exprs(imtx_es),
+                       batch = batch,
+                       mod = modcombat,
+                       par.prior = TRUE,
+                       prior.plots = FALSE,
+                       mean.only = FALSE)
+
+after_df <- as.data.frame(t(combined_combat_edata)) %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  bind_cols(batch_df) %>%
+  dplyr::select(sample_id, center, everything()) %>%
+  gather(key = "gene_id", value = "intensity", -sample_id, -center) %>%
+  group_by(center) %>%
+  print()
+after_box <- ggplot(after_df, 
+                    aes(x = center, y = intensity, group = center)) +
+  geom_boxplot()
+after_box
+```
+
+## Final Expressionset
+```{r}
+# use updated pheno data frame from previous ES
+phenoData
+
+annotation <- as.character("RNAseq counts derived from three immunotherapy experiments in melanoma patients and one urothelial cancer dataset. Counts filtered for protein coding genes, filtered for expression, TMM normalized, and log-transformed. Mean and distribution of each of the 4 datasets normalized with ComBat. All four datasets have best response data and vital status. Hugo et al lacks survival time. Additional metadata stored in tcga/macs/data/IMTX_datasets. Note that Riaz dataset includes ocular melanoma and the Gide dataset includes pre-tx and on-tx biopsies. The urothelial dataset includes an immune phenotype.")
+
+# assemble expressionset
+imtx_es <- ExpressionSet(
+  assayData = combined_combat_edata,
+  phenoData = phenoData,
+  annotation = annotation)
+imtx_es
+```
+
+```{r}
+saveRDS(imtx_es, "output/imtx_expressionset.rds")
+```
+
+## Additional gene sets
+
+Classically activated (in vitro, M1) vs alternately activated (in vitro, M2) macrophages described in part here: https://www.frontiersin.org/articles/10.3389/fimmu.2019.01084/full
+
+Could not find any canonical human gene expression profiles
+
+#### CXCL9/CXCL10 gene expression signature (macrophage)
+
+Source for Merck Gene Set: https://www.jci.org/articles/view/91190/table/2
+
+Source for Macrophage M1/M2 sets: https://link.springer.com/epdf/10.1186/s13059-017-1349-1?author_access_token=DVtns3PR3raQv61Z6RD4Ym_BpE1tBhCbnbw3BuzI2RO7SD-w75iAhrQ7gjSGzw_zJO6jHEpDqZzy8CsttNZVysUprXQi0WGX-FRCguKfv2d96DcweRBG2ni-01x6T6bpU3-cfZ5nkfzCQeNeg-mMUQ%3D%3D (supplemental data - original source is https://link.springer.com/epdf/10.1186/s13059-017-1349-1?author_access_token=DVtns3PR3raQv61Z6RD4Ym_BpE1tBhCbnbw3BuzI2RO7SD-w75iAhrQ7gjSGzw_zJO6jHEpDqZzy8CsttNZVysUprXQi0WGX-FRCguKfv2d96DcweRBG2ni-01x6T6bpU3-cfZ5nkfzCQeNeg-mMUQ%3D%3D)
+
+```{r}
+cxcl9_cxcl10 <- c("CXCL11", "CCL8", "C3", "PADI4", "CXCL10", "RP11-39K24.9", "GEM", "NAF1", "ZBP1", "ECM1", "PDK4", "PLIN2", "NKG7", "SERPINH1", "HIST3H2A", "MARCO", "ADM", "ANGPTL4", "MAP3K7CL", "HILPDA", "LILRB5", "VSIG4", "CRIP2", "LYVE1", "THBS1", "CXCL1")
+
+merck_tis_expanded_ifn <- c("CD3D", "IDO1", "CIITA", "CD3E", "CCL5", "GZMK", "CD2", "HLA-DRA", "CXCL13", "IL2RG", "NKG7", "HLA-E", "CXCR6", "LAG3", "TAGAP", "CXCL10", "STAT1", "GZMB")
+
+m1_blueprint <- c("ACP2", "ABCD1", "C1QA", "FDX1", "CCL22", "CD163", "SCAMP2", "ADAMDEC1", "ARL8B", "HAMP")
+
+m2_blueprint <- c("CLCN7", "FGR",	"GLB1",	"HEXA",	"HEXB",	"HS3ST2",	"FKBP15",	"PQLC2", "TMEM70", "SLC38A7")
+
+new_gsets <- list(cxcl9_cxcl10, merck_tis_expanded_ifn, m1_blueprint, m2_blueprint)
+names(new_gsets) <- c("cxcl9_cxcl10", "merck_tis_expanded_ifn", "m1_blueprint", "m2_blueprint")
+new_gsets
+
+new_gsets_df_frame <- map(new_gsets, enframe)
+new_gsets_df <- map(new_gsets_df_frame, function(df){
+  df %>% dplyr::select(gene_name = value)})
+new_gsets_df
+```
+
+Read in lookup table for features, gencode v22 (used by GDC to label features)
+```{r}
+gencode_gtf <- read_tsv("data/gencode.v22.primary_assembly.annotation.gtf.geneinfo")
+```
+
+```{r}
+# define function that uses lookup table to convert gene symbols to gene id
+# then returns a list of gene ids that define the gene set
+ensemblgset <- function(df, gtf){
+  gene_ids <- gtf %>%
+  dplyr::select(gene_id, gene_name)
+gset <- df %>% left_join(gene_ids) %>%
+  pull(gene_id)
+gset
+}
+
+# apply function to list of gene sets
+new_gsets_id <- map(new_gsets_df, function(x){ensemblgset(x, gtf = gencode_gtf)})
+
+# remove nas (small number of gene symbols do not map to gencode gene ids)
+new_gset_ids <- map(new_gsets_id, function(x){
+  x[!is.na(x)]
+})
+new_gset_ids
+```
+
+Add to existing gene list
+```{r}
+gset_ids_complete <- readRDS("output/gset_ids_complete.rds")
+gset_ids_plusnew <- c(gset_ids_complete, new_gset_ids)
+saveRDS(gset_ids_plusnew, "output/gset_ids_plusnew.rds")
+
+```
+
+Diagnostics on gene sets
+```{r}
+library(veccompare)
+names(gset_ids_complete)
+
+# select upregulated genes
+upreg_gs <- list("upreg_c1" = gset_ids_complete[["upreg_c1"]],
+                 "upreg_c2" = gset_ids_complete[["upreg_c2"]],
+                 "upreg_c3" = gset_ids_complete[["upreg_c3"]],
+                 "upreg_c4" = gset_ids_complete[["upreg_c4"]],
+                 "upreg_c5" = gset_ids_complete[["upreg_c5"]],
+                 "upreg_c6" = gset_ids_complete[["upreg_c6"]],
+                 "upreg_c7" = gset_ids_complete[["upreg_c7"]])
+upreg_gs
+
+comparisons <- compare.vectors(upreg_gs,
+                               degrees_of_comparison_to_include = 2,
+                               draw_venn_diagrams = TRUE,
+                               save_venn_diagram_files = TRUE,
+                               location_for_venn_diagram_files = "output/Venn_Diagrams_GSVA")
+
+c1_comparisons <- list(comparisons[[2]]$overlap_of_elements,
+                       comparisons[[3]]$overlap_of_elements, 
+                       comparisons[[4]]$overlap_of_elements, 
+                       comparisons[[5]]$overlap_of_elements, 
+                       comparisons[[6]]$overlap_of_elements, 
+                       comparisons[[7]]$overlap_of_elements)
+
+```
+
+Write out matrix for cluster
+```{r}
+imtx_matrix <- exprs(imtx_es) %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene") %>%
+  as_tibble() %>%
+  print()
+
+write_csv(imtx_matrix, "output/imtx_matrix.csv")
+```
+
+# Local GSVA
+
+```{r}
+# read in data
+total_reads <- imtx_matrix
+gset <- gset_ids_plusnew
+
+# set up expression matrix
+rownames <- total_reads %>% pull(gene)
+expr_matrix <- total_reads %>%
+  dplyr::select(-gene) %>%
+  as.matrix()
+rownames(expr_matrix) <- rownames
+
+# get gvsa scores
+imtx_es <- gsva(expr = expr_matrix, 
+                gset.idx.list = gset, 
+                annotation = NULL, 
+                method = "gsva", 
+                verbose = TRUE)
+
+# write out results
+saveRDS(imtx_es, "output/gsva_imtx_plusuro_results.rds")
+```

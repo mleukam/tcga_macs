@@ -1,0 +1,427 @@
+---
+title: "prediction_model"
+author: "mleukam"
+date: "2020-02-12"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+Load packages
+```{r}
+library(tidyverse)
+library(Biobase)
+library(BiocGenerics)
+library(parallel)
+library(caret)
+library(MASS)
+library(glmnet)
+library(broom)
+library(ggsci)
+library(ROCR)
+library(ggpubr)
+```
+
+Read in data
+```{r}
+imtx_decon <- read_delim("/Volumes/kline-lab/backups/tcga_macs/output/cibersort_results/relative_fractions/imtx/CIBERSORTx_Job1_Results (1).txt", 
+                          delim = "\t", 
+                          col_names = TRUE) %>%
+  dplyr::rename(sample_id = Mixture, 
+                C1 = cluster_1,
+                C2 = cluster_2,
+                C3 = cluster_3,
+                C4 = cluster_4,
+                C5 = cluster_5,
+                C6 = cluster_6,
+                C7 = cluster_7) %>%
+  dplyr::select(-Correlation, -`P-value`, -RMSE)
+imtx_decon
+imtx_es <- readRDS("/Volumes/kline-lab/backups/tcga_macs/output/imtx_expressionset.rds") 
+
+```
+
+```{r}
+# get pheno data out of expressionset
+imtx_pdata <- pData(imtx_es) %>% 
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  print()
+summary(as.factor(imtx_pdata$center))
+
+# remove ocular and other types of melanoma (keep only cutaneous, urothelial, or not specified)
+response <- imtx_pdata %>% 
+  dplyr::filter(subtype %in% c("CUTANEOUS", "I", "II", "III", "IV", NA)) %>%
+  dplyr::select(sample_id, response, center) %>%
+  mutate(response = as.factor(response))
+summary(response$response)
+
+# remove missing or not evaluable responses
+response_clean <- response %>% 
+  dplyr::filter(response %in% c("CR", "PD", "PR", "SD")) %>%
+  mutate(response = as.factor(response),
+         response = fct_drop(response))
+summary(response_clean$response)
+
+# collapse categories into three groups
+response_data <- response_clean %>%
+  left_join(imtx_decon) %>%
+  mutate(response = ifelse(response == "CR", "CR_or_PR", 
+                           ifelse(response == "PR", "CR_or_PR",
+                                  ifelse(response == "SD", "SD",
+                                         ifelse(response == "PD", "PD", NA)))),
+         response = as.factor(response),
+         response = fct_drop(response)) %>% 
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+response_data[1:5, 1:5]
+summary(response_data$response)
+
+# different way of collapsing categories - two groups
+response_noSD <- response_data <- response_clean %>%
+  left_join(imtx_decon) %>%
+  mutate(response = ifelse(response == "CR", "CR_or_PR", 
+                           ifelse(response == "PR", "CR_or_PR",
+                                  ifelse(response == "PD", "PD", NA))),
+         response = as.factor(response),
+         response = fct_drop(response)) %>% 
+  dplyr::filter(response %in% c("CR_or_PR", "PD")) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+response_noSD[1:5, 1:5]
+summary(response_noSD$response)
+```
+
+#### Plot relationships as a first step
+```{r}
+# reformat data into tidy format
+tidy_response <- response_data %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  gather(key = "cluster", value = "cibersort_score", -response, -sample_id, -center) %>%
+  mutate(cluster = as.factor(cluster)) %>%
+  mutate(center = as.factor(center)) %>%
+  print()
+
+boxplots <- ggplot(data = tidy_response, aes(x = cluster, 
+                                             y = cibersort_score, 
+                                             fill = response)) +
+  geom_boxplot() + 
+  geom_hline(yintercept = 0, linetype = 3) +
+  theme_classic() +
+  scale_fill_nejm() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  ylab("CIBERSORTx Score") +
+  xlab("") +
+  labs(fill = "Best Response") +
+  ggtitle("Deconvolution score and immunotherapy response")
+
+boxplots
+
+boxplot_facet <- boxplots <- ggplot(data = tidy_response, aes(x = response, 
+                                             y = cibersort_score, 
+                                             fill = response)) +
+  geom_boxplot() + 
+  geom_hline(yintercept = 0, linetype = 3) +
+  theme_classic() +
+  scale_fill_nejm() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        legend.position = "none") +
+  ylab("CIBERSORTx Score") +
+  xlab("") +
+  labs(fill = "Best Response") +
+  ggtitle("Deconvolution score and immunotherapy response") +
+  facet_wrap(facets = ~center + cluster, ncol = 7) +
+  stat_compare_means(
+    comparisons = list(c("CR_or_PR", "PD")),
+    label = "p.signif"
+    )
+boxplot_facet
+
+ggsave("output/imtx_decon_resposnes.pdf", plot = boxplot_facet, height = 18, width = 10, units = "in")
+```
+
+#### Univariate logistic regression models
+```{r}
+fit_c1 <- glm(response ~ C1, family = binomial, data = response_noSD)
+sumc1 <- tidy(fit_c1)
+
+fit_c2 <- glm(response ~ C2, family = binomial, data = response_noSD)
+sumc2 <- tidy(fit_c2)
+
+fit_c3 <- glm(response ~ C3, family = binomial, data = response_noSD)
+sumc3 <- tidy(fit_c3)
+
+fit_c4 <- glm(response ~ C4, family = binomial, data = response_noSD)
+sumc4 <- tidy(fit_c4)
+
+fit_c5 <- glm(response ~ C5, family = binomial, data = response_noSD)
+sumc5 <- tidy(fit_c5)
+
+fit_c6 <- glm(response ~ C6, family = binomial, data = response_noSD)
+sumc6 <- tidy(fit_c6)
+
+fit_c7 <- glm(response ~ C7, family = binomial, data = response_noSD)
+sumc7 <- tidy(fit_c7)
+
+univariate_models <- bind_rows(sumc1, sumc2, sumc3, sumc4, sumc5, sumc6, sumc7) %>%
+  dplyr::filter(term != "(Intercept)") %>% 
+  print()
+```
+
+First we will look at the melanoma data and the urothelial data separately.
+
+```{r}
+# make melanoma-only dataset
+tidy_melanoma <- tidy_response %>%
+  dplyr::filter(center %in% c("GIDE", "HUGO", "RIAZ")) %>%
+  print()
+
+summary(tidy_melanoma$response)
+summary(tidy_melanoma$cluster)
+
+# restrict to only the gene sets of interest
+tidy_melanoma_subset <- tidy_melanoma %>%
+  dplyr::filter(cluster %in% c("C1", "C2", "C3", "C4", "C5", "C6", "C7")) %>%
+  print()
+
+summary(tidy_melanoma_subset$cluster)
+
+# reformat
+mel_response_clean <- tidy_melanoma_subset %>%
+  spread(key = "cluster", value = "cibersort_score") %>%
+  dplyr::select(sample_id, response, C1, C2, C3, C4, C5, C6, C7) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+
+dim(mel_response_clean)
+str(mel_response_clean)
+mel_response_clean[1:5, 1:5]
+
+#----------------------------------------
+
+# make urothelial-only dataset
+tidy_urothelial <- tidy_response %>% 
+  dplyr::filter(center == "urothelial") %>%
+  print()
+
+summary(tidy_urothelial$response)
+summary(tidy_urothelial$cluster)
+
+# restrict to only the gene sets of interest
+tidy_urothelial_subset <- tidy_urothelial %>%
+  dplyr::filter(cluster %in% c("C1", "C2", "C3", "C4", "C5", "C6", "C7")) %>%
+  mutate(cluster = fct_drop(cluster)) %>%
+  print()
+
+summary(tidy_urothelial_subset$cluster)
+
+# reformat
+uro_response_clean <- tidy_urothelial_subset %>%
+  spread(key = "cluster", value = "cibersort_score") %>%
+  dplyr::select(sample_id, response, C1, C2, C3, C4, C5, C6, C7) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id")
+
+dim(uro_response_clean)
+str(uro_response_clean)
+uro_response_clean[1:5, 1:5]
+
+```
+
+#### Melanoma-only regression
+```{r}
+set.seed(313)
+# split data into test and training sets
+training.samples <- mel_response_clean$response %>%
+  createDataPartition(p = 0.8, list = FALSE)
+mel.train.data <- mel_response_clean[training.samples, ]
+dim(mel.train.data)
+mel.test.data <- mel_response_clean[-training.samples, ]
+dim(mel.test.data)
+
+saveRDS(mel.train.data, "output/mel.train.data.rds")
+saveRDS(mel.test.data, "output/mel.test.data.rds")
+
+# code predictor variables
+x <- as.matrix(mel.train.data[, -1])
+y <- ifelse(mel.train.data$response == "CR_or_PR", 1, 0)
+
+mel.cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial", type.measure = "auc")
+
+# plot cross-validation AUC per log lambda value
+plot(mel.cv.lasso)
+
+# show minimum lambda, and labda for model one standard deviation away with the fewest predictors (assumption that simplest model that still explains most of the deviance is more likely to be real and less likely to be overfit)
+mel.cv.lasso$lambda.min
+mel.cv.lasso$lambda.1se
+
+saveRDS(mel.cv.lasso, "output/mel.cv.lasso.rds")
+
+# coefficients of minimum lambda model
+coef(mel.cv.lasso, mel.cv.lasso$lambda.min)
+
+# fit minimum lambda model on training data
+mel.min.model <- glmnet(x, 
+                    y, 
+                    alpha = 1, 
+                    family = "binomial", 
+                    lambda = mel.cv.lasso$lambda.min)
+
+# display regression coefficients
+coef(mel.min.model)
+
+# make predictions on the test data
+x.test <- as.matrix(mel.test.data[,-1])
+y.test <- ifelse(mel.test.data$response == "CR_or_PR", 1, 0)
+
+probabilities <- mel.min.model %>% 
+  predict(newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- as.factor(predicted.classes)
+predicted.classes
+
+# model accuracy
+observed.classes <- mel.test.data$response
+names(observed.classes) <- rownames(mel.test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+```
+
+1SE melanoma model
+```{r}
+mel.cv.lasso <- read_RDS("output/mel.cv.lasso.rds")
+
+# coefficients of minimum lambda model
+coef(mel.cv.lasso, mel.cv.lasso$lambda.1se)
+
+# fit minimum lambda model on training data
+mel.1se.model <- glmnet(x, 
+                    y, 
+                    alpha = 1, 
+                    family = "binomial", 
+                    lambda = mel.cv.lasso$lambda.1se)
+
+# display regression coefficients
+coef(mel.1se.model)
+
+# make predictions on the test data
+x.test <- as.matrix(mel.test.data[,-1])
+y.test <- ifelse(mel.test.data$response == "CR_or_PR", 1, 0)
+
+probabilities <- mel.1se.model %>% 
+  predict(newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- as.factor(predicted.classes)
+predicted.classes
+
+# model accuracy
+observed.classes <- mel.test.data$response
+names(observed.classes) <- rownames(mel.test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+```
+
+#### Urothelial-only regression
+```{r}
+set.seed(313)
+# split data into test and training sets
+training.samples <- uro_response_clean$response %>%
+  createDataPartition(p = 0.8, list = FALSE)
+uro.train.data <- uro_response_clean[training.samples, ]
+dim(uro.train.data)
+uro.test.data <- uro_response_clean[-training.samples, ]
+dim(uro.test.data)
+
+saveRDS(uro.train.data, "output/uro.train.data.rds")
+saveRDS(uro.test.data, "output/uro.test.data.rds")
+
+# code predictor variables
+x <- as.matrix(uro.train.data[, -1])
+y <- ifelse(uro.train.data$response == "CR_or_PR", 1, 0)
+
+uro.cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial", type.measure = "auc")
+
+# plot cross-validation AUC per log lambda value
+plot(uro.cv.lasso)
+
+# show minimum lambda, and labda for model one standard deviation away with the fewest predictors (assumption that simplest model that still explains most of the deviance is more likely to be real and less likely to be overfit)
+uro.cv.lasso$lambda.min
+uro.cv.lasso$lambda.1se
+
+saveRDS(uro.cv.lasso, "output/mel.cv.lasso.rds")
+
+# coefficients of minimum lambda model
+coef(uro.cv.lasso, uro.cv.lasso$lambda.min)
+
+# fit minimum lambda model on training data
+uro.min.model <- glmnet(x, 
+                    y, 
+                    alpha = 1, 
+                    family = "binomial", 
+                    lambda = uro.cv.lasso$lambda.min)
+
+# display regression coefficients
+coef(uro.min.model)
+
+# make predictions on the test data
+x.test <- as.matrix(uro.test.data[,-1])
+y.test <- ifelse(uro.test.data$response == "CR_or_PR", 1, 0)
+
+probabilities <- uro.min.model %>% 
+  predict(newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- as.factor(predicted.classes)
+predicted.classes
+
+# model accuracy
+observed.classes <- uro.test.data$response
+names(observed.classes) <- rownames(uro.test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+```
+
+1SE urothelial model
+```{r}
+uro.cv.lasso <- read_RDS("output/uro.cv.lasso.rds")
+
+# coefficients of minimum lambda model
+coef(uro.cv.lasso, uro.cv.lasso$lambda.1se)
+
+# fit minimum lambda model on training data
+uro.1se.model <- glmnet(x, 
+                    y, 
+                    alpha = 1, 
+                    family = "binomial", 
+                    lambda = uro.cv.lasso$lambda.1se)
+
+# display regression coefficients
+coef(uro.1se.model)
+
+# make predictions on the test data
+x.test <- as.matrix(uro.test.data[,-1])
+y.test <- ifelse(uro.test.data$response == "CR_or_PR", 1, 0)
+
+probabilities <- uro.1se.model %>% 
+  predict(newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
+predicted.classes <- as.factor(predicted.classes)
+predicted.classes
+
+# model accuracy
+observed.classes <- uro.test.data$response
+names(observed.classes) <- rownames(uro.test.data)
+observed.classes
+mean(predicted.classes == observed.classes)
+
+```

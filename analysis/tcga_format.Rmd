@@ -865,6 +865,13 @@ Goals: Remove non-tumor data and split metastatic from primary tumors> Remove no
 
 #### Get extended pheno data
 
+Read in data
+```{r}
+total_counts <- readRDS("output/flat_total_counts.rds")
+total_pheno <- readRDS("output/flat_total_pheno.rds")
+
+```
+
 Helper function from Kevin Blighe: https://www.biostars.org/p/318756/#318919
 
 ```{r}

@@ -15,15 +15,22 @@ rm(list = ls())
 ```
 
 ```{r}
-library("tidyverse")
+# clustering and DGE
 library("factoextra")
+library("DESeq2")
+library("FactoMineR")
 library("WGCNA")
+
+# database packages
 library("annotate")
 library("lumi")
-library("FactoMineR")
+
+# plotting
 library("ggsci")
 library("ggpubr")
-library("DESeq2")
+
+# load last due to masking
+library("tidyverse")
 ```
 
 Load data

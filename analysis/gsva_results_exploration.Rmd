@@ -1,0 +1,1281 @@
+---
+title: "gsva_results_exploration"
+author: "mleukam"
+date: "2019-06-25"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+Load packages
+```{r}
+library(tidyverse)
+library("ComplexHeatmap")
+library("PerformanceAnalytics")
+library("GenomicDataCommons")
+library(survival)
+library(survminer)
+```
+
+## Data cleaning and annotation
+```{r}
+# read in RDS from cluster, convert to tibble
+tcga_es_pre <- readRDS("output/tcga_gsva_new_clust_geneset_results.rds") %>% 
+  as.data.frame()
+
+tcga_es_old <- readRDS("output/tcga_gsva_17geneset_results.rds") %>% 
+  as.data.frame()
+
+# need to switch cluster 1 and 2 to fit the new convention
+tcga_es <- tcga_es_pre %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_set") %>%
+  as_tibble() %>%
+  dplyr::filter(!grepl("^downreg_", gene_set)) %>%
+  mutate(gene_set = as.factor(gene_set),
+         gene_set = fct_recode(gene_set,
+                               "C1" = "upreg_c2",
+                               "C2" = "upreg_c1",
+                               "C3" = "upreg_c3",
+                               "C4" = "upreg_c4",
+                               "C5" = "upreg_c5",
+                               "C6" = "upreg_c6",
+                               "C7" = "upreg_c7",
+                               "T" = "tcell_gset")) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "gene_set") %>%
+  as.matrix() %>%
+  t()
+
+tcga_es[1:5, 1:5]
+  
+tcga_es_tbl <- tcga_es %>% 
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_set") %>%
+  as_tibble() %>%
+  print()
+
+# convert to tidy format for plotting
+tcga_es_tidy <- tcga_es_tbl %>% 
+  gather(key = "sampleID", value = "score", -gene_set) %>%
+  print()
+
+# fix group assignments
+tidy_es <- tcga_es_tidy %>%
+  mutate(group = str_sub(sampleID, 1, 4)) %>%
+  mutate(group = ifelse(grepl("^GBM*", group), "GBM", group)) %>%
+  mutate(group = ifelse(grepl("^OV*", group), "OV", group)) %>%
+  mutate(group = ifelse(grepl("^LGG*", group), "LGG", group)) %>%
+  mutate(group = ifelse(grepl("^UVM*", group), "UVM", group)) %>%
+  mutate(group = ifelse(grepl("^UCS*", group), "UCS", group)) %>%
+  mutate(group = ifelse(grepl("^ACC*", group), "ACC", group)) %>%
+  mutate(group = as.factor(group))
+
+# review results
+tidy_es
+summary(tidy_es$group)
+names(summary(tidy_es$group))
+unique(names(summary(tidy_es$group)))
+```
+
+Split metastatic melanoma from primary tumors
+Build lookup table that includes clinical data linked to file uuID and filenames
+Helper function from Kevin Blighe: https://www.biostars.org/p/318756/#318919
+```{r}
+# Build a query of HTSeq files availble in GDC from TCGA
+qfiles <- files() %>%
+  GenomicDataCommons::filter(~ cases.project.project_id == 'TCGA*' & 
+                               type == 'gene_expression' & 
+                               analysis.workflow_type =='HTSeq - Counts')
+
+# get a table of filenames and ids from the query
+total_manifest <- manifest(qfiles)
+
+# read in helper function
+TCGAtranslateID = function(file_names, legacy = TRUE)
+{
+  info = files(legacy = legacy) %>%
+    GenomicDataCommons::filter( ~ file_name %in% file_names) %>%
+    GenomicDataCommons::select('cases.samples.submitter_id') %>%
+    results_all()
+
+  id_list = lapply(info$cases,function(a)
+  {
+    a[[1]][[1]][[1]]
+  })
+
+    barcodes_per_file = sapply(id_list,length)
+
+    return(data.frame(file_id = rep(ids(info), barcodes_per_file), submitter_id = unlist(id_list), file_names = file_names))
+}
+
+file_table <- TCGAtranslateID(total_manifest$filename, legacy = FALSE) 
+file_table <- as_tibble(file_table)
+
+# read in kyle's TCGA metadata table
+kyle_table <- read_tsv("data/kyle.gdc_tcga_bam_metadata.txt")
+kyle_table <- kyle_table %>% 
+  dplyr::rename(submitter_id = cases_0_samples_0_submitter_id) %>%
+  dplyr::select(-file_id)
+
+lookup_table <- file_table %>% 
+  left_join(kyle_table, by = "submitter_id") %>% 
+  dplyr::select(submitter_id, 
+                file_id, 
+                project_id = cases_0_project_project_id, 
+                sample_type = cases_0_samples_0_sample_type,
+                everything()) %>%
+  dplyr::select(-data_type, 
+                -file_name, 
+                -data_category, 
+                -analysis_workflow_type)
+```
+
+Add sample names to lookup table and regroup melanoma
+```{r}
+# read in pheno data linked to my sample names
+pheno_data <- read_csv("output/filtered.total.phenodata.csv")
+
+pheno_joined <- pheno_data %>%
+  left_join(lookup_table) %>%
+  print()
+
+summary(as.factor(pheno_data$project_id))
+
+pheno_data$project_id %>% 
+  as.factor() %>%
+  summary() %>%
+  names() %>%
+  length()
+
+pheno_data$project_id %>% 
+  as.factor() %>%
+  summary() %>%
+  names() %>%
+  unique() %>%
+  length()
+
+pheno_joined %>% 
+  dplyr::filter(project_id == "TCGA-SKCM") %>% 
+  mutate(sample_type = as.factor(sample_type)) %>%
+  dplyr::select(sample_type) %>%
+  summary()
+
+metastatic_vector <- pheno_joined %>% 
+  dplyr::filter(project_id == "TCGA-SKCM",
+                sample_type == "Metastatic") %>% 
+  pull(sample) %>%
+  print()
+
+primary_vector <- pheno_joined %>% 
+  dplyr::filter(project_id == "TCGA-SKCM",
+                sample_type == "Primary Tumor") %>% 
+  pull(sample) %>%
+  print()
+
+tidy_es_cleaned <- tidy_es %>%
+  mutate(group = as.character(group)) %>%
+  mutate(group = ifelse(sampleID %in% metastatic_vector, "SKCM_MET", group)) %>%
+  mutate(group = ifelse(sampleID %in% primary_vector, "SKCM_PRI", group)) %>%
+  mutate(group = as.factor(group)) 
+summary(tidy_es_cleaned$group)
+           
+```
+
+## Beeswarm plots 
+```{r}
+library(ggsci)
+library(ggpubr)
+library(ggbeeswarm)
+
+tidy_es_c1 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c1")
+c1plot <- ggplot(tidy_es_c1,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC1") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c1plot
+
+tidy_es_c2 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c2")
+c2plot <- ggplot(tidy_es_c2,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC2") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c2plot
+
+tidy_es_c3 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c3")
+c3plot <- ggplot(tidy_es_c3,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC3") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c3plot
+
+tidy_es_c4 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c4")
+c4plot <- ggplot(tidy_es_c4,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC4") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c4plot
+
+tidy_es_c5 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c5")
+c5plot <- ggplot(tidy_es_c5,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC5") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c5plot
+
+tidy_es_c6 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c6")
+c6plot <- ggplot(tidy_es_c6,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC6") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c6plot
+
+tidy_es_c7 <- tidy_es_cleaned %>% dplyr::filter(gene_set == "upreg_c7")
+c7plot <- ggplot(tidy_es_c7,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC7") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c7plot
+
+tidy_es_t <- tidy_es_cleaned %>% dplyr::filter(gene_set == "tcell_gset")
+tplot <- ggplot(tidy_es_t,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.12) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("T") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+tplot
+```
+
+Downregulated gene sets
+```{r}
+tidy_es_c1d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c1")
+c1dplot <- ggplot(tidy_es_c1d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC1") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c1dplot
+
+tidy_es_c2d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c2")
+c2dplot <- ggplot(tidy_es_c2d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC2") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c2dplot
+
+tidy_es_c3d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c3")
+c3dplot <- ggplot(tidy_es_c3d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC3") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c3dplot
+
+tidy_es_c4d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c4")
+c4dplot <- ggplot(tidy_es_c4d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC7") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c4dplot
+
+tidy_es_c5d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c5")
+c5dplot <- ggplot(tidy_es_c5d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("MC5") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c5dplot
+
+tidy_es_c6d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c6")
+c6dplot <- ggplot(tidy_es_c6d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("M6") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c6dplot
+
+tidy_es_c7d <- tidy_es_cleaned %>% dplyr::filter(gene_set == "downreg_c7")
+c7dplot <- ggplot(tidy_es_c7d,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("M7") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+c7dplot
+
+tidy_es_t <- tidy_es_cleaned %>% dplyr::filter(gene_set == "tcell_gset")
+tplot <- ggplot(tidy_es_t,
+       aes(x = fct_reorder(group, score, mean), y = score)) + 
+  geom_quasirandom(alpha = 0.2) +
+  scale_fill_igv() + 
+  stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean,
+                 geom = "crossbar", width = 0.5, color = "red") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") +
+  ylab("GSVA score") +
+  ggtitle("T") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+tplot
+```
+
+
+Annotate combined figure source: https://rpkgs.datanovia.com/ggpubr/reference/annotate_figure.html
+
+ggpubr tutorial: http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/
+
+
+```{r fig.height=12, fig.width=12}
+combined_up_plot <- ggarrange(c1plot, 
+                              c2plot, 
+                              c3plot, 
+                              c4plot, 
+                              c5plot, 
+                              c6plot, 
+                              c7plot, 
+                              tplot,
+          labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+          ncol = 3, nrow = 3)
+
+# combined_up_plot <- annotate_figure(combined_up_plot,
+#                top = text_grob("", 
+#                                color = "black", 
+#                                face = "bold", 
+#                                size = 14))
+
+combined_up_plot
+
+combined_down_plot <- ggarrange(c1dplot, c2dplot, c3dplot, c4dplot, c5dplot, c6dplot, c7dplot, tplot,
+          labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+          ncol = 2, nrow = 4)
+
+combined_down_plot <- annotate_figure(combined_down_plot,
+                top = text_grob("Enrichment scores for downregulated genes in macrophage clusters", 
+                                color = "black", 
+                                face = "bold", 
+                                size = 14))
+
+combined_down_plot
+
+# 13 in by 10 in
+```
+
+## Boxplots
+
+```{r}
+library(viridis)
+library(ggsci)
+# iterate over list of groups
+# get list of groups
+grouplist <- summary(tidy_es_cleaned$group) %>% 
+  enframe() %>%
+  dplyr::select(name)
+grouplist <- as.list(c(grouplist$name))
+grouplist
+
+# define function
+boxplotter <- function(grouplist){
+  df <- tidy_es_cleaned %>%
+    dplyr::filter(group == grouplist) %>%
+    mutate(gene_set = as.factor(gene_set)) %>%
+    group_by(gene_set)
+  boxplot <- ggplot(df, aes(y = score, 
+                              x = gene_set, 
+                              fill = gene_set)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set Type") +
+    theme_classic2() +
+    scale_fill_d3() +
+    ggtitle(paste0("GVSA scores for ", grouplist)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  boxplot
+}
+
+# map function to group list to get plots
+boxplots <- map(grouplist, boxplotter)
+names(boxplots) <- grouplist
+list2env(boxplots, env = environment())
+```
+
+Combine plots into a single plot
+```{r fig.height=16, fig.width=16}
+combined_boxplot <- ggarrange(ACC, BLCA, BRCA, CESC, CHOL, COAD, ESCA, GBM, HNSC,KICH, KIRC, KIRP, LGG, LIHC, LUAD, LUSC, MESO, OV, PAAD, PCPG, PRAD, READ, SARC, SKCM_MET, SKCM_PRI, STAD, TGCT, THCA, UCS, UVM, 
+                              ncol = 5, 
+                              nrow = 6,
+                              common.legend = TRUE,
+                              legend = "bottom")
+combined_boxplot
+```
+
+Upregulated signatures only
+```{r}
+# iterate over list of groups
+# get list of groups
+grouplist <- summary(tidy_es_cleaned$group) %>% 
+  enframe() %>%
+  dplyr::select(name)
+grouplist <- as.list(c(grouplist$name))
+grouplist
+
+# define function
+boxplotter_up <- function(grouplist){
+  df <- tidy_es_cleaned %>%
+    dplyr::filter(group == grouplist) %>%
+    mutate(cluster = fct_relevel(gene_set, c("C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7",
+                                            "T"))) %>%
+    group_by(cluster)
+  boxplot <- ggplot(df, aes(y = score, x = cluster, fill = cluster)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set") +
+    theme_classic2() +
+    scale_fill_d3() +
+    ggtitle(grouplist) +
+    theme(legend.position = "none") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+  boxplot
+}
+
+# map function to group list to get plots
+boxplots <- map(grouplist, boxplotter_up)
+names(boxplots) <- grouplist
+list2env(boxplots, env = environment())
+```
+
+Selected plots for publication figure
+```{r}
+# define function for plotting
+plot_form <- function(plot){
+  comparisons <- c("")
+  plot + 
+    scale_fill_d3() +
+    xlab("") +
+    ylab("GSVA score") +
+    stat_compare_means(label = "p.signif", 
+                       method = "t.test",
+                       ref.group = "T") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+}
+
+# get list of boxplots for paper figure
+boxplotlist <- list(KICH, HNSC, OV, PAAD)
+
+# apply function to list of plots
+formlist <- map(boxplotlist, plot_form)
+
+# combine into a single plot
+pub_boxplot <- ggarrange(formlist[[1]], 
+                         formlist[[2]], 
+                         formlist[[3]], 
+                         formlist[[4]],
+                         nrow = 2, ncol = 2,
+                         common.legend = TRUE,
+                         legend = "none") %>%
+  print()
+
+ggsave("output/figures/figure_2_b_c_d_e.pdf", plot = pub_boxplot, height = 6.5, width = 7.5, units = "in")
+```
+
+Combine plots into a single plot
+```{r fig.height=16, fig.width=16}
+formlist_full <- list(ACC, BLCA, BRCA, CESC, CHOL, COAD, ESCA, GBM, HNSC, KICH, KIRC, KIRP, LGG, LIHC, LUAD, LUSC, MESO, OV, PAAD, PCPG, PRAD, READ, SARC, SKCM_MET, SKCM_PRI, STAD, TGCT, THCA, UCS, UVM)
+
+formlist_full <- map(formlist_full, plot_form)
+
+combined_up_boxplot <- ggarrange(formlist_full[[1]],
+                                 formlist_full[[2]],
+                                 formlist_full[[3]],
+                                 formlist_full[[4]],
+                                 formlist_full[[5]],
+                                 formlist_full[[6]],
+                                 formlist_full[[7]],
+                                 formlist_full[[8]],
+                                 formlist_full[[9]],
+                                 formlist_full[[10]],
+                                 formlist_full[[11]],
+                                 formlist_full[[12]],
+                                 formlist_full[[13]],
+                                 formlist_full[[14]],
+                                 formlist_full[[15]],
+                                 formlist_full[[16]],
+                                 formlist_full[[17]],
+                                 formlist_full[[18]],
+                                 formlist_full[[19]],
+                                 formlist_full[[20]],
+                                 formlist_full[[21]],
+                                 formlist_full[[22]],
+                                 formlist_full[[23]],
+                                 formlist_full[[24]],
+                                 formlist_full[[25]],
+                                 formlist_full[[26]],
+                                 formlist_full[[27]],
+                                 formlist_full[[28]],
+                                 formlist_full[[29]],
+                                 formlist_full[[30]],
+                              ncol = 5, 
+                              nrow = 6)
+combined_up_boxplot
+
+ggsave("output/figures/supplemental/combined_up_boxplot.pdf", plot = combined_up_boxplot, height = 17, width = 14, units = "in")
+
+# 10 x 13 in
+```
+
+```{r}
+# individual plots
+# cluster 1 enrichment
+c2_comparisons <- list(c("C2", "T"))
+KICH + stat_compare_means(comparisons = c2_comparisons)
+LGG + stat_compare_means(comparisons = c2_comparisons)
+THCA + stat_compare_means(comparisons = c2_comparisons)
+PRAD + stat_compare_means(comparisons = c2_comparisons)
+PCPG + stat_compare_means(comparisons = c2_comparisons)
+
+# cluster 2 enrichment
+c1_comparisons <- list(c("C1", "C2"))
+HNSC + stat_compare_means(comparisons = c1_comparisons)
+CESC + stat_compare_means(comparisons = c1_comparisons)
+STAD + stat_compare_means(comparisons = c1_comparisons)
+
+# cluster 6 enrichment
+c6_comparisons <- list(c("C6", "T"))
+UVM + stat_compare_means(comparisons = c6_comparisons)
+ACC + stat_compare_means(comparisons = c6_comparisons)
+```
+
+## Summary Heatmap
+```{r}
+# add in DLBCL GSVA data
+dlbcl_es_cleaned <- readRDS("output/gsva_dlbcl_results.rds") %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "gene_set") %>%
+  as_tibble() %>%
+  dplyr::filter(gene_set %in% c("upreg_c1", "upreg_c2", "upreg_c3", "upreg_c4", "upreg_c5", "upreg_c6", "upreg_c7", "tcell_gset")) %>%
+  dplyr::mutate(gene_set = ifelse(gene_set == "upreg_c1", "C1",
+                                  ifelse(gene_set == "upreg_c2", "C2",
+                                         ifelse(gene_set == "upreg_c3", "C3",
+                                                ifelse(gene_set == "upreg_c4", "C4",
+                                                       ifelse(gene_set == "upreg_c5", "C5",
+                                                              ifelse(gene_set == "upreg_c6", "C6",
+                                                                     ifelse(gene_set == "upreg_c7", "C7",
+                                                                            ifelse(gene_set == "tcell_gset", "T", NA))))))))) %>%
+  gather(key = "sampleID", value = "score", -gene_set) %>%
+  bind_cols(group = rep("DLBCL", 3848)) %>%
+  print()
+
+dlbcl_es_cleaned %>%
+    mutate(cluster = fct_relevel(gene_set, c("C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7",
+                                            "T"))) %>%
+    group_by(cluster) %>%
+  ggplot(aes(y = score, x = cluster, fill = cluster)) +
+    geom_boxplot(alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(fill = "Gene Set") +
+    theme_classic2() +
+    scale_fill_d3() +
+    ggtitle("DLBCL") +
+    theme(legend.position = "none") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_d3() +
+    xlab("") +
+    ylab("GSVA score") +
+    stat_compare_means(label = "p.signif", 
+                       method = "t.test",
+                       ref.group = "T")
+```
+
+```{r}
+total_es_cleaned <- tidy_es_cleaned %>%
+  bind_rows(dlbcl_es_cleaned)
+
+grouplist <- summary(as.factor(total_es_cleaned$group)) %>% 
+  enframe() %>%
+  dplyr::select(name)
+grouplist <- as.list(c(grouplist$name))
+grouplist
+
+
+# reformat data
+reformat_up <- function(grouplist){
+  df <- total_es_cleaned %>%
+    dplyr::filter(group == grouplist) %>%
+    mutate(cluster = fct_relevel(gene_set, c("C1", 
+                                            "C2", 
+                                            "C3", 
+                                            "C4", 
+                                            "C5", 
+                                            "C6", 
+                                            "C7",
+                                            "T"))) %>%
+    group_by(group, cluster) %>%
+    summarize(mean_exp = mean(score)) %>%
+    print()
+}
+
+# get list of summarized results (mean GSVA for each cluster and each tumor type)
+ave_scores <- map(grouplist, reformat_up)
+names(ave_scores) <- names(grouplist)
+
+# convert to single average score matrix
+a_scores <- enframe(ave_scores) %>%
+  unnest(value) %>%
+  dplyr::select(-name) %>%
+  spread(key = cluster, value = mean_exp) %>%
+  dplyr::filter(!group == "SKCM_MET") %>%
+  mutate(group = as.character(group)) %>%
+  mutate(group = ifelse(group == "SKCM_PRI", "SKCM", group)) %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "group") %>%
+  as.matrix() %>%
+  t()
+
+# review results
+a_scores[1:5, 1:5]
+dim(a_scores)
+str(a_scores)
+
+# save matrix for later use
+saveRDS(a_scores, "output/ave_scores_gsva_by_tumor.rds")
+```
+
+Actual plotting
+```{r}
+# read in data
+a_scores <- readRDS("output/ave_scores_gsva_by_tumor.rds")
+
+# get row and column orders via seriation
+library(seriation)
+set.seed(818)
+o1 = seriate(dist(a_scores), method = "TSP") %>% get_order()
+o2 = seriate(dist(t(a_scores)), method = "TSP") %>% get_order()
+
+# print heatmap
+
+hm <- Heatmap(a_scores, 
+              name = "Mean \nGSVA Score", 
+              row_order = o1, 
+              column_order = o2,
+              cluster_columns = FALSE,
+              cluster_rows = FALSE,
+              use_raster = FALSE)
+hm
+
+# width = 8, height = 3
+```
+
+## Individual Heatmaps
+
+Data preparation
+```{r}
+# need data in the form of a matrix, one for each tumor type
+# create list of dataframes, one for each tumor type
+tcga_es_tidy_list <- total_es_cleaned %>% 
+  tidyr::nest(data = c(gene_set, sampleID, score)) %>%
+  as.list()
+
+tcga_es_list <- tcga_es_tidy_list$data
+names(tcga_es_list) <- tcga_es_tidy_list$group
+
+# review results
+tcga_es_list
+
+# function to convert format for group comparison
+t_low <- function(df){
+  df_wide <- df %>%
+    spread(value = score, key = gene_set) %>%
+    dplyr::filter(T < 0) %>%
+    as.data.frame() %>%
+    column_to_rownames(var = "sampleID") %>%
+    as.matrix() %>%
+    t()}
+
+t_low_matrix <- map(tcga_es_list, t_low)
+
+t_high <- function(df){
+  df_wide <- df %>%
+    spread(value = score, key = gene_set) %>%
+    dplyr::filter(T > 0) %>%
+    as.data.frame() %>%
+    column_to_rownames(var = "sampleID") %>%
+    as.matrix() %>%
+    t()}
+
+t_high_matrix <- map(tcga_es_list, t_high)
+
+# function to convert format for heatmap
+EnterTheMatrix <- function(df){
+  mat <- df %>%
+    spread(key = sampleID, value = score) %>%
+    as.data.frame() %>%
+    column_to_rownames(var = "gene_set") %>%
+    as.matrix()
+  mat
+}
+
+# apply function to list of dataframes
+mat_list <- map(tcga_es_list, EnterTheMatrix)
+
+# quick check of mat_list format
+mat_list[[1]] %>% .[1:5, 1:5]
+```
+
+Plotting gradient heatmaps
+```{r}
+# function for making heatmap from supplied matrix
+makeheatmap <- function(mat, mat_names){
+  ha <- rowAnnotation(score = anno_histogram(mat, n_breaks = 20))
+  ht <- Heatmap(mat, name = "GSVA Score", 
+                row_title = "",
+                show_row_names = TRUE,
+                row_names_side = "left",
+                column_title = mat_names, 
+                show_column_names = FALSE,
+                show_column_dend = FALSE,
+                show_row_dend = FALSE,
+                column_title_side = "top",
+                right_annotation = ha)
+  ht}
+
+# apply function to list of matrices
+mat_names <- names(mat_list)
+listofheatmaps <- map2(mat_list, mat_names, makeheatmap)
+names(listofheatmaps) <- names(mat_list)
+
+# plot heatmaps
+listofheatmaps
+
+# low T heatmaps
+list_of_low_t <- map2(t_low_matrix, names(t_low_matrix), makeheatmap)
+
+# list of high T heatmaps
+list_of_high_t <- map2(t_high_matrix, names(t_high_matrix), makeheatmap)
+
+# function for frequency plots
+make_freq_plot <- function(mat, mat_names){
+  df <- mat %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "sample_id") %>%
+    as_tibble() %>%
+    mutate(C1 = ifelse(C1 >= 0, 1, 0),
+           C2 = ifelse(C2 >= 0, 1, 0),
+           C3 = ifelse(C3 >= 0, 1, 0),
+           C4 = ifelse(C4 >= 0, 1, 0),
+           C5 = ifelse(C5 >= 0, 1, 0),
+           C6 = ifelse(C6 >= 0, 1, 0),
+           C7 = ifelse(C7 >= 0, 1, 0),
+           `T` = ifelse(`T` >= 0, 1, 0)) %>%
+    dplyr::filter(`T` == 0) %>%
+    gather(key = "gene_set", value = "indicator", -sample_id) %>%
+    dplyr::filter(indicator == 1) 
+  plot <- ggplot(data = df,
+                 aes(x = gene_set)) +
+    geom_bar(stat = "count") +
+    ggtitle(mat_names)
+  plot
+}
+
+freq_plot_list <- map2(mat_list, names(mat_list), make_freq_plot)
+
+freq_plot_list[["DLBCL"]]
+freq_plot_list[["PAAD"]]
+freq_plot_list[["OV"]]
+
+
+```
+
+Figure to match 2 B-E
+```{r}
+listofheatmaps[["KICH"]] + listofheatmaps[["HNSC"]] + listofheatmaps[["UVM"]] + listofheatmaps[["PAAD"]]
+
+# 2.2 x 11
+
+```
+
+## Binned GSVA Scores
+
+Making bins and selecting T-cell inflamed high only
+```{r}
+# review stats for global GSVA scores
+summary(total_es_cleaned$score)
+quantile(tidy_es$score, probs = c(0.34, 0.66))
+quantile(tidy_es$score)
+# use cutoffs corresponding to approximately 1/3 groups
+
+# review density plots
+densplot <- function(mat, name){
+  d_tidy <- mat %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "sample_ID") %>%
+    as_tibble() %>%
+    gather(key = "gene_set", value = "gsva_score", -sample_ID)
+  ggplot(data = d_tidy, aes(x = gsva_score)) +
+    geom_density() +
+    geom_vline(aes(xintercept = -0.22), linetype = "dashed") +
+    geom_vline(aes(xintercept = 0.21), linetype = "dashed") +
+    geom_vline(aes(xintercept = 0), color = "red", linetype = "dashed") +
+    theme_classic() +
+    ggtitle(name)
+}
+
+# apply density plots to matrix list
+map2(mat_list, names(mat_list), densplot)
+
+# bin the GSVA scores for each gene set by greater than or less than 0.
+makebins <- function(mat){
+  mat_bin <- mat %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "sample_ID") %>%
+    as_tibble() %>%
+    gather(key = "gene_set", value = "gsva_score", -sample_ID) %>%
+    mutate(gsva_bin = ifelse(gsva_score > 0, 1, 0)) %>%
+    mutate(gsva_bin = as.factor(gsva_bin)) %>%
+    dplyr::select(sample_ID, gene_set, gsva_bin) %>%
+    tidyr::spread(key = gene_set, value = gsva_bin) %>%
+    as.data.frame() %>%
+    column_to_rownames(var = "sample_ID") %>%
+    t()
+  mat_bin
+}
+
+makebins(mat_list[[2]])
+
+bin_list <- map(mat_list, makebins)
+
+# select only the T-cell inflamed high group
+# define a function
+hi_t_maker <- function(mat){
+  mat_hi_t <- mat %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "sample") %>%
+    as_tibble() %>%
+    dplyr::filter(`T` == "1") %>%
+    dplyr::select(-`T`) %>%
+    as.data.frame() %>%
+    column_to_rownames(var = "sample") %>%
+    as.matrix() %>%
+    t()
+  mat_hi_t
+}
+
+bin_list_filt <- map(bin_list, hi_t_maker)
+```
+
+Plotting heatmaps
+```{r}
+
+makebinmap <- function(mat, mat_names){
+  o1 = seriate(dist(mat), 
+               method = "TSP") %>% 
+    get_order()
+  o2 = seriate(dist(t(mat)), 
+               method = "TSP") %>% 
+    get_order()
+  ht <- Heatmap(mat, name = "Expression\nLevel", 
+                col = pal_d3()(2),
+                color_space = "rgb",
+                row_title = "",
+                show_row_names = TRUE,
+                row_names_side = "left",
+                row_order = o1, 
+                column_order = o2,
+                cluster_columns = FALSE,
+                cluster_rows = FALSE,
+                column_title = mat_names, 
+                show_column_names = FALSE,
+                show_column_dend = FALSE,
+                show_row_dend = FALSE,
+                column_title_side = "top",
+                heatmap_legend_param = list(
+                  at = c("0", "1"),
+                  labels = c("low", "high"),
+                  title = "Gene Set\nExpression",
+                  legend_height = unit(3, "cm"),
+                  title_position = "topleft"))
+  ht
+}
+
+makebinmap(bin_list_filt[[2]],
+           names(bin_list_filt[[2]]))
+binmaps <- map2(bin_list_filt, names(bin_list_filt), makebinmap)
+
+# figure draft for paper
+binmaps[["KICH"]] + binmaps[["HNSC"]] + binmaps[["UVM"]] + binmaps[["PAAD"]]
+
+# figure draft for paper
+binmaps[["DLBCL"]] + binmaps[["PAAD"]]
+```
+
+#### Exploring T-cell high group
+```{r}
+test <- bin_list[[2]]
+
+hi_t_maker <- function(mat){
+  mat_hi_t <- mat %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column(var = "sample_id") %>%
+    dplyr::filter(T == "1") %>%
+    dplyr::select(-T) %>%
+    column_to_rownames(var = "sample_id") %>%
+    as.matrix() %>%
+    t()
+  mat_hi_t
+}
+
+hi_t_maker(test)
+hi_t_binlist <- map(bin_list, hi_t_maker)
+
+hi_t_binmaps <- map2(hi_t_binlist, names(hi_t_binlist), makebinmap)
+```
+
+## Assign individuals to top cluster
+```{r}
+top_clust <- total_es_cleaned %>%
+  dplyr::filter(gene_set != "T") %>%
+  group_by(sampleID) %>%
+  top_n(1, score) %>%
+  ungroup() %>%
+  mutate(gene_set = as.factor(gene_set)) %>%
+  group_by(group, gene_set) %>%
+  tally() %>%
+  print()
+
+top_clust_hi_t <- total_es_cleaned %>%
+  tidyr::spread(key = gene_set, value = score) %>%
+  mutate(quantile_rank = ntile(`T`, 4)) %>%
+  dplyr::filter(quantile_rank == 4) %>%
+  dplyr::select(-quantile_rank) %>%
+  gather(key = gene_set, value = score, -sampleID, -group) %>%
+  dplyr::filter(gene_set != "T") %>%
+  group_by(sampleID) %>%
+  top_n(1, score) %>%
+  ungroup() %>%
+  group_by(group, gene_set) %>%
+  tally() %>%
+  print()
+
+stacked_bar <- ggplot(top_clust, aes(fill = gene_set, y = n, x = group)) +
+  geom_bar(position = "fill", stat = "identity") +
+  # scale_fill_viridis(discrete = TRUE) +
+  scale_fill_brewer(type = "div", palette = "Spectral") +
+  # scale_fill_d3() +
+  theme_classic2() +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(fill = "Macrophage\nCluster") +
+  ylab("Proportion of Tumor Type") +
+  xlab("")
+stacked_bar
+
+stacked_bar <- ggplot(top_clust, aes(fill = gene_set, y = n, x = group)) +
+  geom_bar(position = "fill", stat = "identity") +
+  # scale_fill_viridis(discrete = TRUE) +
+  scale_fill_brewer(type = "div", palette = "Spectral") +
+  # scale_fill_d3() +
+  theme_classic2() +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(fill = "Macrophage\nCluster") +
+  ylab("Proportion of Tumor Type") +
+  xlab("")
+stacked_bar
+
+ggsave("output/figures/figure_3_a.pdf", plot = stacked_bar, height = 4, width = 9, units = "in")
+
+stacked_bar_hi_t <- ggplot(top_clust_hi_t, aes(fill = gene_set, y = n, x = group)) +
+  geom_bar(position = "fill", stat = "identity") +
+  # scale_fill_viridis(discrete = TRUE) +
+  scale_fill_brewer(type = "div", palette = "Spectral") +
+  # scale_fill_d3() +
+  theme_classic2() +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(fill = "Macrophage\nCluster") +
+  ylab("Proportion of Tumor Type") +
+  xlab("")
+stacked_bar_hi_t
+
+ggsave("output/figures/figure_3_b.pdf", plot = stacked_bar_hi_t, height = 4, width = 9, units = "in")
+```
+
+#### Survival analysis
+
+```{r}
+top_clust <- tidy_es %>%
+    dplyr::filter(gene_set != "T") %>%
+    group_by(sampleID) %>%
+    top_n(1, score) %>% 
+  dplyr::rename(sample = sampleID) %>%
+  print()
+
+# merge in GDC ids
+tc_phenodata <- top_clust %>%
+  left_join(pheno_data, by = "sample") %>%
+  print()
+
+# get case IDs
+case_ids <- tc_phenodata %>% 
+  pull(cases_0_case_id) %>% 
+  print()
+
+# pull clinical data for case IDs from GDC servers
+clindat = gdc_clinical(case_ids)
+demo_df <- clindat$demographic %>% as_tibble()
+surv_time <- clindat$diagnoses %>% as_tibble() %>%
+  dplyr::select(case_id, days_to_last_known_disease_status, days_to_last_follow_up, progression_or_recurrence) %>% 
+  print()
+
+# get follow-up time from diagnosis table
+# get time to death from demographics table
+# format survival time into a single column
+# change vital status to numeric (1 = dead, 0 = alive)
+surv_df <- demo_df %>%
+  left_join(surv_time, by = "case_id") %>%
+  dplyr::select(case_id, 
+                vital_status, 
+                days_to_death, 
+                days_to_last_follow_up, 
+                everything()) %>%
+  mutate(surv_days = ifelse(is.na(days_to_death),
+                            days_to_last_follow_up,
+                            days_to_death)) %>%
+  mutate(surv_status = ifelse(vital_status == "Dead", 1, 0)) %>%
+  dplyr::select(case_id, 
+                vital_status,
+                surv_status,
+                surv_days, 
+                everything()) %>%
+  print()
+
+# merge with existing phenodata column and then
+# merge with top mac cluster per individual table
+surv_clust <- tc_phenodata %>%
+  dplyr::rename(case_id = cases_0_case_id) %>%
+  left_join(surv_df, by = "case_id") %>%
+  dplyr::select(sample, vital_status, surv_days, everything()) %>%
+  left_join(top_clust) %>%
+  dplyr::select(sample, gene_set, surv_status, surv_days, everything()) %>%
+  dplyr::rename(mac_cluster = gene_set) %>%
+  print()
+
+
+# faceted survival plot
+surv_obj_1 <- Surv(time = surv_clust$surv_days,
+                   event = surv_clust$surv_status)
+fit1 <- survfit(surv_obj_1 ~ mac_cluster + group, data = surv_clust)
+survplot <- ggsurvplot_facet(fit1,
+                 data = surv_clust,
+                 facet.by = "group",
+                 palette = "Spectral",
+                 )
+ggsave("output/figures/supplemental/surv_by_clust_tcga.pdf", plot = survplot, height = 16, width = 16, units = "in")
+
+# create nested list for iteration
+surv_nest <- surv_clust %>%
+  group_by(group) %>%
+  nest() %>%
+  print()
+surv_list <- as.list(surv_nest$data)
+names(surv_list) <- surv_nest %>% pull(group)
+surv_list
+
+
+# create function to plot survival curves
+survplotter <- function(df){
+  surv_obj <- Surv(time = df$surv_days, event = df$surv_status)
+  fit1 <- survfit(surv_obj ~ mac_cluster, data = df)
+  ggsurvplot(fit1)
+}
+
+survplots <- map(surv_list, survplotter)
+
+ 
+  plot <- ggsurvplot(fit1, data = df, pval = TRUE)
+  plot
+
+```
+
+## Correlation matrix
+```{r}
+
+# first will include both upregulated and downregulated gene lists
+
+# set up data
+tcga_mat <- tcga_es %>%
+  as.matrix() %>%
+  t()
+tcga_mat[1:6, 1:6]
+
+# compute correlation matrix
+res <- cor(tcga_mat)
+round(res, 2)
+
+# plot results
+chart.Correlation(res, histogram = TRUE, pch = 19)
+
+# only upregulated gene lists (and T cell gene list)
+
+# set up data
+tcga_mat_up <- tcga_mat %>%
+  as.data.frame() %>%
+  dplyr::select(starts_with("upreg")) %>%
+  rownames_to_column(var = "sampleID")
+
+tcga_mat_t <- tcga_mat %>%
+  as.data.frame() %>%
+  dplyr::select(starts_with("tcell")) %>%
+  rownames_to_column(var = "sampleID")
+
+tcga_mat_up_t <- tcga_mat_up %>%
+  left_join(tcga_mat_t) %>%
+  column_to_rownames(var = "sampleID") %>%
+  as.matrix()
+
+# compute correlation matrix
+res2 <- cor(t(tcga_mat))
+round(res2, 2)
+
+# plot results
+chart.Correlation(res2, histogram = TRUE, pch = 19)
+````

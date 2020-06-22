@@ -1,0 +1,316 @@
+---
+title: "tcga_survival"
+author: "mleukam"
+date: "2019-11-22"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+Clear workspace
+```{r}
+rm(list = ls())
+```
+
+
+```{r}
+library("GenomicDataCommons")
+library("tidyverse")
+library(survival)
+library(survminer)
+```
+
+Load TCGA and NCICCR metadata and convert sample IDs
+Link to clinical data
+```{r}
+total_meta <- readRDS("output/flat_total_pheno.rds") %>%
+  print()
+
+# read in manifest for NCICCR-DLBCL
+total_nciccr <- read_delim("data/GDC_clinical/gdc_nciccr_manifest.2020-02-12.txt", 
+                           delim = "\t", 
+                           trim_ws = TRUE) %>%
+  dplyr::rename(file_id = id, file_names = filename) %>%
+  print()
+
+# read in helper function
+TCGAtranslateID = function(file_names, legacy = TRUE)
+{
+  info = files(legacy = legacy) %>%
+    GenomicDataCommons::filter( ~ file_name %in% file_names) %>%
+    GenomicDataCommons::select('cases.samples.submitter_id') %>%
+    results_all()
+
+  id_list = lapply(info$cases,function(a)
+  {
+    a[[1]][[1]][[1]]
+  })
+
+    barcodes_per_file = sapply(id_list,length)
+
+    return(data.frame(file_id = rep(ids(info), barcodes_per_file), 
+                      submitter_id = unlist(id_list), 
+                      file_names = file_names))
+}
+
+filenames <- total_meta$file_names
+
+tcga_lookup_table <- TCGAtranslateID(filenames, legacy = FALSE) %>% 
+  as_tibble() %>%
+  dplyr::select(submitter_id, file_id) %>%
+  dplyr::mutate(submitter_id = as.character(submitter_id)) %>%
+  dplyr::mutate(file_id = as.character(file_id)) %>%
+  tidyr::separate(submitter_id, into = c("sid_1", "sid_2", "sid_3", "sid_4"), sep = "-") %>%
+  tidyr::unite(col = "submitter_id", sid_1, sid_2, sid_3, sep = "-") %>%
+  dplyr::select(submitter_id, file_id) %>%
+  print()
+
+filenames_dlbcl <- total_nciccr$file_names
+
+nciccr_lookup_table <- TCGAtranslateID(filenames_dlbcl, legacy = FALSE) %>%
+  as_tibble() %>%
+  dplyr::select(submitter_id, file_id) %>%
+  dplyr::mutate(submitter_id = as.character(submitter_id)) %>%
+  dplyr::mutate(file_id = as.character(file_id)) %>%
+  dplyr::mutate(submitter_id = sub("-sample", "", submitter_id)) %>%
+  print()
+
+nciccr_meta <- total_nciccr %>% 
+  left_join(nciccr_lookup_table) %>%
+  dplyr::select(sample = submitter_id, file_id, file_names, md5, size, state) %>%
+  print()
+
+total_meta_combined <- bind_rows(total_meta, nciccr_meta)
+
+total_lookup_table <- bind_rows(tcga_lookup_table, nciccr_lookup_table)
+
+total_meta_combined <- total_meta_combined %>%
+  left_join(total_lookup_table) %>%
+  dplyr::select(submitter_id, everything()) %>%
+  print()
+
+```
+
+Read in clinical data from TCGA
+```{r}
+proj_list <- list("TCGA-BRCA", "TCGA-GBM", "TCGA-OV", "TCGA-LUAD", "TCGA-UCEC", "TCGA-KIRC", "TCGA-HNSC", "TCGA-LGG", "TCGA-THCA", "TCGA-LUSC", "TCGA-PRAD", "TCGA-SKCM", "TCGA-COAD", "TCGA-STAD", "TCGA-BLCA", "TCGA-LIHC", "TCGA-CESC", "TCGA-KIRP", "TCGA-SARC", "TCGA-LAML", "TCGA-ESCA", "TCGA-PAAD", "TCGA-PCPG", "TCGA-READ", "TCGA-TGCT", "TCGA-THYM", "TCGA-KICH", "TCGA-ACC", "TCGA-MESO", "TCGA-UVM", "TCGA-DLBC", "TCGA-UCS", "TCGA-CHOL", "NCICCR-DLBCL")
+
+names(proj_list) <- c("TCGA-BRCA", "TCGA-GBM", "TCGA-OV", "TCGA-LUAD", "TCGA-UCEC", "TCGA-KIRC", "TCGA-HNSC", "TCGA-LGG", "TCGA-THCA", "TCGA-LUSC", "TCGA-PRAD", "TCGA-SKCM", "TCGA-COAD", "TCGA-STAD", "TCGA-BLCA", "TCGA-LIHC", "TCGA-CESC", "TCGA-KIRP", "TCGA-SARC", "TCGA-LAML", "TCGA-ESCA", "TCGA-PAAD", "TCGA-PCPG", "TCGA-READ", "TCGA-TGCT", "TCGA-THYM", "TCGA-KICH", "TCGA-ACC", "TCGA-MESO", "TCGA-UVM", "TCGA-DLBC", "TCGA-UCS", "TCGA-CHOL", "NCICCR-DLBCL")
+
+proj_list
+
+# define a function to read in clinical data
+readerreader <- function(name){
+  path <- paste0("data/GDC_clinical/clinical.project-", 
+                 name, 
+                 ".2020-02-11/clinical.tsv")
+  read_delim(path, delim = "\t", escape_double = FALSE, trim_ws = TRUE) %>%
+    mutate_all(funs(str_replace(., "--", "NA")))
+}
+
+clinical_tcga <- map(proj_list, readerreader)
+
+clinical_df <- bind_rows(clinical_tcga)
+
+combined_pheno <- total_meta_combined %>%
+  left_join(clinical_df, by = "submitter_id")
+```
+
+Read in CIBERSORTx results and assign quartiles
+
+Pancancer survival by macrophage cluster
+```{r}
+# rename pheno data to match deconvolution results
+combined_pheno_rename <- combined_pheno %>%
+  dplyr::rename(sampleID = sample) %>%
+  print()
+
+# read in deconvolution results
+decon_tidy <- readRDS("output/relative_deconvolution_tidy.rds")
+
+# rank by quartile macrophage expression across all cancer types
+decon_nest <- decon_tidy %>%
+  group_by(cluster) %>%
+  nest() %>%
+  print()
+decon_list <- as.list(decon_nest$data)
+names(decon_list) <- decon_nest$cluster
+decon_list
+decon_quartile_list <- map(decon_list, function(df){
+   df %>% mutate(quartile = ntile(score, n = 4))
+})
+decon_global_quartiles <- enframe(decon_quartile_list) %>%
+  unnest(cols = c(value)) %>%
+  dplyr::rename(cluster = name) %>%
+  print()
+
+# keep only the highest and lowest quartiles
+decon_global_hilo <- decon_global_quartiles %>%
+  dplyr::filter(!quartile %in% c(2,3))
+
+# format survival data
+merged_results_hilo <- decon_global_hilo %>%
+  left_join(combined_pheno_rename, by = "sampleID") %>%
+  dplyr::select(sampleID, cluster, group, quartile, vital_status, days_to_death, days_to_last_follow_up) %>%
+  mutate(days_to_death = as.numeric(days_to_death)) %>%
+  mutate(days_to_last_follow_up = as.numeric(days_to_last_follow_up)) %>%
+  mutate(surv_days = ifelse(is.na(days_to_death),
+                            days_to_last_follow_up,
+                            days_to_death)) %>%
+  mutate(surv_status = ifelse(vital_status == "Dead", 1, 0)) %>%
+  dplyr::filter(!is.na(surv_days)) %>%
+  mutate(surv_years = surv_days / 365.25) %>%
+  mutate(surv_years = as.numeric(surv_years)) %>%
+  dplyr::filter(!is.na(surv_status)) %>%
+  dplyr::mutate(cluster = as.factor(cluster)) %>%
+  dplyr::select(sampleID, cluster, group, quartile, surv_status, surv_years) %>%
+  print() 
+  
+# split into individual dataframes by cluster
+hilo_nest <- merged_results_hilo %>%
+  nest(data = c(sampleID, group, quartile, surv_status, surv_years))
+hilo_list <- as.list(hilo_nest) %>% .$data
+names(hilo_list) <- hilo_nest$cluster
+hilo_list
+
+# C1
+c1 <- hilo_list[["C1"]]
+surv_obj_1 <- Surv(time = c1$surv_years, event = c1$surv_status)
+fit1 <- survfit(surv_obj_1 ~ quartile, data = c1)
+ggsurvplot(fit1, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C1",
+           xlab = "Years",
+           legend.title = "C1 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+c2 <- hilo_list[["C2"]]
+surv_obj_2 <- Surv(time = c2$surv_years, event = c2$surv_status)
+fit2 <- survfit(surv_obj_2 ~ quartile, data = c2)
+ggsurvplot(fit2, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C2",
+           xlab = "Years",
+           legend.title = "C2 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+c3 <- hilo_list[["C3"]]
+surv_obj_3 <- Surv(time = c3$surv_years, event = c3$surv_status)
+fit3 <- survfit(surv_obj_3 ~ quartile, data = c3)
+ggsurvplot(fit3, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C3",
+           xlab = "Years",
+           legend.title = "C3 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+c4 <- hilo_list[["C4"]]
+surv_obj_4 <- Surv(time = c4$surv_years, event = c4$surv_status)
+fit4 <- survfit(surv_obj_4 ~ quartile, data = c4)
+ggsurvplot(fit4, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C4",
+           xlab = "Years",
+           legend.title = "C4 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+c5 <- hilo_list[["C5"]]
+surv_obj_5 <- Surv(time = c5$surv_years, event = c5$surv_status)
+fit5 <- survfit(surv_obj_5 ~ quartile, data = c5)
+ggsurvplot(fit5, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C5",
+           xlab = "Years",
+           legend.title = "C5 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+c6 <- hilo_list[["C6"]]
+surv_obj_6 <- Surv(time = c6$surv_years, event = c6$surv_status)
+fit6 <- survfit(surv_obj_6 ~ quartile, data = c6)
+ggsurvplot(fit6, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C6",
+           xlab = "Years",
+           legend.title = "C6 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+c7 <- hilo_list[["C7"]]
+surv_obj_7 <- Surv(time = c7$surv_years, event = c7$surv_status)
+fit7 <- survfit(surv_obj_7 ~ quartile, data = c7)
+ggsurvplot(fit7, 
+           pval = TRUE, 
+           palette = "nejm", 
+           legend = "right",
+           title = "C7",
+           xlab = "Years",
+           legend.title = "C7 CIBERSORTx \nscore quartile rank",
+           risk.table = TRUE)
+
+combined_pheno_rename <- combined_pheno %>%
+  dplyr::rename(sampleID = sample) %>%
+  print()
+
+merged_results_surv <- decon_tidy %>%
+  left_join(combined_pheno_rename, by = "sampleID") %>%
+  dplyr::select(sampleID, cluster, score, group, vital_status, days_to_death, days_to_last_follow_up) %>%
+  mutate(days_to_death = as.numeric(days_to_death)) %>%
+  mutate(days_to_last_follow_up = as.numeric(days_to_last_follow_up)) %>%
+  mutate(surv_days = ifelse(is.na(days_to_death),
+                            days_to_last_follow_up,
+                            days_to_death)) %>%
+  mutate(surv_status = ifelse(vital_status == "Dead", 1, 0)) %>%
+  dplyr::filter(!is.na(surv_days)) %>%
+  dplyr::filter(!is.na(surv_status)) %>%
+  dplyr::mutate(cluster = as.factor(cluster)) %>%
+  dplyr::select(sampleID, cluster, score, group, surv_status, surv_days) %>%
+  print() 
+
+
+```
+
+
+compute survival curves
+```{r}
+# faceted survival plot
+surv_obj_1 <- Surv(time = merged_results_surv$surv_days,
+                   event = merged_results_surv$surv_status)
+fit1 <- survfit(surv_obj_1 ~ cluster + group, data = merged_results_surv)
+survplot <- ggsurvplot_facet(fit1,
+                 data = merged_results_surv,
+                 facet.by = "group",
+                 palette = "Spectral",
+                 )
+ggsave("output/figures/supplemental/surv_by_decon_tcga.pdf", plot = survplot, height = 16, width = 16, units = "in")
+
+# create nested list for iteration
+surv_nest <- merged_results_surv %>%
+  group_by(group) %>%
+  nest() %>%
+  print()
+surv_list <- as.list(surv_nest$data)
+names(surv_list) <- surv_nest %>% pull(group)
+surv_list
+
+# create function to plot survival curves
+survplotter <- function(df){
+  surv_obj <- Surv(time = df$surv_days, event = df$surv_status)
+  fit1 <- survfit(surv_obj ~ cluster, data = df)
+  ggsurvplot(fit1)
+}
+
+survplots <- map(surv_list, survplotter)
+```

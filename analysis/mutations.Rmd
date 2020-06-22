@@ -1,0 +1,825 @@
+---
+title: "mutations"
+author: "mleukam"
+date: "2020-03-08"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Setup
+
+```{r}
+rm(list = ls())
+```
+
+## Load packages
+
+```{r}
+library(maftools)
+library(cgdsr)
+library(GenomicDataCommons)
+library(TCGAutils)
+library(RTCGAToolbox)
+library(tidyverse)
+library(broom)
+```
+
+## Mutations
+
+#### Get and format mutation data
+
+Download source files from GDC
+
+Can skip
+```{r}
+# function to get manifest id's for aggregated masked mutations
+getnucleotides <- function(i){
+  files() %>%
+    GenomicDataCommons::select(available_fields('files')) %>%
+    GenomicDataCommons::filter(~ cases.project.project_id == i &
+             data_type == 'Masked Somatic Mutation' &
+             analysis.workflow_type == 'MuTect2 Variant Aggregation and Masking') %>%
+    GenomicDataCommons::select('file_id') %>%
+    GenomicDataCommons::results_all()
+}
+
+# list of TGCA projects
+tcgalist <- list("BRCA" = "TCGA-BRCA",
+                 "GBM" = "TCGA-GBM",
+                 "OV" = "TCGA-OV",
+                 "LUAD" = "TCGA-LUAD",
+                 "UCEC" = "TCGA-UCEC",
+                 "KIRC" = "TCGA-KIRC",
+                 "HNSC" = "TCGA-HNSC",
+                 "LGG" = "TCGA-LGG",
+                 "THCA" = "TCGA-THCA",
+                 "LUSC" = "TCGA-LUSC",
+                 "PRAD" = "TCGA-PRAD",
+                 "SKCM" = "TCGA-SKCM",
+                 "COAD" = "TCGA-COAD",
+                 "STAD" = "TCGA-STAD",
+                 "BLCA" = "TCGA-BLCA",
+                 "LIHC" = "TCGA-LIHC",
+                 "CESC" = "TCGA-CESC",
+                 "KIRP" = "TCGA-KIRP",
+                 "SARC" = "TCGA-SARC",
+                 "LAML" = "TCGA-LAML",
+                 "ESCA" = "TCGA-ESCA",
+                 "PAAD" = "TCGA-PAAD",
+                 "PCPG" = "TCGA-PCPG",
+                 "READ" = "TCGA-READ",
+                 "TGCT" = "TCGA-TGCT",
+                 "THYM" = "TCGA-THYM",
+                 "KICH" = "TCGA-KICH",
+                 "ACC" = "TCGA-ACC",
+                 "MESO" = "TCGA-MESO",
+                 "UVM" = "TCGA-UVM",
+                 "DLBC" = "TCGA-DLBC",
+                 "UCS" =  "TCGA-UCS",
+                 "CHOL" = "TCGA-CHOL")
+
+# apply function to list elements
+tcga_snvfiles <- map(tcgalist, getnucleotides) %>%
+  map_df(function(x) x[[1]]) %>% gather(key = "project", value = "filename")
+
+# download files
+fnames = lapply(tcga_snvfiles$filename, gdcdata)
+```
+Moved MAFs to Gardner: /gpfs/data/kline-lab/backups/tcga_macs/TCGA_MAFs/
+
+Read in and format MAFs
+
+Can skip
+```{r}
+acc_muts <- read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.ACC.mutect.81ac2c46-37db-4dcd-923a-061a7ae626a3.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+blca_muts <- read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.BLCA.mutect.0e239d8f-47b0-4e47-9716-e9ecc87605b9.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+brca_muts <- read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.BRCA.mutect.995c0111-d90b-4140-bee7-3845436c3b42.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+cesc_muts <- read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.CESC.mutect.5ffa70b1-61b4-43d1-b10a-eda412187c17.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+chol_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.CHOL.mutect.c116f412-e251-4192-9bc5-3ce3cfaaa774.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+coad_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.COAD.mutect.03652df4-6090-4f5a-a2ff-ee28a37f9301.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+dlbc_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.DLBC.mutect.c3df46a9-85d1-45d4-954a-825313d4a26d.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+esca_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.ESCA.mutect.7f8e1e7c-621c-4dfd-8fad-af07c739dbfc.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+gbm_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.GBM.mutect.da904cd3-79d7-4ae3-b6c0-e7127998b3e6.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+hnsc_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.HNSC.mutect.1aa33f25-3893-4f37-a6a4-361c9785d07e.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+kich_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.KICH.mutect.ddb523ba-29ac-4056-82ca-4147d2e98ddf.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+kirc_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.KIRC.mutect.2a8f2c83-8b5e-4987-8dbf-01f7ee24dc26.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+kirp_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.KIRP.mutect.1ab98b62-5863-4440-84f9-3c15d476d523.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+laml_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.LAML.mutect.27f42413-6d8f-401f-9d07-d019def8939e.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+lgg_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.LGG.mutect.1e0694ca-fcde-41d3-9ae3-47cfaf527f25.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+lihc_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.LIHC.mutect.a630f0a0-39b3-4aab-8181-89c1dde8d3e2.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+luad_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.LUAD.mutect.0458c57f-316c-4a7c-9294-ccd11c97c2f9.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+lusc_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.LUSC.mutect.95258183-63ea-4c97-ae29-1bae9ed06334.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+meso_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.MESO.mutect.88b38a05-e46a-49e1-9c4d-e098709256b1.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+ov_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.OV.mutect.b22b85eb-2ca8-4c9f-a1cd-b77caab999bd.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+paad_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.PAAD.mutect.fea333b5-78e0-43c8-bf76-4c78dd3fac92.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+pcpg_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.PCPG.mutect.64e23e2f-ec04-4f6b-82b3-375e2d49804b.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+prad_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.PRAD.mutect.deca36be-bf05-441a-b2e4-394228f23fbe.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+read_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.READ.mutect.faa5f62a-2731-4867-a264-0e85b7074e87.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+sarc_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.SARC.mutect.cc207fe8-ee0a-4b65-82cb-c8197d264126.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+skcm_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.SKCM.mutect.4b7a5729-b83e-4837-9b61-a6002dce1c0a.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+stad_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.STAD.mutect.c06465a3-50e7-46f7-b2dd-7bd654ca206b.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+tgct_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.TGCT.mutect.6f6a4290-b6be-49f5-be45-97d742957a9e.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+thca_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.THCA.mutect.13999735-2e70-439f-a6d9-45d831ba1a1a.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+thym_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.THYM.mutect.91ddbf37-6429-4338-89df-2d246a8e2d00.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+ucec_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.UCEC.mutect.d3fa70be-520a-420e-bb6d-651aeee5cb50.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+ucs_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.UCS.mutect.02747363-f04a-4ba6-a079-fe4f87853788.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+uvm_muts = read.maf(maf = "/Volumes/kline-lab/backups/tcga_macs/data/TCGA_MAFs/TCGA.UVM.mutect.6c7b01bc-b068-4e01-8b4d-0362f5959f65.DR-10.0.somatic.maf") %>% 
+  .@data %>% 
+  dplyr::select(Tumor_Sample_Barcode, 
+                Hugo_Symbol, 
+                Entrez_Gene_Id, 
+                Transcript_ID, 
+                Variant_Classification)
+
+muts_df <- brca_muts %>%
+  bind_rows(gbm_muts) %>%
+  bind_rows(ov_muts) %>%
+  bind_rows(luad_muts) %>%
+  bind_rows(ucec_muts) %>%
+  bind_rows(kirc_muts) %>%
+  bind_rows(hnsc_muts) %>%
+  bind_rows(lgg_muts) %>%
+  bind_rows(thca_muts) %>%
+  bind_rows(lusc_muts) %>%
+  bind_rows(prad_muts) %>%
+  bind_rows(skcm_muts) %>%
+  bind_rows(coad_muts) %>%
+  bind_rows(stad_muts) %>%
+  bind_rows(blca_muts) %>%
+  bind_rows(lihc_muts) %>%
+  bind_rows(cesc_muts) %>%
+  bind_rows(kirp_muts) %>%
+  bind_rows(sarc_muts) %>%
+  bind_rows(laml_muts) %>%
+  bind_rows(esca_muts) %>%
+  bind_rows(paad_muts) %>%
+  bind_rows(pcpg_muts) %>%
+  bind_rows(read_muts) %>%
+  bind_rows(tgct_muts) %>%
+  bind_rows(thym_muts) %>%
+  bind_rows(kich_muts) %>%
+  bind_rows(acc_muts) %>%
+  bind_rows(meso_muts) %>%
+  bind_rows(uvm_muts) %>%
+  bind_rows(dlbc_muts) %>%
+  bind_rows(ucs_muts) %>%
+  bind_rows(chol_muts) %>%
+  as_tibble()
+
+muts_df
+
+# save for later
+saveRDS(muts_df, "output/combined_tcga_mutations_df.rds")
+
+# add in DLBCL mutation data
+final_analysis_set <- read_delim("~/dlbcl_landscape/data/final_analysis_set.maf", 
+    "\t", escape_double = FALSE, trim_ws = TRUE) %>%
+  dplyr::select(Tumor_Sample_Barcode, everything())
+final_analysis_set
+
+# save for later
+saveRDS(final_analysis_set, "output/dlbcl_mutations_df.rds")
+```
+
+Filter cases for primary solid tumors and convert to count matrix
+
+Possible start point for mutations
+
+```{r}
+final_analysis_set <- readRDS("output/dlbcl_mutations_df.rds")
+
+tcga_metadata_list <- readRDS("/Volumes/kline-lab/backups/tcga_macs/output/tcga_metadata_list.rds")
+
+muts_df <- readRDS("output/combined_tcga_mutations_df.rds")
+
+# add in TCGA barcodes using file UUID
+barcoder2 <- function(df){
+  UUIDtoBarcode(df$id, from_type = "file_id") %>% 
+    as_tibble()
+}
+
+tcga_meta_df <- map_df(tcga_metadata_list, function(df){
+  df %>% 
+    dplyr::rename(file_id = id) %>%
+    dplyr::rename(sample_id = sample)})
+
+metadata_files <- map_df(tcga_metadata_list, barcoder2)
+
+meta_lookup_table <- TCGAbiospec(metadata_files$associated_entities.entity_submitter_id) %>%
+  bind_cols(file_id = metadata_files$file_id) %>%
+  as_tibble() %>%
+  left_join(tcga_meta_df) %>%
+  dplyr::select(sample_id, submitter_id, everything()) %>%
+  dplyr::rename(submitter_barcode = submitter_id) %>%
+  print()
+
+muts_dlbcl <- final_analysis_set %>%
+  dplyr::select(sample_id = Tumor_Sample_Barcode, 
+                Hugo_Symbol) %>%
+  distinct(sample_id, Hugo_Symbol) %>%
+  print()
+
+muts_matrix <- muts_df %>%
+  separate(Tumor_Sample_Barcode, 
+           into = c("TSB_1", "TSB_2", "TSB_3"), 
+           sep = "\\-", 
+           remove = FALSE) %>%
+  unite(col = "submitter_barcode", 2:4, sep = "-", remove = TRUE) %>%
+  dplyr::select(submitter_barcode, Hugo_Symbol, everything()) %>%
+  left_join(meta_lookup_table) %>%
+  drop_na(Hugo_Symbol) %>%
+  # keep only one mutation per gene per sample
+  distinct(sample_id, Hugo_Symbol, .keep_all = TRUE) %>%
+  dplyr::select(sample_id, Hugo_Symbol, Variant_Classification, sample_definition) %>%
+  # keep only primary solid tumor samples
+  dplyr::filter(sample_definition == "Primary Solid Tumor") %>%
+  dplyr::select(sample_id, Hugo_Symbol) %>%
+  bind_rows(muts_dlbcl) %>%
+  dplyr::mutate(n = rep(1, length.out = nrow(.))) %>%
+  spread(key = Hugo_Symbol, value = n, fill = 0) %>%
+  print()
+
+saveRDS(muts_matrix, "output/mutations_matrix_tcga_plus_dlbcl.rds")
+```
+
+#### Mutations Correlation
+
+
+```{r}
+sub_1 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_1/CIBERSORTx_Job1_Results.csv")
+
+sub_2 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_2/CIBERSORTx_Job1_Results.csv")
+
+sub_3 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_3/CIBERSORTx_Job1_Results (1).csv")
+
+sub_4 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_4/CIBERSORTx_Job1_Results (2).csv")
+
+sub_5 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_5/CIBERSORTx_Job1_Results (2).csv")
+
+sub_6 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_6/CIBERSORTx_Job1_Results (2).csv")
+
+sub_7 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_7/CIBERSORTx_Job1_Results (2).csv")
+
+sub_8 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_8/CIBERSORTx_Job1_Results (3).csv")
+
+full_spectrum_deconvolution_results <- sub_1 %>%
+  bind_rows(sub_2, sub_3, sub_4, sub_5, sub_6, sub_7, sub_8) %>%
+  dplyr::rename(sample_id = Mixture) %>%
+  print()
+tail(full_spectrum_deconvolution_results)
+
+decon_names <- colnames(full_spectrum_deconvolution_results)[2:27]
+decon_names
+
+# keep only those columns with >2% mutations
+muts_5 <- muts_matrix %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id") %>%
+  as.matrix() %>%
+  .[, colSums(.) > 477]
+str(muts_5)
+str(muts_5)
+# reduces to 81 candidate genes
+
+muts_5_df <- muts_5 %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  print()
+
+mut_names <- colnames(muts_5_df)[-1]
+mut_names
+
+perms <- expand.grid(mut_names, decon_names) %>%
+  rename(mut_names = Var1, decon_names = Var2) %>%
+  mutate(mut_names = as.character(mut_names)) %>%
+  mutate(decon_names = as.character(decon_names))
+str(perms)
+
+# write function to compare deconvolution scores by mutation
+decon_vs_mut <- function(mut_name, decon_name){
+  mut <- muts_5_df %>%
+    dplyr::filter(!! rlang::sym(mut_name) == 1) %>%
+    dplyr::select(sample_id) %>%
+    left_join(full_spectrum_deconvolution_results) %>%
+    pull(!! rlang::sym(decon_name))
+  nonmut <- muts_5_df %>%
+    dplyr::filter(!! rlang::sym(mut_name) == 0) %>%
+    dplyr::select(sample_id) %>%
+    left_join(full_spectrum_deconvolution_results) %>%
+    pull(!! rlang::sym(decon_name))
+  tidy(t.test(mut, nonmut)) %>%
+    bind_cols("gene" = mut_name) %>%
+    bind_cols("cell_type" = decon_name) %>%
+    bind_cols("mut_number" = length(mut)) %>%
+    bind_cols("nonmut_number" = length(nonmut)) %>%
+    dplyr::mutate(mut_rate = length(mut) / (length(mut) + length(nonmut))) %>%
+    dplyr::mutate(mut_mean = sum(mut, na.rm = TRUE) / length(mut)) %>%
+    dplyr::mutate(nonmut_mean = sum(nonmut, na.rm = TRUE) / length(nonmut)) %>%
+    dplyr::mutate(percent_change = (((mut_mean - nonmut_mean) / nonmut_mean))*100) %>%
+    dplyr::select(gene, cell_type, p.value, percent_change, mut_mean, nonmut_mean, mut_rate, mut_number, nonmut_number, everything())
+}
+
+# test function
+decon_vs_mut("KRAS", "cd8_eff")
+
+mutation_correlations <- map2_dfr(perms$mut_names, 
+                                  perms$decon_names, 
+                                  decon_vs_mut)
+
+mut_decon_corr <- mutation_correlations %>%
+  arrange(p.value) %>%
+  mutate(p.adj = p.adjust(p.value, method = "BH")) %>%
+  dplyr::select(gene, cell_type, p.value, p.adj, everything()) %>%
+  print()
+write_csv(mut_decon_corr, "output/pancancer_decon_vs_muts.csv")
+```
+
+
+###### Not using point-biserial correlation at this time, saved for possible future use
+
+Need point-biserial correlation. Discrete variable is mutation where 0 = absent and 1 = present while continuous variable is custom deconvolution score
+
+https://stats.stackexchange.com/questions/89209/interpretation-of-point-biserial-correlation
+https://rpubs.com/juanhklopper/biserial_correlation
+https://bookdown.org/burak2358/SARP-EN/correlation.html#biserial-and-point-biserial-correlation-coefficients-with-r
+
+First import deconvolution results
+```{r}
+sub_1 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_1/CIBERSORTx_Job1_Results.csv")
+
+sub_2 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_2/CIBERSORTx_Job1_Results.csv")
+
+sub_3 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_3/CIBERSORTx_Job1_Results (1).csv")
+
+sub_4 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_4/CIBERSORTx_Job1_Results (2).csv")
+
+sub_5 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_5/CIBERSORTx_Job1_Results (2).csv")
+
+sub_6 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_6/CIBERSORTx_Job1_Results (2).csv")
+
+sub_7 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_7/CIBERSORTx_Job1_Results (2).csv")
+
+sub_8 <- read_csv("output/cibersort_results/absolute_fractions/tcga_dlbcl_full_spectrum/subset_8/CIBERSORTx_Job1_Results (3).csv")
+
+full_spectrum_deconvolution_results <- sub_1 %>%
+  bind_rows(sub_2, sub_3, sub_4, sub_5, sub_6, sub_7, sub_8) %>%
+  dplyr::rename(sample_id = Mixture) %>%
+  print()
+tail(full_spectrum_deconvolution_results)
+```
+
+Make combined table
+```{r}
+# filter for mutations present in at least 1% of samples
+muts_matrix_mat <- muts_matrix %>%
+  as.data.frame() %>%
+  column_to_rownames(var = "sample_id") %>%
+  as.matrix()
+muts_matrix_colsum <- muts_matrix_mat %>%
+  colSums() %>%
+  print()
+keepers <- names(muts_matrix_colsum[muts_matrix_colsum > (nrow(muts_matrix) * 0.01)]) %>%
+  print()
+muts_matrix_filtered <- muts_matrix_mat[, keepers]
+identical(colnames(muts_matrix_filtered), keepers)
+muts_matrix_filtered[1:5, 1:5]
+dim(muts_matrix_filtered)
+
+muts_matrix_plus_decon <- muts_matrix_filtered %>%
+  rownames_to_column(var = "sample_id") %>%
+  as_tibble() %>%
+  left_join(full_spectrum_deconvolution_results) %>% 
+  dplyr::select()
+  print()
+```
+
+
+## Copy number
+
+#### Get and format copy number data
+
+Can skip - Download copy number data
+```{r}
+# function to get manifest id's for aggregated masked mutations
+getcna <- function(i){
+  files() %>%
+    GenomicDataCommons::select(available_fields('files')) %>%
+    GenomicDataCommons::filter(~ cases.project.project_id == i &
+             data_type == 'Gene Level Copy Number Scores' &
+             analysis.workflow_type == 'GISTIC - Copy Number Score') %>%
+    GenomicDataCommons::select('file_id') %>%
+    GenomicDataCommons::results_all()
+}
+
+# apply function to list elements
+tcga_cnafiles <- map(tcgalist, getcna) %>%
+  map_df(function(x) x[[1]]) %>% gather(key = "project", value = "filename")
+
+# download files
+cna_names <- lapply(tcga_cnafiles$filename, gdcdata)
+```
+
+Can skip - gather into single dataframe
+```{r}
+# gather files
+brca_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/BRCA.focal_score_by_genes.txt", delim = "\t")
+
+gbm_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/GBM.focal_score_by_genes.txt", delim = "\t")
+
+ov_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/OV.focal_score_by_genes.txt", delim = "\t")
+
+luad_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/LUAD.focal_score_by_genes.txt", delim = "\t")
+
+ucec_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/UCEC.focal_score_by_genes.txt", delim = "\t")
+
+kirc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/KIRC.focal_score_by_genes.txt", delim = "\t")
+
+hnsc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/HNSC.focal_score_by_genes.txt", delim = "\t")
+
+lgg_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/LGG.focal_score_by_genes.txt", delim = "\t")
+
+thca_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/THCA.focal_score_by_genes.txt", delim = "\t")
+
+lusc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/LUSC.focal_score_by_genes.txt", delim = "\t")
+
+prad_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/PRAD.focal_score_by_genes.txt", delim = "\t")
+
+skcm_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/SKCM.focal_score_by_genes.txt", delim = "\t")
+
+coad_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/COAD.focal_score_by_genes.txt", delim = "\t")
+
+stad_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/STAD.focal_score_by_genes.txt", delim = "\t")
+
+blca_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/BLCA.focal_score_by_genes.txt", delim = "\t")
+
+lihc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/LIHC.focal_score_by_genes.txt", delim = "\t")
+
+cesc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/CESC.focal_score_by_genes.txt", delim = "\t")
+
+kirp_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/KIRP.focal_score_by_genes.txt", delim = "\t")
+
+sarc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/SARC.focal_score_by_genes.txt", delim = "\t")
+
+laml_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/LAML.focal_score_by_genes.txt", delim = "\t")
+
+esca_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/ESCA.focal_score_by_genes.txt", delim = "\t")
+
+paad_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/PAAD.focal_score_by_genes.txt", delim = "\t")
+
+pcpg_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/PCPG.focal_score_by_genes.txt", delim = "\t")
+
+read_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/READ.focal_score_by_genes.txt", delim = "\t")
+
+tgct_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/TGCT.focal_score_by_genes.txt", delim = "\t")
+
+thym_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/THYM.focal_score_by_genes.txt", delim = "\t")
+
+kich_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/KICH.focal_score_by_genes.txt", delim = "\t")
+
+acc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/ACC.focal_score_by_genes.txt", delim = "\t")
+
+meso_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/MESO.focal_score_by_genes.txt", delim = "\t")
+
+uvm_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/UVM.focal_score_by_genes.txt", delim = "\t")
+
+dlbc_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/DLBC.focal_score_by_genes.txt", delim = "\t")
+
+ucs_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/UCS.focal_score_by_genes.txt", delim = "\t")
+
+chol_cna <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/TCGA_CNA/CHOL.focal_score_by_genes.txt", delim = "\t")
+
+cna_list <- list(
+  "BRCA" = brca_cna,
+  "GBM" = gbm_cna,
+  "OV" = ov_cna,
+  "LUAD" = luad_cna,
+  "UCEC" = ucec_cna,
+  "KIRC" = kirc_cna,
+  "HNSC" = hnsc_cna,
+  "LGG" = lgg_cna,
+  "THCA" = thca_cna,
+  "LUSC" = lusc_cna,
+  "PRAD" = prad_cna,
+  "SKCM" = skcm_cna,
+  "COAD" = coad_cna,
+  "STAD" = stad_cna,
+  "BLCA" = blca_cna,
+  "LIHC" = lihc_cna,
+  "CESC" = cesc_cna,
+  "KIRP" = kirp_cna,
+  "SARC" = sarc_cna,
+  "LAML" = laml_cna,
+  "ESCA" = esca_cna,
+  "PAAD" = paad_cna,
+  "PCPG" = pcpg_cna,
+  "READ" = read_cna,
+  "TGCT" = tgct_cna,
+  "THYM" = thym_cna,
+  "KICH" = kich_cna,
+  "ACC" = acc_cna,
+  "MESO" = meso_cna,
+  "UVM" = uvm_cna,
+  "DLBC" = dlbc_cna,
+  "UCS" = ucs_cna,
+  "CHOL" = chol_cna)
+
+saveRDS(cna_list, "output/tcga_cna_list.rds")
+
+cna_df <- reduce(cna_list, left_join)
+
+saveRDS(cna_df, "output/tcga_cna_df.rds")
+
+```
+
+Convert cna colnames to TCGA barcodes to match mutations
+
+Possible start point for CNAs
+```{r}
+cna_df <- readRDS("output/tcga_cna_df.rds")
+
+cnames_cna <- colnames(cna_df)
+new_colnames <- UUIDtoBarcode(cnames_cna, from_type = "aliquot_ids") %>%
+  print()
+new_cols <- new_colnames$portions.analytes.aliquots.submitter_id
+head(new_cols)
+new_cols[1:3] <- c("Gene Symbol", "Gene ID", "Cytoband")
+head(new_cols)
+length(new_cols)
+length(unique(new_cols))
+length(unique(cnames_cna))
+colnames(cna_df) <- new_cols
+
+cna_t <- cna_df %>% t()
+```
+
+```{r}
+# function to get case IDs for conversion to TCGA legacy barcodes
+get_id <- function(df){
+  df %>% 
+  dplyr::select(-`Gene Symbol`, -`Gene ID`, -`Cytoband`) %>%
+  colnames()
+}
+
+# apply function to cna list
+ids_list <- map(cna_list, get_id)
+
+ids_list[[1]] %>% head()
+str(ids_list)
+
+# make lookup table with UUIDs and TCGA legacy barcodes
+barcoder <- function(uuid_vector){
+  UUIDtoBarcode(uuid_vector, from_type = "aliquot_ids") %>% 
+    as_tibble()
+}
+
+barcodes_list <- map(ids_list, barcoder)
+
+# parse barcode for metadata
+get_metadata <- function(df){
+  TCGAbiospec(df$portions.analytes.aliquots.submitter_id) %>%
+    bind_cols(portions.analytes.aliquots.submitter_id = df$portions.analytes.aliquots.submitter_id) %>%
+    as_tibble() %>%
+    dplyr::select(portions.analytes.aliquots.submitter_id, everything()) %>%
+    left_join(df)
+}
+
+# get metadata and combine into a single dataframe
+metadata_lookup <- map_df(barcodes_list, get_metadata)
+
+summary(as.factor(metadata_lookup$sample_definition))
+
+# eventually combine the metadata for all cases
+saveRDS(metadata_lookup, "output/cna_metadata_lookup.rds")
+```
+
+#### Correlations CNA
+
+
+
+

@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="mleukam" />
+
+<meta name="date" content="2019-10-10" />
+
+<title>survival</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Macrophage signatures in TCGA</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/mleukam/tcga_macs">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">survival</h1>
+<h4 class="author">mleukam</h4>
+<h4 class="date">2019-10-10</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2019-10-13
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>tcga_macs/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.4.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20190409code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20190409)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20190409code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20190409)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree20bb500b06c28190863a6a644f2e66fcc17bc325targetblank20bb500a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/mleukam/tcga_macs/tree/20bb500b06c28190863a6a644f2e66fcc17bc325" target="_blank">20bb500</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcommleukamtcgamacstree20bb500b06c28190863a6a644f2e66fcc17bc325targetblank20bb500a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    all.pdf
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/figure/
+    Ignored:    data/.DS_Store
+    Ignored:    data/160genes_ensembl.gencode28.txt
+    Ignored:    data/GSE46903_Affymetrix_Reanalyzed_data.txt.gz
+    Ignored:    data/GSE46903_Affymetrix_metadata.txt.gz
+    Ignored:    data/GSE46903_RAW.tar
+    Ignored:    data/GSE46903_non-normalized.txt
+    Ignored:    data/gencode.v22.primary_assembly.annotation.gtf.geneinfo
+    Ignored:    data/gse_46903.rds
+    Ignored:    data/htseq_counts/
+    Ignored:    data/kyle.gdc_tcga_bam_metadata.txt
+    Ignored:    output/Combined_down_plots.pdf
+    Ignored:    output/Combined_up_plots.pdf
+    Ignored:    output/PFS_CoxPH.pdf
+    Ignored:    output/Rplot.pdf
+    Ignored:    output/arrange.pdf
+    Ignored:    output/ave_scores_gsva_by_tumor.rds
+    Ignored:    output/combined_boxplots.pdf
+    Ignored:    output/combined_up_plot.pdf
+    Ignored:    output/coxph_pfs.pdf
+    Ignored:    output/cv.lasso.merck.rds
+    Ignored:    output/cv.lasso.rds
+    Ignored:    output/dge_frame.csv
+    Ignored:    output/downreg_c1.csv
+    Ignored:    output/downreg_c2.csv
+    Ignored:    output/downreg_c3.csv
+    Ignored:    output/downreg_c4.csv
+    Ignored:    output/downreg_c5.csv
+    Ignored:    output/downreg_c6.csv
+    Ignored:    output/downreg_c7.csv
+    Ignored:    output/expr_matrix.csv
+    Ignored:    output/expr_matrix.rds
+    Ignored:    output/expression_set.rds
+    Ignored:    output/filtered.total.phenodata.csv
+    Ignored:    output/filtered.total.phenodata.rds
+    Ignored:    output/flat_total_counts.rds
+    Ignored:    output/flat_total_pheno.rds
+    Ignored:    output/gset_ids_complete.rds
+    Ignored:    output/gset_ids_plusnew.rds
+    Ignored:    output/heatmaps_fig3.pdf
+    Ignored:    output/hm_chol.pdf
+    Ignored:    output/imtx_expressionset.rds
+    Ignored:    output/imtx_gsva_17geneset_results.rds
+    Ignored:    output/imtx_matrix.csv
+    Ignored:    output/km_cluster_assignments.csv
+    Ignored:    output/lasso.min.model.merck.rds
+    Ignored:    output/lasso.min.model.rds
+    Ignored:    output/lasso.test.data.merck.rds
+    Ignored:    output/lasso.test.data.rds
+    Ignored:    output/lasso.train.data.merck.rds
+    Ignored:    output/lasso.train.data.rds
+    Ignored:    output/mac_eset.rds
+    Ignored:    output/mac_eset_w_clusters.rds
+    Ignored:    output/nested_list_dge_top50_updown.rds
+    Ignored:    output/normalized_probe_intensities.Rds
+    Ignored:    output/os_km_curves.pdf
+    Ignored:    output/os_km_plots.pdf
+    Ignored:    output/processed_lumi_46903.Rds
+    Ignored:    output/processed_lumi_46903.tsv
+    Ignored:    output/processed_lumi_exprs.txt
+    Ignored:    output/pub_boxplot.pdf
+    Ignored:    output/score_matrix.csv
+    Ignored:    output/selected.total.counts.csv
+    Ignored:    output/summary heatmap.pdf
+    Ignored:    output/table_c1.csv
+    Ignored:    output/table_c2.csv
+    Ignored:    output/table_c3.csv
+    Ignored:    output/table_c4.csv
+    Ignored:    output/table_c5.csv
+    Ignored:    output/table_c6.csv
+    Ignored:    output/table_c7.csv
+    Ignored:    output/tcga_counts_dataframe_list.rds
+    Ignored:    output/tcga_counts_list.rds
+    Ignored:    output/tcga_gdc_manifest.rds
+    Ignored:    output/tcga_gsva_17geneset_results.rds
+    Ignored:    output/tcga_metadata_list.rds
+    Ignored:    output/tcga_total_counts.csv
+    Ignored:    output/univariate_p_values.pdf
+    Ignored:    output/upreg_c1.csv
+    Ignored:    output/upreg_c2.csv
+    Ignored:    output/upreg_c3.csv
+    Ignored:    output/upreg_c4.csv
+    Ignored:    output/upreg_c5.csv
+    Ignored:    output/upreg_c6.csv
+    Ignored:    output/upreg_c7.csv
+
+Untracked files:
+    Untracked:  analysis/expanded_gsva.Rmd
+    Untracked:  analysis/expanded_gsva_analysis.Rmd
+    Untracked:  analysis/gsva_results_exploration.Rmd
+    Untracked:  analysis/survival.Rmd
+    Untracked:  data/IMTX_datasets/
+    Untracked:  data/xcel_signatures.xlsx
+    Untracked:  output/PFS_CoxPH-concordance.tex
+    Untracked:  output/PFS_CoxPH.Rnw
+    Untracked:  output/PFS_CoxPH.log
+    Untracked:  output/PFS_CoxPH.synctex.gz
+    Untracked:  output/PFS_CoxPH.tex
+    Untracked:  output/coxph_pfs-concordance.tex
+    Untracked:  output/coxph_pfs.Rnw
+    Untracked:  output/coxph_pfs.log
+    Untracked:  output/coxph_pfs.synctex.gz
+    Untracked:  output/coxph_pfs.tex
+    Untracked:  output/univariate_p_values-concordance.tex
+    Untracked:  output/univariate_p_values.Rnw
+    Untracked:  output/univariate_p_values.log
+    Untracked:  output/univariate_p_values.synctex.gz
+    Untracked:  output/univariate_p_values.tex
+
+Unstaged changes:
+    Modified:   .gitignore
+    Modified:   analysis/clustering.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   analysis/ss_gsea.Rmd
+    Modified:   analysis/tcga_format.Rmd
+    Deleted:    docs/.nojekyll
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>Clear workspace</p>
+<pre class="r"><code>rm(list = ls())</code></pre>
+<p>Load packages</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.2.1     ✔ purrr   0.3.2
+✔ tibble  2.1.3     ✔ dplyr   0.8.3
+✔ tidyr   1.0.0     ✔ stringr 1.4.0
+✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>── Conflicts ───────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(survival)
+library(survminer)</code></pre>
+<pre><code>Loading required package: ggpubr</code></pre>
+<pre><code>Loading required package: magrittr</code></pre>
+<pre><code>
+Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:purrr&#39;:
+
+    set_names</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    extract</code></pre>
+<pre class="r"><code>library(ggsci)
+library(ggpubr)
+library(viridis)</code></pre>
+<pre><code>Loading required package: viridisLite</code></pre>
+<pre class="r"><code>library(broom)
+library(Biobase)</code></pre>
+<pre><code>Loading required package: BiocGenerics</code></pre>
+<pre><code>Loading required package: parallel</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:parallel&#39;:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    combine, intersect, setdiff, union</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, append, as.data.frame, basename, cbind,
+    colMeans, colnames, colSums, dirname, do.call, duplicated,
+    eval, evalq, Filter, Find, get, grep, grepl, intersect,
+    is.unsorted, lapply, lengths, Map, mapply, match, mget, order,
+    paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind,
+    Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max,
+    which.min</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<p>Load data</p>
+<pre class="r"><code>imtx_gsva_results &lt;- readRDS(&quot;output/imtx_gsva_17geneset_results.rds&quot;) %&gt;%
+  t() %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(var = &quot;sample_id&quot;) %&gt;% 
+  as_tibble() %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 226 x 20
+   sample_id upreg_c1 upreg_c2 upreg_c3 upreg_c4 upreg_c5 upreg_c6 upreg_c7
+   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+ 1 ERR22088…   0.355    -0.277  -0.112    -0.242  -0.172   -0.341    -0.268
+ 2 ERR22088…  -0.187    -0.531  -0.294    -0.369  -0.486   -0.458    -0.482
+ 3 ERR22088…  -0.238    -0.349  -0.304    -0.219  -0.121   -0.316    -0.304
+ 4 ERR22088…   0.465     0.116   0.316     0.349   0.273    0.140     0.166
+ 5 ERR22088…   0.318     0.592   0.615     0.574   0.563    0.576     0.638
+ 6 ERR22088…   0.161     0.448   0.436     0.346   0.208    0.438     0.427
+ 7 ERR22088…  -0.354    -0.521  -0.492    -0.357  -0.475   -0.324    -0.533
+ 8 ERR22088…  -0.251    -0.334  -0.385    -0.434  -0.430   -0.329    -0.530
+ 9 ERR22088…  -0.0162   -0.426  -0.181    -0.242  -0.196   -0.244    -0.237
+10 ERR22088…  -0.143     0.318  -0.0566   -0.149  -0.0607   0.0735    0.179
+# … with 216 more rows, and 12 more variables: downreg_c1 &lt;dbl&gt;,
+#   downreg_c2 &lt;dbl&gt;, downreg_c3 &lt;dbl&gt;, downreg_c4 &lt;dbl&gt;,
+#   downreg_c5 &lt;dbl&gt;, downreg_c6 &lt;dbl&gt;, downreg_c7 &lt;dbl&gt;,
+#   tcell_gset &lt;dbl&gt;, cxcl9_cxcl10 &lt;dbl&gt;, merck_tis_expanded_ifn &lt;dbl&gt;,
+#   m1_blueprint &lt;dbl&gt;, m2_blueprint &lt;dbl&gt;</code></pre>
+<pre class="r"><code>imtx_es &lt;- readRDS(&quot;output/imtx_expressionset.rds&quot;) </code></pre>
+</div>
+<div id="pfs" class="section level2">
+<h2>PFS</h2>
+<p>Clean data</p>
+<p><a href="https://www.datacamp.com/community/tutorials/survival-analysis-R" class="uri">https://www.datacamp.com/community/tutorials/survival-analysis-R</a> <a href="https://dplyr.tidyverse.org/articles/window-functions.html" class="uri">https://dplyr.tidyverse.org/articles/window-functions.html</a></p>
+<pre class="r"><code># get pheno data out of expressionset
+# remove ocular and other types of melanoma (keep only cutaneous or not specified)
+imtx_pdata &lt;- pData(imtx_es) %&gt;% 
+  rownames_to_column(var = &quot;sample_id&quot;) %&gt;%
+  as_tibble() %&gt;%
+  dplyr::filter(subtype %in% c(&quot;CUTANEOUS&quot;, NA)) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 191 x 18
+   sample_id patient library read_group platform center date   lane   run
+   &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 ERR22088… gide_i… ERR220… ERR2208887 Illumina GIDE   1/1/…     1   356
+ 2 ERR22088… gide_i… ERR220… ERR2208888 Illumina GIDE   1/1/…     1   356
+ 3 ERR22088… gide_i… ERR220… ERR2208889 Illumina GIDE   1/1/…     5   434
+ 4 ERR22088… gide_i… ERR220… ERR2208890 Illumina GIDE   1/1/…     5   356
+ 5 ERR22088… gide_i… ERR220… ERR2208891 Illumina GIDE   1/1/…     6   434
+ 6 ERR22088… gide_i… ERR220… ERR2208892 Illumina GIDE   1/1/…     6   434
+ 7 ERR22088… gide_i… ERR220… ERR2208893 Illumina GIDE   1/1/…     4   434
+ 8 ERR22088… gide_i… ERR220… ERR2208894 Illumina GIDE   1/1/…     4   434
+ 9 ERR22088… gide_i… ERR220… ERR2208895 Illumina GIDE   1/1/…     5   356
+10 ERR22088… gide_i… ERR220… ERR2208896 Illumina GIDE   1/1/…     1     0
+# … with 181 more rows, and 9 more variables: flavor &lt;chr&gt;, genome &lt;chr&gt;,
+#   os_days &lt;dbl&gt;, os_status &lt;dbl&gt;, response &lt;chr&gt;, subtype &lt;chr&gt;,
+#   cyt &lt;dbl&gt;, pfs_days &lt;dbl&gt;, pfs_status &lt;dbl&gt;</code></pre>
+<pre class="r"><code># get cases with PFS data, merge with gsva results
+pfs_data &lt;- imtx_pdata %&gt;%
+  drop_na(pfs_status) %&gt;%
+  left_join(imtx_gsva_results) %&gt;%
+  print()</code></pre>
+<pre><code>Joining, by = &quot;sample_id&quot;</code></pre>
+<pre><code># A tibble: 91 x 37
+   sample_id patient library read_group platform center date   lane   run
+   &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 ERR22088… gide_i… ERR220… ERR2208887 Illumina GIDE   1/1/…     1   356
+ 2 ERR22088… gide_i… ERR220… ERR2208888 Illumina GIDE   1/1/…     1   356
+ 3 ERR22088… gide_i… ERR220… ERR2208889 Illumina GIDE   1/1/…     5   434
+ 4 ERR22088… gide_i… ERR220… ERR2208890 Illumina GIDE   1/1/…     5   356
+ 5 ERR22088… gide_i… ERR220… ERR2208891 Illumina GIDE   1/1/…     6   434
+ 6 ERR22088… gide_i… ERR220… ERR2208892 Illumina GIDE   1/1/…     6   434
+ 7 ERR22088… gide_i… ERR220… ERR2208893 Illumina GIDE   1/1/…     4   434
+ 8 ERR22088… gide_i… ERR220… ERR2208894 Illumina GIDE   1/1/…     4   434
+ 9 ERR22088… gide_i… ERR220… ERR2208895 Illumina GIDE   1/1/…     5   356
+10 ERR22088… gide_i… ERR220… ERR2208896 Illumina GIDE   1/1/…     1     0
+# … with 81 more rows, and 28 more variables: flavor &lt;chr&gt;, genome &lt;chr&gt;,
+#   os_days &lt;dbl&gt;, os_status &lt;dbl&gt;, response &lt;chr&gt;, subtype &lt;chr&gt;,
+#   cyt &lt;dbl&gt;, pfs_days &lt;dbl&gt;, pfs_status &lt;dbl&gt;, upreg_c1 &lt;dbl&gt;,
+#   upreg_c2 &lt;dbl&gt;, upreg_c3 &lt;dbl&gt;, upreg_c4 &lt;dbl&gt;, upreg_c5 &lt;dbl&gt;,
+#   upreg_c6 &lt;dbl&gt;, upreg_c7 &lt;dbl&gt;, downreg_c1 &lt;dbl&gt;, downreg_c2 &lt;dbl&gt;,
+#   downreg_c3 &lt;dbl&gt;, downreg_c4 &lt;dbl&gt;, downreg_c5 &lt;dbl&gt;,
+#   downreg_c6 &lt;dbl&gt;, downreg_c7 &lt;dbl&gt;, tcell_gset &lt;dbl&gt;,
+#   cxcl9_cxcl10 &lt;dbl&gt;, merck_tis_expanded_ifn &lt;dbl&gt;, m1_blueprint &lt;dbl&gt;,
+#   m2_blueprint &lt;dbl&gt;</code></pre>
+<pre class="r"><code># divide into quartiles by cluster expression
+# 4 is highest quartile and 1 is lowest
+pfs_data_rank &lt;- pfs_data %&gt;%
+  mutate(c1_quartile = ntile(upreg_c1, 4)) %&gt;%
+  mutate(c2_quartile = ntile(upreg_c2, 4)) %&gt;%
+  mutate(c3_quartile = ntile(upreg_c3, 4)) %&gt;%
+  mutate(c4_quartile = ntile(upreg_c4, 4)) %&gt;%
+  mutate(c5_quartile = ntile(upreg_c5, 4)) %&gt;%
+  mutate(c6_quartile = ntile(upreg_c6, 4)) %&gt;%
+  mutate(c7_quartile = ntile(upreg_c7, 4)) %&gt;%
+  mutate(tcell_quartile = ntile(tcell_gset, 4)) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 91 x 45
+   sample_id patient library read_group platform center date   lane   run
+   &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 ERR22088… gide_i… ERR220… ERR2208887 Illumina GIDE   1/1/…     1   356
+ 2 ERR22088… gide_i… ERR220… ERR2208888 Illumina GIDE   1/1/…     1   356
+ 3 ERR22088… gide_i… ERR220… ERR2208889 Illumina GIDE   1/1/…     5   434
+ 4 ERR22088… gide_i… ERR220… ERR2208890 Illumina GIDE   1/1/…     5   356
+ 5 ERR22088… gide_i… ERR220… ERR2208891 Illumina GIDE   1/1/…     6   434
+ 6 ERR22088… gide_i… ERR220… ERR2208892 Illumina GIDE   1/1/…     6   434
+ 7 ERR22088… gide_i… ERR220… ERR2208893 Illumina GIDE   1/1/…     4   434
+ 8 ERR22088… gide_i… ERR220… ERR2208894 Illumina GIDE   1/1/…     4   434
+ 9 ERR22088… gide_i… ERR220… ERR2208895 Illumina GIDE   1/1/…     5   356
+10 ERR22088… gide_i… ERR220… ERR2208896 Illumina GIDE   1/1/…     1     0
+# … with 81 more rows, and 36 more variables: flavor &lt;chr&gt;, genome &lt;chr&gt;,
+#   os_days &lt;dbl&gt;, os_status &lt;dbl&gt;, response &lt;chr&gt;, subtype &lt;chr&gt;,
+#   cyt &lt;dbl&gt;, pfs_days &lt;dbl&gt;, pfs_status &lt;dbl&gt;, upreg_c1 &lt;dbl&gt;,
+#   upreg_c2 &lt;dbl&gt;, upreg_c3 &lt;dbl&gt;, upreg_c4 &lt;dbl&gt;, upreg_c5 &lt;dbl&gt;,
+#   upreg_c6 &lt;dbl&gt;, upreg_c7 &lt;dbl&gt;, downreg_c1 &lt;dbl&gt;, downreg_c2 &lt;dbl&gt;,
+#   downreg_c3 &lt;dbl&gt;, downreg_c4 &lt;dbl&gt;, downreg_c5 &lt;dbl&gt;,
+#   downreg_c6 &lt;dbl&gt;, downreg_c7 &lt;dbl&gt;, tcell_gset &lt;dbl&gt;,
+#   cxcl9_cxcl10 &lt;dbl&gt;, merck_tis_expanded_ifn &lt;dbl&gt;, m1_blueprint &lt;dbl&gt;,
+#   m2_blueprint &lt;dbl&gt;, c1_quartile &lt;int&gt;, c2_quartile &lt;int&gt;,
+#   c3_quartile &lt;int&gt;, c4_quartile &lt;int&gt;, c5_quartile &lt;int&gt;,
+#   c6_quartile &lt;int&gt;, c7_quartile &lt;int&gt;, tcell_quartile &lt;int&gt;</code></pre>
+<p>PFS analysis</p>
+<pre class="r"><code># cluster 1
+c1_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c1_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c1_pfs_data$pfs_days, event = c1_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c1_quartile, data = c1_pfs_data)
+survdiff(pfs_surv_obj ~ c1_quartile, data = c1_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c1_quartile, data = c1_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c1_quartile=1 23       15     14.7   0.00642    0.0132
+c1_quartile=4 22       14     14.3   0.00659    0.0132
+
+ Chisq= 0  on 1 degrees of freedom, p= 0.9 </code></pre>
+<pre class="r"><code>c1_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c1_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 1&quot;)
+
+c1_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 2
+c2_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c2_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c2_pfs_data$pfs_days, event = c2_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c2_quartile, data = c2_pfs_data)
+survdiff(pfs_surv_obj ~ c2_quartile, data = c2_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c2_quartile, data = c2_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c2_quartile=1 23       19     8.35     13.60      22.1
+c2_quartile=4 22        8    18.65      6.09      22.1
+
+ Chisq= 22.1  on 1 degrees of freedom, p= 3e-06 </code></pre>
+<pre class="r"><code>c2_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c2_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 2&quot;,
+                      risk.table = FALSE)
+c2_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 3
+c3_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c3_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c3_pfs_data$pfs_days, event = c3_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c3_quartile, data = c3_pfs_data)
+survdiff(pfs_surv_obj ~ c3_quartile, data = c3_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c3_quartile, data = c3_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c3_quartile=1 23       18     12.6      2.35      4.29
+c3_quartile=4 22       12     17.4      1.69      4.29
+
+ Chisq= 4.3  on 1 degrees of freedom, p= 0.04 </code></pre>
+<pre class="r"><code>c3_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c3_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 3&quot;)
+c3_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 4
+c4_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c4_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c4_pfs_data$pfs_days, event = c4_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c4_quartile, data = c4_pfs_data)
+survdiff(pfs_surv_obj ~ c4_quartile, data = c4_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c4_quartile, data = c4_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c4_quartile=1 23       15     12.4     0.541      1.01
+c4_quartile=4 22       13     15.6     0.430      1.01
+
+ Chisq= 1  on 1 degrees of freedom, p= 0.3 </code></pre>
+<pre class="r"><code>c4_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c4_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 4&quot;)
+c4_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 5
+c5_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c5_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c5_pfs_data$pfs_days, event = c5_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c5_quartile, data = c5_pfs_data)
+survdiff(pfs_surv_obj ~ c5_quartile, data = c5_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c5_quartile, data = c5_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c5_quartile=1 23       17       12      2.13       3.8
+c5_quartile=4 22       12       17      1.49       3.8
+
+ Chisq= 3.8  on 1 degrees of freedom, p= 0.05 </code></pre>
+<pre class="r"><code>c5_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c5_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 5&quot;)
+c5_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 6
+c6_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c6_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c6_pfs_data$pfs_days, event = c6_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c6_quartile, data = c6_pfs_data)
+survdiff(pfs_surv_obj ~ c6_quartile, data = c6_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c6_quartile, data = c6_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c6_quartile=1 23       15     12.3     0.590      1.16
+c6_quartile=4 22       13     15.7     0.463      1.16
+
+ Chisq= 1.2  on 1 degrees of freedom, p= 0.3 </code></pre>
+<pre class="r"><code>c6_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c6_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 6&quot;)
+c6_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 7
+c7_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(c7_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = c7_pfs_data$pfs_days, event = c7_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ c7_quartile, data = c7_pfs_data)
+survdiff(pfs_surv_obj ~ c7_quartile, data = c7_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ c7_quartile, data = c7_pfs_data)
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c7_quartile=1 23       19     9.95      8.23      13.9
+c7_quartile=4 22       10    19.05      4.30      13.9
+
+ Chisq= 13.9  on 1 degrees of freedom, p= 2e-04 </code></pre>
+<pre class="r"><code>c7_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = c7_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;right&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;PFS, Cluster 7&quot;)
+c7_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># t-cell
+tcell_pfs_data &lt;- pfs_data_rank %&gt;%
+  dplyr::filter(tcell_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+pfs_surv_obj &lt;- Surv(time = tcell_pfs_data$pfs_days, event = tcell_pfs_data$pfs_status)
+fit_pfs &lt;- survfit(pfs_surv_obj ~ tcell_quartile, data = tcell_pfs_data)
+survdiff(pfs_surv_obj ~ tcell_quartile, data = tcell_pfs_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = pfs_surv_obj ~ tcell_quartile, data = tcell_pfs_data)
+
+                  N Observed Expected (O-E)^2/E (O-E)^2/V
+tcell_quartile=1 23       18     10.1      6.27      10.7
+tcell_quartile=4 22        9     16.9      3.72      10.7
+
+ Chisq= 10.7  on 1 degrees of freedom, p= 0.001 </code></pre>
+<pre class="r"><code>tcell_plot &lt;- ggsurvplot(fit_pfs, 
+                      data = tcell_pfs_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;right&quot;,
+                      legend.title = &quot;Tcell \nexpression quartile&quot;,
+                      title = &quot;PFS, Tcell&quot;)
+tcell_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggarrange(c1_plot$plot, c2_plot$plot, c3_plot$plot, c4_plot$plot, c5_plot$plot, c6_plot$plot, c7_plot$plot,
+          labels = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;),
+                     ncol = 4, nrow = 2)</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="cox-ph" class="section level4">
+<h4>Cox PH</h4>
+<pre class="r"><code>pfs_surv_obj &lt;- Surv(time = pfs_data$pfs_days, event = pfs_data$pfs_status)
+fit_pfs_cox &lt;- coxph(pfs_surv_obj ~ c1_quartile + 
+                       c2_quartile +
+                       c3_quartile +
+                       c4_quartile +
+                       c5_quartile +
+                       c6_quartile +
+                       c7_quartile,
+                     data = pfs_data_rank)
+summary(fit_pfs_cox)</code></pre>
+<pre><code>Call:
+coxph(formula = pfs_surv_obj ~ c1_quartile + c2_quartile + c3_quartile + 
+    c4_quartile + c5_quartile + c6_quartile + c7_quartile, data = pfs_data_rank)
+
+  n= 91, number of events= 51 
+
+                coef exp(coef) se(coef)      z Pr(&gt;|z|)    
+c1_quartile  0.31343   1.36811  0.18113  1.730  0.08356 .  
+c2_quartile -1.30242   0.27187  0.36113 -3.607  0.00031 ***
+c3_quartile -0.02766   0.97271  0.29651 -0.093  0.92566    
+c4_quartile -0.08820   0.91558  0.24983 -0.353  0.72406    
+c5_quartile -0.05056   0.95069  0.24426 -0.207  0.83600    
+c6_quartile  0.69560   2.00492  0.26457  2.629  0.00856 ** 
+c7_quartile  0.09860   1.10362  0.39167  0.252  0.80125    
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+            exp(coef) exp(-coef) lower .95 upper .95
+c1_quartile    1.3681     0.7309    0.9593    1.9512
+c2_quartile    0.2719     3.6782    0.1340    0.5518
+c3_quartile    0.9727     1.0281    0.5440    1.7393
+c4_quartile    0.9156     1.0922    0.5611    1.4940
+c5_quartile    0.9507     1.0519    0.5890    1.5344
+c6_quartile    2.0049     0.4988    1.1937    3.3674
+c7_quartile    1.1036     0.9061    0.5122    2.3780
+
+Concordance= 0.716  (se = 0.038 )
+Likelihood ratio test= 34.25  on 7 df,   p=2e-05
+Wald test            = 28.2  on 7 df,   p=2e-04
+Score (logrank) test = 30.35  on 7 df,   p=8e-05</code></pre>
+<pre class="r"><code>tidy(fit_pfs_cox)</code></pre>
+<pre><code># A tibble: 7 x 7
+  term        estimate std.error statistic  p.value conf.low conf.high
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 c1_quartile   0.313      0.181    1.73   0.0836    -0.0416     0.668
+2 c2_quartile  -1.30       0.361   -3.61   0.000310  -2.01      -0.595
+3 c3_quartile  -0.0277     0.297   -0.0933 0.926     -0.609      0.553
+4 c4_quartile  -0.0882     0.250   -0.353  0.724     -0.578      0.401
+5 c5_quartile  -0.0506     0.244   -0.207  0.836     -0.529      0.428
+6 c6_quartile   0.696      0.265    2.63   0.00856    0.177      1.21 
+7 c7_quartile   0.0986     0.392    0.252  0.801     -0.669      0.866</code></pre>
+</div>
+</div>
+<div id="os" class="section level2">
+<h2>OS</h2>
+<p>Clean data</p>
+<pre class="r"><code># get pheno data out of expressionset
+# remove ocular and other types of melanoma (keep only cutaneous or not specified)
+imtx_pdata &lt;- pData(imtx_es) %&gt;% 
+  rownames_to_column(var = &quot;sample_id&quot;) %&gt;%
+  as_tibble() %&gt;%
+  dplyr::filter(subtype %in% c(&quot;CUTANEOUS&quot;, NA)) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 191 x 18
+   sample_id patient library read_group platform center date   lane   run
+   &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 ERR22088… gide_i… ERR220… ERR2208887 Illumina GIDE   1/1/…     1   356
+ 2 ERR22088… gide_i… ERR220… ERR2208888 Illumina GIDE   1/1/…     1   356
+ 3 ERR22088… gide_i… ERR220… ERR2208889 Illumina GIDE   1/1/…     5   434
+ 4 ERR22088… gide_i… ERR220… ERR2208890 Illumina GIDE   1/1/…     5   356
+ 5 ERR22088… gide_i… ERR220… ERR2208891 Illumina GIDE   1/1/…     6   434
+ 6 ERR22088… gide_i… ERR220… ERR2208892 Illumina GIDE   1/1/…     6   434
+ 7 ERR22088… gide_i… ERR220… ERR2208893 Illumina GIDE   1/1/…     4   434
+ 8 ERR22088… gide_i… ERR220… ERR2208894 Illumina GIDE   1/1/…     4   434
+ 9 ERR22088… gide_i… ERR220… ERR2208895 Illumina GIDE   1/1/…     5   356
+10 ERR22088… gide_i… ERR220… ERR2208896 Illumina GIDE   1/1/…     1     0
+# … with 181 more rows, and 9 more variables: flavor &lt;chr&gt;, genome &lt;chr&gt;,
+#   os_days &lt;dbl&gt;, os_status &lt;dbl&gt;, response &lt;chr&gt;, subtype &lt;chr&gt;,
+#   cyt &lt;dbl&gt;, pfs_days &lt;dbl&gt;, pfs_status &lt;dbl&gt;</code></pre>
+<pre class="r"><code># get cases with PFS data, merge with gsva results
+os_data &lt;- imtx_pdata %&gt;%
+  drop_na(os_status) %&gt;%
+  left_join(imtx_gsva_results) %&gt;%
+  dplyr::select(os_status, os_days, response, everything()) %&gt;%
+  print()</code></pre>
+<pre><code>Joining, by = &quot;sample_id&quot;</code></pre>
+<pre><code># A tibble: 183 x 37
+   os_status os_days response sample_id patient library read_group platform
+       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;   
+ 1         0     689 PD       ERR22088… gide_i… ERR220… ERR2208887 Illumina
+ 2         0     689 PD       ERR22088… gide_i… ERR220… ERR2208888 Illumina
+ 3         1     176 PD       ERR22088… gide_i… ERR220… ERR2208889 Illumina
+ 4         0     293 PD       ERR22088… gide_i… ERR220… ERR2208890 Illumina
+ 5         1     357 PR       ERR22088… gide_i… ERR220… ERR2208891 Illumina
+ 6         1     357 PR       ERR22088… gide_i… ERR220… ERR2208892 Illumina
+ 7         0     691 SD       ERR22088… gide_i… ERR220… ERR2208893 Illumina
+ 8         1     660 SD       ERR22088… gide_i… ERR220… ERR2208894 Illumina
+ 9         0     196 PR       ERR22088… gide_i… ERR220… ERR2208895 Illumina
+10         0     635 SD       ERR22088… gide_i… ERR220… ERR2208896 Illumina
+# … with 173 more rows, and 29 more variables: center &lt;chr&gt;, date &lt;chr&gt;,
+#   lane &lt;dbl&gt;, run &lt;dbl&gt;, flavor &lt;chr&gt;, genome &lt;chr&gt;, subtype &lt;chr&gt;,
+#   cyt &lt;dbl&gt;, pfs_days &lt;dbl&gt;, pfs_status &lt;dbl&gt;, upreg_c1 &lt;dbl&gt;,
+#   upreg_c2 &lt;dbl&gt;, upreg_c3 &lt;dbl&gt;, upreg_c4 &lt;dbl&gt;, upreg_c5 &lt;dbl&gt;,
+#   upreg_c6 &lt;dbl&gt;, upreg_c7 &lt;dbl&gt;, downreg_c1 &lt;dbl&gt;, downreg_c2 &lt;dbl&gt;,
+#   downreg_c3 &lt;dbl&gt;, downreg_c4 &lt;dbl&gt;, downreg_c5 &lt;dbl&gt;,
+#   downreg_c6 &lt;dbl&gt;, downreg_c7 &lt;dbl&gt;, tcell_gset &lt;dbl&gt;,
+#   cxcl9_cxcl10 &lt;dbl&gt;, merck_tis_expanded_ifn &lt;dbl&gt;, m1_blueprint &lt;dbl&gt;,
+#   m2_blueprint &lt;dbl&gt;</code></pre>
+<pre class="r"><code># divide into quartiles by cluster expression
+# 4 is highest quartile and 1 is lowest
+os_data_rank &lt;- os_data %&gt;%
+  mutate(c1_quartile = ntile(upreg_c1, 4)) %&gt;%
+  mutate(c2_quartile = ntile(upreg_c2, 4)) %&gt;%
+  mutate(c3_quartile = ntile(upreg_c3, 4)) %&gt;%
+  mutate(c4_quartile = ntile(upreg_c4, 4)) %&gt;%
+  mutate(c5_quartile = ntile(upreg_c5, 4)) %&gt;%
+  mutate(c6_quartile = ntile(upreg_c6, 4)) %&gt;%
+  mutate(c7_quartile = ntile(upreg_c7, 4)) %&gt;%
+  mutate(tcell_quartile = ntile(tcell_gset, 4)) %&gt;%
+  dplyr::select(os_days, os_status, c1_quartile, c2_quartile, c3_quartile, c4_quartile, c5_quartile, c6_quartile, c7_quartile, tcell_quartile) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 183 x 10
+   os_days os_status c1_quartile c2_quartile c3_quartile c4_quartile
+     &lt;dbl&gt;     &lt;dbl&gt;       &lt;int&gt;       &lt;int&gt;       &lt;int&gt;       &lt;int&gt;
+ 1     689         0           4           2           2           1
+ 2     689         0           2           1           2           1
+ 3     176         1           1           1           1           2
+ 4     293         0           4           3           3           4
+ 5     357         1           4           4           4           4
+ 6     357         1           3           4           4           4
+ 7     691         0           1           1           1           1
+ 8     660         1           1           1           1           1
+ 9     196         0           2           1           2           1
+10     635         0           2           3           2           2
+# … with 173 more rows, and 4 more variables: c5_quartile &lt;int&gt;,
+#   c6_quartile &lt;int&gt;, c7_quartile &lt;int&gt;, tcell_quartile &lt;int&gt;</code></pre>
+<p>KM OS plots</p>
+<pre class="r"><code># cluster 1
+c1_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c1_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c1_os_data$os_days, event = c1_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c1_quartile, data = c1_os_data)
+survdiff(os_surv_obj ~ c1_quartile, data = c1_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c1_quartile, data = c1_os_data)
+
+n=77, 14 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c1_quartile=1 40       26     19.3      2.29      4.88
+c1_quartile=4 37       11     17.7      2.51      4.88
+
+ Chisq= 4.9  on 1 degrees of freedom, p= 0.03 </code></pre>
+<pre class="r"><code>c1_plot &lt;- ggsurvplot(fit_os, 
+                      data = c1_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 1&quot;)
+
+c1_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 2
+c2_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c2_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c2_os_data$os_days, event = c2_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c2_quartile, data = c2_os_data)
+survdiff(os_surv_obj ~ c2_quartile, data = c2_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c2_quartile, data = c2_os_data)
+
+n=78, 13 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c2_quartile=1 40       27     17.2      5.53      10.3
+c2_quartile=4 38       12     21.8      4.38      10.3
+
+ Chisq= 10.3  on 1 degrees of freedom, p= 0.001 </code></pre>
+<pre class="r"><code>c2_plot &lt;- ggsurvplot(fit_os, 
+                      data = c2_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 2&quot;,
+                      risk.table = FALSE)
+c2_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 3
+c3_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c3_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c3_os_data$os_days, event = c3_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c3_quartile, data = c3_os_data)
+survdiff(os_surv_obj ~ c3_quartile, data = c3_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c3_quartile, data = c3_os_data)
+
+n=81, 10 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c3_quartile=1 42       29     20.9      3.17      6.17
+c3_quartile=4 39       15     23.1      2.86      6.17
+
+ Chisq= 6.2  on 1 degrees of freedom, p= 0.01 </code></pre>
+<pre class="r"><code>c3_plot &lt;- ggsurvplot(fit_os, 
+                      data = c3_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 3&quot;)
+c3_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 4
+c4_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c4_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c4_os_data$os_days, event = c4_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c4_quartile, data = c4_os_data)
+survdiff(os_surv_obj ~ c4_quartile, data = c4_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c4_quartile, data = c4_os_data)
+
+n=82, 9 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c4_quartile=1 41       21     17.2     0.836      1.64
+c4_quartile=4 41       15     18.8     0.765      1.64
+
+ Chisq= 1.6  on 1 degrees of freedom, p= 0.2 </code></pre>
+<pre class="r"><code>c4_plot &lt;- ggsurvplot(fit_os, 
+                      data = c4_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 4&quot;)
+c4_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 5
+c5_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c5_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c5_os_data$os_days, event = c5_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c5_quartile, data = c5_os_data)
+survdiff(os_surv_obj ~ c5_quartile, data = c5_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c5_quartile, data = c5_os_data)
+
+n=79, 12 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c5_quartile=1 39       24     16.9      3.02      5.69
+c5_quartile=4 40       13     20.1      2.53      5.69
+
+ Chisq= 5.7  on 1 degrees of freedom, p= 0.02 </code></pre>
+<pre class="r"><code>c5_plot &lt;- ggsurvplot(fit_os, 
+                      data = c5_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 5&quot;)
+c5_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 6
+c6_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c6_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c6_os_data$os_days, event = c6_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c6_quartile, data = c6_os_data)
+survdiff(os_surv_obj ~ c6_quartile, data = c6_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c6_quartile, data = c6_os_data)
+
+n=81, 10 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c6_quartile=1 42       27     20.1      2.35      4.58
+c6_quartile=4 39       16     22.9      2.07      4.58
+
+ Chisq= 4.6  on 1 degrees of freedom, p= 0.03 </code></pre>
+<pre class="r"><code>c6_plot &lt;- ggsurvplot(fit_os, 
+                      data = c6_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;none&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 6&quot;)
+c6_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># cluster 7
+c7_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(c7_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = c7_os_data$os_days, event = c7_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ c7_quartile, data = c7_os_data)
+survdiff(os_surv_obj ~ c7_quartile, data = c7_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ c7_quartile, data = c7_os_data)
+
+n=77, 14 observations deleted due to missingness.
+
+               N Observed Expected (O-E)^2/E (O-E)^2/V
+c7_quartile=1 41       28     18.3      5.16        10
+c7_quartile=4 36       11     20.7      4.56        10
+
+ Chisq= 10  on 1 degrees of freedom, p= 0.002 </code></pre>
+<pre class="r"><code>c7_plot &lt;- ggsurvplot(fit_os, 
+                      data = c7_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;right&quot;,
+                      legend.title = &quot;Macrophage cluster \nexpression quartile&quot;,
+                      title = &quot;OS, Cluster 7&quot;)
+c7_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># t-cell
+tcell_os_data &lt;- os_data_rank %&gt;%
+  dplyr::filter(tcell_quartile %in% c(&quot;1&quot;, &quot;4&quot;))
+os_surv_obj &lt;- Surv(time = tcell_os_data$os_days, event = tcell_os_data$os_status)
+fit_os &lt;- survfit(os_surv_obj ~ tcell_quartile, data = tcell_os_data)
+survdiff(os_surv_obj ~ tcell_quartile, data = tcell_os_data)</code></pre>
+<pre><code>Call:
+survdiff(formula = os_surv_obj ~ tcell_quartile, data = tcell_os_data)
+
+n=79, 12 observations deleted due to missingness.
+
+                  N Observed Expected (O-E)^2/E (O-E)^2/V
+tcell_quartile=1 41       28       17      7.19      13.2
+tcell_quartile=4 38       11       22      5.53      13.2
+
+ Chisq= 13.2  on 1 degrees of freedom, p= 3e-04 </code></pre>
+<pre class="r"><code>tcell_plot &lt;- ggsurvplot(fit_os, 
+                      data = tcell_os_data, 
+                      pval = TRUE, 
+                      palette = &quot;nejm&quot;,
+                      legend = &quot;right&quot;,
+                      legend.title = &quot;Tcell \nexpression quartile&quot;,
+                      title = &quot;os, Tcell&quot;)
+tcell_plot</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggarrange(c1_plot$plot, c2_plot$plot, c3_plot$plot, c4_plot$plot, c5_plot$plot, c6_plot$plot, c7_plot$plot,
+          labels = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;),
+                     ncol = 4, nrow = 2,
+          common.legend = TRUE,
+          legend = &quot;bottom&quot;)</code></pre>
+<p><img src="figure/survival.Rmd/unnamed-chunk-8-9.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="cox-ph-for-os" class="section level4">
+<h4>Cox PH for OS</h4>
+<pre class="r"><code>os_surv_obj &lt;- Surv(time = os_data$os_days, event = os_data$os_status)
+fit_os_cox &lt;- coxph(os_surv_obj ~ c1_quartile + 
+                       c2_quartile +
+                       c3_quartile +
+                       c4_quartile +
+                       c5_quartile +
+                       c6_quartile +
+                       c7_quartile,
+                     data = os_data_rank)
+summary(fit_os_cox)</code></pre>
+<pre><code>Call:
+coxph(formula = os_surv_obj ~ c1_quartile + c2_quartile + c3_quartile + 
+    c4_quartile + c5_quartile + c6_quartile + c7_quartile, data = os_data_rank)
+
+  n= 157, number of events= 78 
+   (26 observations deleted due to missingness)
+
+                coef exp(coef) se(coef)      z Pr(&gt;|z|)
+c1_quartile -0.06319   0.93877  0.14614 -0.432    0.665
+c2_quartile -0.25983   0.77118  0.26666 -0.974    0.330
+c3_quartile -0.20122   0.81773  0.25709 -0.783    0.434
+c4_quartile  0.24796   1.28141  0.20959  1.183    0.237
+c5_quartile  0.15110   1.16312  0.21701  0.696    0.486
+c6_quartile  0.05558   1.05716  0.20019  0.278    0.781
+c7_quartile -0.25025   0.77860  0.31132 -0.804    0.421
+
+            exp(coef) exp(-coef) lower .95 upper .95
+c1_quartile    0.9388     1.0652    0.7050     1.250
+c2_quartile    0.7712     1.2967    0.4573     1.301
+c3_quartile    0.8177     1.2229    0.4941     1.353
+c4_quartile    1.2814     0.7804    0.8497     1.932
+c5_quartile    1.1631     0.8598    0.7602     1.780
+c6_quartile    1.0572     0.9459    0.7141     1.565
+c7_quartile    0.7786     1.2844    0.4230     1.433
+
+Concordance= 0.61  (se = 0.034 )
+Likelihood ratio test= 14.65  on 7 df,   p=0.04
+Wald test            = 13.74  on 7 df,   p=0.06
+Score (logrank) test = 14.18  on 7 df,   p=0.05</code></pre>
+<pre class="r"><code>tidy(fit_os_cox)</code></pre>
+<pre><code># A tibble: 7 x 7
+  term        estimate std.error statistic p.value conf.low conf.high
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 c1_quartile  -0.0632     0.146    -0.432   0.665   -0.350     0.223
+2 c2_quartile  -0.260      0.267    -0.974   0.330   -0.782     0.263
+3 c3_quartile  -0.201      0.257    -0.783   0.434   -0.705     0.303
+4 c4_quartile   0.248      0.210     1.18    0.237   -0.163     0.659
+5 c5_quartile   0.151      0.217     0.696   0.486   -0.274     0.576
+6 c6_quartile   0.0556     0.200     0.278   0.781   -0.337     0.448
+7 c7_quartile  -0.250      0.311    -0.804   0.421   -0.860     0.360</code></pre>
+% latex table generated in R 3.5.3 by xtable 1.8-4 package % Sun Oct 13 21:38:15 2019
+
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.5.3 (2019-03-11)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Mojave 10.14.4
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] parallel  stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] Biobase_2.42.0      BiocGenerics_0.28.0 broom_0.5.2        
+ [4] viridis_0.5.1       viridisLite_0.3.0   ggsci_2.9          
+ [7] survminer_0.4.6     ggpubr_0.2.3        magrittr_1.5       
+[10] survival_2.44-1.1   forcats_0.4.0       stringr_1.4.0      
+[13] dplyr_0.8.3         purrr_0.3.2         readr_1.3.1        
+[16] tidyr_1.0.0         tibble_2.1.3        ggplot2_3.2.1      
+[19] tidyverse_1.2.1    
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.2        lubridate_1.7.4   lattice_0.20-38  
+ [4] zoo_1.8-6         utf8_1.1.4        assertthat_0.2.1 
+ [7] zeallot_0.1.0     rprojroot_1.3-2   digest_0.6.21    
+[10] R6_2.4.0          cellranger_1.1.0  backports_1.1.5  
+[13] evaluate_0.14     httr_1.4.1        pillar_1.4.2     
+[16] rlang_0.4.0       lazyeval_0.2.2    readxl_1.3.1     
+[19] rstudioapi_0.10   data.table_1.12.2 Matrix_1.2-17    
+[22] rmarkdown_1.16    labeling_0.3      splines_3.5.3    
+[25] munsell_0.5.0     compiler_3.5.3    modelr_0.1.5     
+[28] xfun_0.10         pkgconfig_2.0.3   htmltools_0.4.0  
+[31] tidyselect_0.2.5  gridExtra_2.3     km.ci_0.5-2      
+[34] workflowr_1.4.0   fansi_0.4.0       crayon_1.3.4     
+[37] withr_2.1.2       grid_3.5.3        nlme_3.1-141     
+[40] jsonlite_1.6      xtable_1.8-4      gtable_0.3.0     
+[43] lifecycle_0.1.0   git2r_0.26.1      KMsurv_0.1-5     
+[46] scales_1.0.0      cli_1.1.0         stringi_1.4.3    
+[49] ggsignif_0.6.0    fs_1.3.1          xml2_1.2.2       
+[52] ellipsis_0.3.0    survMisc_0.5.5    generics_0.0.2   
+[55] vctrs_0.2.0       cowplot_1.0.0     tools_3.5.3      
+[58] glue_1.3.1        hms_0.5.1         yaml_2.2.0       
+[61] colorspace_1.4-1  rvest_0.3.4       knitr_1.25       
+[64] haven_2.1.1      </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
