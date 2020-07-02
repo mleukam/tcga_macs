@@ -303,22 +303,19 @@ probabilities <- mel.min.model %>%
   predict(newx = x.test)
 predicted.classes <- ifelse(probabilities > 0.5, "CR_or_PR", "PD")
 predicted.classes <- as.factor(predicted.classes)
+predicted.classes <- ifelse(predicted.classes == "CR_or_PR", 1, 0)
+names(predicted.classes) <- rownames(x.test)
 predicted.classes
 
 # model accuracy
-observed.classes <- test.data$response
-names(observed.classes) <- rownames(test.data)
+observed.classes <- y.test
+names(observed.classes) <- rownames(x.test)
 observed.classes
 mean(predicted.classes == observed.classes)
-
-
 ```
 
 
-
-
 ## Penalized regression with UChicago Tcell signature
-
 
 
 ```{r}

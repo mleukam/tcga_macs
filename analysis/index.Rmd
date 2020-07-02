@@ -69,6 +69,7 @@ Apply gene lists from above to datasets of tumor gene expression linked to clini
 ## Other datasets:
 
 1. Macrophage results that Lei previously generated around CSF1R in the original macrophage project we did. 
+
 The question we had was how your work overlaps with his work. I think it will not correlate well but this is an important point to make in his paper in that it emphasizes that CSF1R is not a good “biomarker” for the pleotropic macrophage states in cancer.
 Array Update Comp Files 2018.01.11.zip
 13 MB Zip — Click to download

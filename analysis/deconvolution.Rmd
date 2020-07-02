@@ -57,7 +57,7 @@ For this project, we will use the list of housekeeping genes from:
 "Human housekeeping genes revisited" E. Eisenberg and E.Y. Levanon, Trends in Genetics, 29 (2013) as the first filter. List of housekeeping genes downloaded from author's website: https://www.tau.ac.il/~elieis/HKG/
 
 ```{r}
-hk_genes <- read_delim("/Volumes/kline-lab/backups/tcga_macs/data/HK_genes.tsv", 
+hk_genes <- read_delim("data/HK_genes.tsv", 
                        delim = "\t", 
                        col_names = c("hgnc_name", "refseq_name"), 
                        trim_ws = TRUE)
@@ -74,10 +74,10 @@ File moved to data folder
 
 ```{r}
 # read in as matrix
-ccle <- CePa::read.gct("/Volumes/kline-lab/backups/tcga_macs/data/CCLE_RNAseq_genes_counts_20180929.gct")
+ccle <- CePa::read.gct("data/CCLE_RNAseq_genes_counts_20180929.gct")
 dim(ccle)
 
-# remove hematopoetic cancer cell lines
+# remove hematopoietic cancer cell lines
 ccle_non_heme <- ccle %>%
   as.data.frame() %>%
   rownames_to_column(var = "gene_id") %>%
@@ -92,7 +92,7 @@ str(ccle_non_heme)
 log2_ccle <- log2(ccle_non_heme)
 
 # read in gene_id to gene_name conversion table
-gencode_gtf <- read_tsv("/Volumes/kline-lab/backups/tcga_macs/data/gencode.v22.primary_assembly.annotation.gtf.geneinfo") %>%
+gencode_gtf <- read_tsv("data/gencode.v22.primary_assembly.annotation.gtf.geneinfo") %>%
   separate(gene_id, into = c("gene_id", "version"), sep = "\\.") %>%
   dplyr::select(gene_id, gene_name) %>%
   print()
@@ -129,7 +129,7 @@ head(blacklist)
 # contains normalized expression matrix made from raw illumina beadchip data
 # also contains metadata from GEO, treatment assignment, and cluster assignments
 # probe ID is unique sequence ID from lumiHumanIDMapping
-mac_eset <- readRDS("/Volumes/kline-lab/backups/tcga_macs/output/mac_eset_w_clusters.rds")
+mac_eset <- readRDS("output/mac_eset_w_clusters.rds")
 
 # retreive normalized data
 dataMatrix <- exprs(mac_eset)
@@ -161,7 +161,6 @@ dim(selDataMatrix)
 
 # gather list of selected probes
 probeList <- rownames(selDataMatrix)
-
 ```
 
 #### Differential gene expression
@@ -181,7 +180,7 @@ pheno_data %>% dplyr::select("raw_id", "treatment", "adj_cluster")
 # save for outside use
 pheno_data %>% 
   dplyr::select(geo_id, adj_cluster) %>%
-  write_csv("/Volumes/kline-lab/backups/tcga_macs/output/geo_id_adj_cluster_lookup_table.csv")
+  write_csv("output/geo_id_adj_cluster_lookup_table.csv")
 ```
 
 From:
